@@ -21,7 +21,7 @@
     </div>
 
     <div class="health-icon">
-      <img src="@/assets/images/heart.png" class="w-[45px]" alt="Health" />
+      <img src="@/assets/images/heart.png" class="w-10" alt="Health" />
     </div>
   </div>
 </template>
@@ -87,7 +87,7 @@ const segments = computed(() => {
 
 .health-text {
   font-weight: bold;
-  font-size: 12px;
+  font-size: 16px;
   color: #f5e4a9;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 }

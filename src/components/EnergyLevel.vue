@@ -20,7 +20,7 @@
     </div>
 
     <div class="energy-icon">
-      <img src="@/assets/images/flash.png" class="w-[30px]" alt="Energy" />
+      <img src="@/assets/images/flash.png" class="w-10" alt="Energy" />
     </div>
   </div>
 </template>
@@ -90,7 +90,7 @@ const segments = computed(() => {
 
 .energy-text {
   font-weight: bold;
-  font-size: 12px;
+  font-size: 16px;
   color: #f5e4a9;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 }
