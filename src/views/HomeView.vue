@@ -2,6 +2,8 @@
 import { ref } from 'vue'
 import { CoinIcon } from '@/assets/icons'
 import { WidthdrawSvg } from '@/assets/svgs'
+import EnergyLevel from '@/components/EnergyLevel.vue'
+import HealthLevel from '@/components/HealthLevel.vue'
 
 const isMusicPlaying = ref(false)
 const audioRef = ref<HTMLAudioElement | null>(null)
@@ -34,7 +36,7 @@ const handleAudioError = () => {
   </audio>
 
   <div class="h-full w-full flex flex-col justify-between relative">
-    <div class="flex justify-between items-start mt-10">
+    <div class="flex justify-between items-start">
       <div class="flex items-center p-2 bg-[#FAC487] gap-2 border border-[#000]">
         <CoinIcon class="w-[24px]" />
         <p class="font-bold">34923.123</p>
@@ -78,15 +80,29 @@ const handleAudioError = () => {
 
       <div class="flex justify-between">
         <div class="flex flex-col items-center">
-          <p class="font-bold text-[#F5E4A9] ms-1">100%</p>
-          <img src="@/assets/images/level-green.png" alt="" class="w-[25px]" />
-          <img src="@/assets/images/heart.png" alt="" class="w-[50px]" />
+          <HealthLevel
+            :current-value="100"
+            :max-value="100"
+            :min-value="0"
+            color="green"
+            size="medium"
+            :show-glow="true"
+            :animated="true"
+          />
         </div>
 
         <div class="flex flex-col items-center">
-          <p class="font-bold text-[#F5E4A9] ms-1">100 min</p>
-          <img src="@/assets/images/level-blue.png" alt="" class="w-[21px]" />
-          <img src="@/assets/images/flash.png" alt="" class="w-[40px]" />
+          <EnergyLevel
+            :current-value="85"
+            :max-value="100"
+            :min-value="0"
+            unit="min"
+            color="blue"
+            size="medium"
+            :show-glow="true"
+            :show-stats="false"
+            :animated="true"
+          />
         </div>
       </div>
     </div>
