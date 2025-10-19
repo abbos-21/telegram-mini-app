@@ -71,7 +71,7 @@ const closeSpinPopup = () => {
         <button
           class="flex items-center justify-center bg-[#FAC487] border border-[#000] cursor-pointer pe-2"
         >
-          <img src="@/assets/images/uk-flag.png" class="w-10" alt="" />
+          <img src="@/assets/images/uk-flag.png" class="w-10 h-10" alt="" />
           <span class="font-bold">EN</span>
         </button>
 
@@ -139,7 +139,7 @@ const closeSpinPopup = () => {
         </div>
       </div>
 
-      <div class="flex justify-between">
+      <div class="flex justify-between mb-2">
         <div class="flex flex-col items-center">
           <HealthLevel
             :current-value="100"
@@ -154,7 +154,7 @@ const closeSpinPopup = () => {
 
         <div class="flex flex-col items-center">
           <EnergyLevel
-            :current-value="85"
+            :current-value="90"
             :max-value="100"
             :min-value="0"
             unit="min"
@@ -181,40 +181,44 @@ const closeSpinPopup = () => {
 
     <div class="flex justify-between items-center">
       <button type="button" class="cursor-pointer" @click="openBottlePopup">
-        <img src="@/assets/images/bottle.png" class="w-15" />
+        <img src="@/assets/images/bottle.png" class="w-12" />
       </button>
 
       <button type="button" class="cursor-pointer" @click="openSpinPopup">
-        <img src="@/assets/images/spin.png" class="w-15" />
+        <img src="@/assets/images/spin.png" class="w-12" />
       </button>
     </div>
   </div>
 
-  <div class="flex justify-between items-center absolute bottom-2 inset-x-0 px-2 max-w-[425px]">
-    <div
-      class="flex flex-col items-center justify-center bg-[#D68C62] rounded-[10px] w-20 h-20 mx-1 border border-[#FBEFE7]"
+  <div class="grid grid-cols-4 gap-2 absolute bottom-2 inset-x-0 px-2 max-w-[425px]">
+    <button
+      type="button"
+      class="cursor-pointer flex flex-col items-center justify-center bg-[#D68C62] rounded-[10px] w-full h-16 border border-[#FBEFE7]"
     >
       <img src="@/assets/images/home.png" alt="" class="w-8 h-8 object-contain" />
       <p class="font-bold">Home</p>
-    </div>
-    <div
-      class="flex flex-col items-center justify-center bg-[#DAC7C0] rounded-[10px] w-20 h-20 mx-1 border border-[#FBEFE7]"
+    </button>
+    <button
+      type="button"
+      class="cursor-pointer flex flex-col items-center justify-center bg-[#DAC7C0] rounded-[10px] w-full h-16 border border-[#FBEFE7]"
     >
       <img src="@/assets/images/shop.png" alt="" class="w-8 h-8 object-contain" />
       <p class="font-bold">Shop</p>
-    </div>
-    <div
-      class="flex flex-col items-center justify-center bg-[#D68C62] rounded-[10px] w-20 h-20 mx-1 border border-[#FBEFE7]"
+    </button>
+    <button
+      type="button"
+      class="cursor-pointer flex flex-col items-center justify-center bg-[#D68C62] rounded-[10px] w-full h-16 border border-[#FBEFE7]"
     >
       <img src="@/assets/images/task.png" alt="" class="w-8 h-8 object-contain" />
       <p class="font-bold">Task</p>
-    </div>
-    <div
-      class="flex flex-col items-center justify-center bg-[#DAC7C0] rounded-[10px] w-20 h-20 mx-1 border border-[#FBEFE7]"
+    </button>
+    <button
+      type="button"
+      class="cursor-pointer flex flex-col items-center justify-center bg-[#DAC7C0] rounded-[10px] w-full h-16 border border-[#FBEFE7]"
     >
       <img src="@/assets/images/friends.png" alt="" class="w-8 h-8 object-contain" />
       <p class="font-bold">Friends</p>
-    </div>
+    </button>
   </div>
 
   <!-- Bottle Popup -->
