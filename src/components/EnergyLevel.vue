@@ -121,6 +121,12 @@ const segments = computed(() => {
   height: 150px;
 }
 
+@media only screen and (max-height: 700px) {
+  .energy-bar-medium {
+    height: 148px;
+  }
+}
+
 /* Border Colors */
 .energy-bar-blue {
   border-color: #2563eb;

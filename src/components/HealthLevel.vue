@@ -121,6 +121,12 @@ const segments = computed(() => {
   height: 150px;
 }
 
+@media only screen and (max-height: 700px) {
+  .health-bar-medium {
+    height: 148px;
+  }
+}
+
 /* Color Borders */
 .health-bar-green {
   border-color: #16a34a;
