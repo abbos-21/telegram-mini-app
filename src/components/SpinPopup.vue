@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
-import { CoinIcon } from '@/assets/icons'
+import { ref, watch, onMounted, onUnmounted } from 'vue'
+import { CoinIcon, CloseIcon } from '@/assets/icons'
+import { SpinImage } from '@/assets/images'
 
 interface Props {
   isOpen: boolean
@@ -47,7 +48,7 @@ const spinWheel = () => {
   // Calculate which prize was selected
   const normalizedRotation = finalRotation % 360
   const prizeIndex = Math.floor((360 - normalizedRotation) / 45) % prizes.value.length
-  selectedPrize.value = prizes.value[prizeIndex].amount
+  selectedPrize.value = prizes.value[prizeIndex]?.amount || 0
 
   // Stop spinning after animation
   setTimeout(() => {
@@ -115,21 +116,7 @@ onUnmounted(() => {
           @click="closePopup"
           class="absolute -top-3 -right-3 w-12 h-10 bg-gradient-to-b from-red-400 to-red-600 text-white rounded-lg flex items-center justify-center border-2 border-black shadow-lg"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="3"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="lucide lucide-x-icon lucide-x"
-          >
-            <path d="M18 6 6 18" />
-            <path d="m6 6 12 12" />
-          </svg>
+          <CloseIcon class="w-6 h-6" />
         </button>
 
         <!-- Popup Content -->
@@ -200,7 +187,7 @@ onUnmounted(() => {
               :disabled="isSpinning"
               class="bg-[#D68C62] border-2 border-black rounded-lg px-8 py-3 flex items-center gap-2 hover:bg-[#C47A4F] transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <img src="@/assets/images/spin.png" class="w-6 h-6" alt="Spin" />
+              <img :src="SpinImage" class="w-6 h-6" alt="Spin" />
               <span class="font-bold text-black text-lg">
                 {{ isSpinning ? 'Spinning...' : 'SPIN WHEEL' }}
               </span>

@@ -20,13 +20,14 @@
     </div>
 
     <div class="energy-icon">
-      <img src="@/assets/images/flash.png" class="w-8" alt="Energy" />
+      <img :src="FlashImage" class="w-8" alt="Energy" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { FlashImage } from '@/assets/images'
 
 interface Props {
   currentValue?: number
@@ -112,8 +113,8 @@ const segments = computed(() => {
   height: 60px;
 }
 .energy-bar-medium {
-  width: 16px;
-  height: 225px;
+  width: 14px;
+  height: 196px;
 }
 .energy-bar-large {
   width: 20px;

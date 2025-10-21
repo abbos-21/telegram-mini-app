@@ -21,13 +21,14 @@
     </div>
 
     <div class="health-icon">
-      <img src="@/assets/images/heart.png" class="w-8" alt="Health" />
+      <img :src="HeartImage" class="w-8" alt="Health" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { HeartImage } from '@/assets/images'
 
 interface Props {
   currentValue?: number
@@ -111,8 +112,8 @@ const segments = computed(() => {
 }
 
 .health-bar-medium {
-  width: 16px;
-  height: 225px;
+  width: 14px;
+  height: 196px;
 }
 
 .health-bar-large {

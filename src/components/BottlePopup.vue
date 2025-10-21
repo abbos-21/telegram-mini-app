@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
-import { CoinIcon } from '@/assets/icons'
+import { CoinIcon, CloseIcon, AdIcon, LeftArrowIcon, RightArrowIcon } from '@/assets/icons'
+import { HeartImage, FlashImage } from '@/assets/images'
 
 interface Props {
   isOpen: boolean
@@ -15,19 +16,18 @@ const emit = defineEmits<Emits>()
 
 const currentSection = ref(0)
 
-// Sample sections data - you can customize these
 const sections = ref([
   {
     id: 1,
     title: 'Refill health',
-    content: 'Fill health tank completely to continuecoin mining.',
-    image: '/src/assets/images/heart.png',
+    content: 'Fill health tank completely to continue coin mining.',
+    image: HeartImage,
   },
   {
     id: 2,
     title: 'Refill energy',
-    content: 'Fill energy tank completely to continuemining.',
-    image: '/src/assets/images/flash.png',
+    content: 'Fill energy tank completely to continue coin mining.',
+    image: FlashImage,
   },
 ])
 
@@ -130,21 +130,7 @@ onUnmounted(() => {
           @click="closePopup"
           class="absolute -top-3 -right-3 w-12 h-10 bg-gradient-to-b from-red-400 to-red-600 text-white rounded-lg flex items-center justify-center border-2 border-black shadow-lg"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="3"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="lucide lucide-x-icon lucide-x"
-          >
-            <path d="M18 6 6 18" />
-            <path d="m6 6 12 12" />
-          </svg>
+          <CloseIcon class="w-6 h-6" />
         </button>
 
         <!-- Carousel Content -->
@@ -190,48 +176,7 @@ onUnmounted(() => {
               @click="watchAd"
               class="flex-1 bg-[#4CAF50] border-2 border-black rounded-lg p-3 flex items-center justify-center gap-2 hover:bg-[#45a049] transition-colors shadow-lg"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="w-8 h-8"
-                viewBox="0 0 24 24"
-                fill="none"
-              >
-                <path
-                  d="M5 5H19C20.1046 5 21 5.89543 21 7V17C21 18.1046 20.1046 19 19 19H5C3.89543 19 3 18.1046 3 17V7C3 5.89543 3.89543 5 5 5Z"
-                  stroke="#fff"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M7 15V11C7 9.89543 7.89543 9 9 9V9C10.1046 9 11 9.89543 11 11V15"
-                  stroke="#fff"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M17 9V15"
-                  stroke="#fff"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M17 12H15.5C13.5 12 13.5 15 15.5 15H17"
-                  stroke="#fff"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M7 13H11"
-                  stroke="#fff"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
+              <AdIcon class="w-8 h-8" />
               <span class="font-bold text-white">Free</span>
             </button>
           </div>
@@ -243,14 +188,7 @@ onUnmounted(() => {
               @click="prevSection"
               class="w-12 h-12 bg-[#D68C62] border-2 border-black rounded-full flex items-center justify-center hover:bg-[#C47A4F] transition-colors shadow-lg"
             >
-              <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="3"
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
+              <LeftArrowIcon class="w-6 h-6 text-black" />
             </button>
 
             <!-- Section Indicators -->
@@ -268,14 +206,7 @@ onUnmounted(() => {
               @click="nextSection"
               class="w-12 h-12 bg-[#D68C62] border-2 border-black rounded-full flex items-center justify-center hover:bg-[#C47A4F] transition-colors shadow-lg"
             >
-              <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="3"
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
+              <RightArrowIcon class="w-6 h-6 text-black" />
             </button>
           </div>
 
