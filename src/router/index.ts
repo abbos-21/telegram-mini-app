@@ -27,6 +27,11 @@ const router = createRouter({
       name: 'friends',
       component: () => import('../views/FriendsView.vue'),
     },
+    {
+      path: '/widthdraw',
+      name: 'widthdraw',
+      component: () => import('../views/WidthdrawView.vue'),
+    },
   ],
 })
 

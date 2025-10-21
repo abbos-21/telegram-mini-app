@@ -12,6 +12,7 @@ import {
 import { isMusicEnabled, isMusicAvailable, toggleMusic } from '@/stores/music'
 import EnergyLevel from '@/components/EnergyLevel.vue'
 import HealthLevel from '@/components/HealthLevel.vue'
+import { RouterLink } from 'vue-router'
 import BottlePopup from '@/components/BottlePopup.vue'
 import SpinPopup from '@/components/SpinPopup.vue'
 
@@ -41,11 +42,14 @@ const closeSpinPopup = () => {
     :style="{ backgroundImage: `url(${HomeBgImage})` }"
   >
     <div class="flex justify-between items-start">
-      <div class="flex items-center p-2 bg-[#FAC487] gap-2 border border-[#000]">
+      <RouterLink
+        to="/widthdraw"
+        class="flex items-center p-2 bg-[#FAC487] gap-2 border border-[#000]"
+      >
         <CoinIcon class="w-6" />
         <p class="font-bold">0</p>
         <WidthdrawIcon class="ms-1 mt-1 w-7" />
-      </div>
+      </RouterLink>
 
       <div class="flex flex-col gap-2 items-end">
         <div class="flex items-center justify-center p-2 bg-[#FAC487] border border-[#000]">

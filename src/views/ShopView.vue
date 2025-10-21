@@ -36,13 +36,13 @@ import { ImmuneImage, ShopBgImage } from '@/assets/images'
           </div>
 
           <div class="flex-1">
-            <div class="flex justify-between">
+            <div class="flex justify-between items-start">
               <p class="text-[#fff]">
                 <span class="uppercase font-bold text-lg">wealth</span> - Coin capacity
               </p>
 
               <div
-                class="bg-[#fff] border border-[#CBCBCB] rounded-[5px] flex items-center justify-center px-1"
+                class="shrink-0 bg-[#fff] border border-[#CBCBCB] rounded-[5px] flex items-center justify-center px-1"
               >
                 <p class="font-bold text-sm">
                   Lvl. <span class="text-[#3C863C]">0</span> /
@@ -80,13 +80,13 @@ import { ImmuneImage, ShopBgImage } from '@/assets/images'
           </div>
 
           <div class="flex-1">
-            <div class="flex justify-between">
+            <div class="flex justify-between items-start">
               <p class="text-[#fff]">
                 <span class="uppercase font-bold text-lg">work</span> - Coin mining
               </p>
 
               <div
-                class="bg-[#fff] border border-[#CBCBCB] rounded-[5px] flex items-center justify-center px-1"
+                class="shrink-0 bg-[#fff] border border-[#CBCBCB] rounded-[5px] flex items-center justify-center px-1"
               >
                 <p class="font-bold text-sm">
                   Lvl. <span class="text-[#3C863C]">0</span> /
@@ -124,13 +124,13 @@ import { ImmuneImage, ShopBgImage } from '@/assets/images'
           </div>
 
           <div class="flex-1">
-            <div class="flex justify-between">
+            <div class="flex justify-between items-start">
               <p class="text-[#fff]">
                 <span class="uppercase font-bold text-lg">food</span> - Energy tank
               </p>
 
               <div
-                class="bg-[#fff] border border-[#CBCBCB] rounded-[5px] flex items-center justify-center px-1"
+                class="shrink-0 bg-[#fff] border border-[#CBCBCB] rounded-[5px] flex items-center justify-center px-1"
               >
                 <p class="font-bold text-sm">
                   Lvl. <span class="text-[#3C863C]">0</span> /
@@ -168,13 +168,13 @@ import { ImmuneImage, ShopBgImage } from '@/assets/images'
           </div>
 
           <div class="flex-1">
-            <div class="flex justify-between">
+            <div class="flex justify-between items-start">
               <p class="text-[#fff]">
                 <span class="uppercase font-bold text-lg">immune</span> - Immune strength
               </p>
 
               <div
-                class="bg-[#fff] border border-[#CBCBCB] rounded-[5px] flex items-center justify-center px-1"
+                class="shrink-0 bg-[#fff] border border-[#CBCBCB] rounded-[5px] flex items-center justify-center px-1"
               >
                 <p class="font-bold text-sm">
                   Lvl. <span class="text-[#3C863C]">0</span> /
