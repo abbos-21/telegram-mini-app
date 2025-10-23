@@ -38,20 +38,20 @@ const closeSpinPopup = () => {
 import { userService } from '@/api/userService'
 import type { User } from '@/api/types'
 
-const users = ref<User[]>([])
+const user = ref<User | null>(null)
 const loading = ref(true)
 
-onMounted(async () => {
-  try {
-    const response = await userService.getById('1')
-    users.value = response.data
-    console.log(users.value)
-  } catch (err) {
-    alert(`Failed to fetch users: ${err}`)
-  } finally {
-    loading.value = false
-  }
-})
+// onMounted(async () => {
+//   try {
+//     const response = await userService.getById('1')
+//     user.value = response.data
+//     console.log(user.value)
+//   } catch (err) {
+//     alert(`Failed to fetch user: ${err}`)
+//   } finally {
+//     loading.value = false
+//   }
+// })
 </script>
 
 <template>
@@ -71,7 +71,7 @@ onMounted(async () => {
 
       <div class="flex flex-col gap-2 items-end">
         <div class="flex items-center justify-center p-2 bg-[#FAC487] border border-[#000]">
-          <p class="font-bold">Your level: {{ users.telegramId }}</p>
+          <p class="font-bold">Your level: 1</p>
         </div>
 
         <button

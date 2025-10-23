@@ -4,6 +4,7 @@ import TaskView from '../views/TaskView.vue'
 import ShopView from '../views/ShopView.vue'
 import FriendsView from '../views/FriendsView.vue'
 import WidthdrawView from '../views/WidthdrawView.vue'
+import WidthdrawHistoryView from '@/views/WidthdrawHistoryView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -39,6 +40,11 @@ const router = createRouter({
       name: 'widthdraw',
       // component: () => import('../views/WidthdrawView.vue'),
       component: WidthdrawView,
+    },
+    {
+      path: '/widthdraw-history',
+      name: 'widthdraw-history',
+      component: WidthdrawHistoryView,
     },
   ],
 })
