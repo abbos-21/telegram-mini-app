@@ -25,7 +25,7 @@ import {
 } from '@/assets/icons'
 
 // All assets that need to be preloaded
-const allAssets = [
+const allAssets: (string | { default: string } | { render: () => unknown } | undefined)[] = [
   // Images
   HomeBgImage,
   UkFlagImage,
@@ -58,11 +58,34 @@ export const isAssetLoadingComplete = ref(false)
 export const failedAssets = ref<string[]>([])
 
 // Load a single asset
-const loadAsset = (src: string): Promise<void> => {
+const loadAsset = (
+  src: string | { default: string } | { render: () => unknown } | undefined,
+): Promise<void> => {
   return new Promise((resolve, reject) => {
-    const assetName = src.split('/').pop() || 'Unknown'
+    // Check if asset is undefined
+    if (!src) {
+      resolve()
+      return
+    }
 
-    if (src.endsWith('.mp3') || src.endsWith('.wav') || src.endsWith('.ogg')) {
+    // Skip Vue components (SVGs imported as components)
+    if (typeof src === 'object' && 'render' in src) {
+      resolve()
+      return
+    }
+
+    // Handle Vite asset imports which come as objects with default property
+    const assetUrl = typeof src === 'string' ? src : src.default
+
+    // Check if assetUrl is undefined
+    if (!assetUrl) {
+      resolve()
+      return
+    }
+
+    const assetName = assetUrl.split('/').pop() || 'Unknown'
+
+    if (assetUrl.endsWith('.mp3') || assetUrl.endsWith('.wav') || assetUrl.endsWith('.ogg')) {
       // Audio file
       const audio = new Audio()
       audio.preload = 'auto'
@@ -82,8 +105,8 @@ const loadAsset = (src: string): Promise<void> => {
         reject(new Error(`Failed to load ${assetName}`))
       }
 
-      audio.src = src
-    } else if (src.match(/\.(jpg|jpeg|png|gif|svg|webp)$/i)) {
+      audio.src = assetUrl
+    } else if (assetUrl.match(/\.(jpg|jpeg|png|gif|svg|webp)$/i)) {
       // Image file
       const img = new Image()
 
@@ -102,7 +125,7 @@ const loadAsset = (src: string): Promise<void> => {
         reject(new Error(`Failed to load ${assetName}`))
       }
 
-      img.src = src
+      img.src = assetUrl
     } else {
       // For SVGs and other assets, assume they're already loaded
       resolve()
@@ -121,7 +144,7 @@ export const preloadAllAssets = async (): Promise<void> => {
 
   // Load assets in batches to avoid overwhelming the browser
   const batchSize = 3
-  const batches: string[][] = []
+  const batches: (string | { default: string } | { render: () => unknown } | undefined)[][] = []
 
   for (let i = 0; i < allAssets.length; i += batchSize) {
     batches.push(allAssets.slice(i, i + batchSize))
@@ -146,8 +169,17 @@ export const preloadAllAssets = async (): Promise<void> => {
           loadingMessage.value = 'Finalizing...'
         }
       } catch (error) {
-        console.error(`Failed to load asset: ${asset}`, error)
-        failed.push(asset)
+        // Skip Vue components in error handling
+        if (typeof asset === 'object' && 'render' in asset) {
+          loadedCount++
+          const progress = Math.round((loadedCount / totalAssets) * 100)
+          loadingProgress.value = progress
+          return
+        }
+
+        const assetUrl = typeof asset === 'string' ? asset : asset?.default || 'undefined'
+        console.error(`Failed to load asset: ${assetUrl}`, error)
+        failed.push(assetUrl)
         loadedCount++
         const progress = Math.round((loadedCount / totalAssets) * 100)
         loadingProgress.value = progress

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { CoinIcon, WidthdrawIcon } from '@/assets/icons'
 import {
   UkFlagImage,
@@ -34,6 +34,24 @@ const openSpinPopup = () => {
 const closeSpinPopup = () => {
   isSpinPopupOpen.value = false
 }
+
+import { userService } from '@/api/userService'
+import type { User } from '@/api/types'
+
+const users = ref<User[]>([])
+const loading = ref(true)
+
+onMounted(async () => {
+  try {
+    const response = await userService.getById('1')
+    users.value = response.data
+    console.log(users.value)
+  } catch (err) {
+    alert(`Failed to fetch users: ${err}`)
+  } finally {
+    loading.value = false
+  }
+})
 </script>
 
 <template>
@@ -53,7 +71,7 @@ const closeSpinPopup = () => {
 
       <div class="flex flex-col gap-2 items-end">
         <div class="flex items-center justify-center p-2 bg-[#FAC487] border border-[#000]">
-          <p class="font-bold">Your level: 1</p>
+          <p class="font-bold">Your level: {{ users.telegramId }}</p>
         </div>
 
         <button

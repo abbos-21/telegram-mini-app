@@ -1,17 +1,29 @@
 <script setup lang="ts">
 import { CoinIcon } from '@/assets/icons'
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import WebApp from '@twa-dev/sdk'
 
-const referralLink = 'https:// t.me/ brunoearning/123010230123001230'
+const userId = ref<number | null>(null)
+
+const referralLink = ref<string | null>(null)
 const copied = ref(false)
 
 function copyLink(e: Event) {
   e.preventDefault()
-  navigator.clipboard.writeText(referralLink).then(() => {
+  navigator.clipboard.writeText(referralLink.value as string).then(() => {
     copied.value = true
     setTimeout(() => (copied.value = false), 1500)
   })
 }
+
+onMounted(() => {
+  userId.value = WebApp.initDataUnsafe.user?.id as number
+  if (userId.value) {
+    referralLink.value = `https://t.me/brunoearning/${userId.value}`
+  } else {
+    referralLink.value = 'No referral link available'
+  }
+})
 </script>
 
 <template>
