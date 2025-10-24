@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
 import { authService } from './api/authService'
+import { gameService } from './api/gameService'
 
 import { RouterView, RouterLink } from 'vue-router'
 import { HomeImage, ShopImage, TaskImage, FriendsImage } from '@/assets/images'
@@ -62,8 +63,14 @@ watch(isMusicEnabled, async (enabled) => {
   }
 })
 
+async function initGame() {
+  await authService.loginWithTelegram()
+  setInterval(() => gameService.mine(), 60_000) // Ping every minute
+}
+
 // Auto-play background music when app mounts
 onMounted(async () => {
+  await initGame()
   try {
     // Authenticate via Telegram Mini App
     const { data } = await authService.loginWithTelegram()
