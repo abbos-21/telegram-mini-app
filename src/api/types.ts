@@ -3,11 +3,7 @@ export interface User {
   telegramId: number
   username?: string
   firstName?: string
-  lastName?: string
-  languageCode?: string
-  isBot: boolean
   createdAt: string
-  updatedAt: string
 }
 
 export interface ApiResponse<T> {

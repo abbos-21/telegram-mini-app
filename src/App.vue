@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
+import { authService } from './api/authService'
+
 import { RouterView, RouterLink } from 'vue-router'
 import { HomeImage, ShopImage, TaskImage, FriendsImage } from '@/assets/images'
 import { BgMusicAudio } from '@/assets/audios'
@@ -62,6 +64,17 @@ watch(isMusicEnabled, async (enabled) => {
 
 // Auto-play background music when app mounts
 onMounted(async () => {
+  try {
+    // Authenticate via Telegram Mini App
+    const { data } = await authService.loginWithTelegram()
+    console.log('Authenticated as', data.user)
+
+    // Fetch user info from your API
+    // const users = await userService.getAll()
+    // console.log('Users:', users.data)
+  } catch (err) {
+    console.error('Auth failed:', err)
+  }
   // Initialize loader
   showLoader('Initializing Bruno Earning...')
 

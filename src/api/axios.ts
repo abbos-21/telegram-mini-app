@@ -2,29 +2,32 @@
 import axios, { type AxiosInstance } from 'axios'
 
 const apiClient: AxiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api',
+  baseURL:
+    import.meta.env.VITE_API_BASE_URL?.replace(/\/+$/, '') + '/api' || 'http://localhost:8080/api',
   headers: {
     'Content-Type': 'application/json',
   },
   timeout: 10000,
 })
 
-// ✅ Request interceptor for auth token
+// ✅ Attach JWT from localStorage
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token')
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
-    }
+    if (token) config.headers.Authorization = `Bearer ${token}`
     return config
   },
   (error) => Promise.reject(error),
 )
 
-// ✅ Optional response interceptor
+// ✅ Handle 401s globally (optional)
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token')
+      // optionally redirect to login
+    }
     console.error('API Error:', error.response?.data || error.message)
     return Promise.reject(error)
   },
