@@ -2,8 +2,7 @@
 import axios, { type AxiosInstance } from 'axios'
 
 const apiClient: AxiosInstance = axios.create({
-  baseURL:
-    import.meta.env.VITE_API_BASE_URL?.replace(/\/+$/, '') + '/api' || 'http://localhost:8080/api',
+  baseURL: 'http://localhost:8080/api', // import.meta.env.VITE_API_BASE_URL?.replace(/\/+$/, '') + '/api' ||
   headers: {
     'Content-Type': 'application/json',
   },
