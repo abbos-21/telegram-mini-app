@@ -1,4 +1,3 @@
-// src/api/gameService.ts
 import apiClient from './axios'
 
 export const gameService = {

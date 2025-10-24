@@ -18,18 +18,13 @@ const audioRef = ref<HTMLAudioElement | null>(null)
 
 async function initGame() {
   try {
-    // Show loader while authenticating
-    showLoader('Authenticating with Telegram...')
     const { user } = await authService.loginWithTelegram()
     console.log('✅ Authenticated as', user)
-    hideLoader()
 
-    // Start mining every minute
-    await gameService.mine() // Initial mining tick
+    await gameService.mine()
     setInterval(() => gameService.mine(), 60_000)
   } catch (err) {
     console.error('Auth failed:', err)
-    hideLoader()
   }
 }
 
@@ -81,7 +76,6 @@ onMounted(async () => {
 </script>
 
 <template>
-  <!-- App Loader -->
   <AppLoader
     :is-loading="isLoading"
     :progress="loadingProgress"
@@ -89,7 +83,6 @@ onMounted(async () => {
     @loaded="hideLoader"
   />
 
-  <!-- Background Music - plays continuously across all routes -->
   <audio
     ref="audioRef"
     loop

@@ -10,7 +10,6 @@ interface TelegramAuthResponse {
 export const authService = {
   async loginWithTelegram() {
     try {
-      // Ensure Telegram WebApp is ready
       const initData = WebApp.initData
       const ref = new URLSearchParams(window.location.search).get('ref')
 
@@ -25,7 +24,6 @@ export const authService = {
 
       const { token, user } = response.data.data
 
-      // Save token locally
       localStorage.setItem('token', token)
       localStorage.setItem('user', JSON.stringify(user))
 
