@@ -1,34 +1,38 @@
 // src/api/authService.ts
 import apiClient from './axios'
-import type { ApiResponse, User } from './types'
-import WebApp from '@twa-dev/sdk' // ✅ new import
+import WebApp from '@twa-dev/sdk'
+
+interface TelegramAuthResponse {
+  token: string
+  user: unknown
+}
 
 export const authService = {
-  async loginWithTelegram(): Promise<ApiResponse<{ token: string; user: User }>> {
-    // 1️⃣ Get Telegram launch params from WebApp
-    const initDataRaw = WebApp.initData
-    const initDataUnsafe = WebApp.initDataUnsafe
+  async loginWithTelegram() {
+    try {
+      // Ensure Telegram WebApp is ready
+      const initData = WebApp.initData
+      const ref = new URLSearchParams(window.location.search).get('ref')
 
-    if (!initDataRaw || !initDataUnsafe?.user) {
-      throw new Error('Telegram WebApp initData not available — are you running inside Telegram?')
-    }
+      if (!initData) {
+        throw new Error('Telegram WebApp initData is missing.')
+      }
 
-    // 2️⃣ Send initDataRaw to backend for verification
-    const response = await apiClient.post<ApiResponse<{ token: string; user: User }>>(
-      '/auth/telegram',
-      { initData: initDataRaw },
-    )
+      const response = await apiClient.post<{ data: TelegramAuthResponse }>('/auth/telegram', {
+        initData,
+        ref,
+      })
 
-    // 3️⃣ Save token for future API requests
-    const { token, user } = response.data.data
-    if (token) {
+      const { token, user } = response.data.data
+
+      // Save token locally
       localStorage.setItem('token', token)
+      localStorage.setItem('user', JSON.stringify(user))
+
+      return { token, user }
+    } catch (error) {
+      console.error('Auth failed:', error)
+      throw error
     }
-
-    return { data: { token, user }, success: true }
-  },
-
-  logout(): void {
-    localStorage.removeItem('token')
   },
 }

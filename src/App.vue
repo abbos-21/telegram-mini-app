@@ -2,7 +2,6 @@
 import { ref, onMounted, watch } from 'vue'
 import { authService } from './api/authService'
 import { gameService } from './api/gameService'
-
 import { RouterView, RouterLink } from 'vue-router'
 import { HomeImage, ShopImage, TaskImage, FriendsImage } from '@/assets/images'
 import { BgMusicAudio } from '@/assets/audios'
@@ -17,10 +16,24 @@ import {
 
 const audioRef = ref<HTMLAudioElement | null>(null)
 
-const handleAudioEnded = () => {
-  setMusicPlaying(false)
+async function initGame() {
+  try {
+    // Show loader while authenticating
+    showLoader('Authenticating with Telegram...')
+    const { user } = await authService.loginWithTelegram()
+    console.log('✅ Authenticated as', user)
+    hideLoader()
+
+    // Start mining every minute
+    await gameService.mine() // Initial mining tick
+    setInterval(() => gameService.mine(), 60_000)
+  } catch (err) {
+    console.error('Auth failed:', err)
+    hideLoader()
+  }
 }
 
+const handleAudioEnded = () => setMusicPlaying(false)
 const handleAudioError = () => {
   console.log('Audio could not be loaded')
   setMusicPlaying(false)
@@ -29,20 +42,18 @@ const handleAudioError = () => {
 const handleAudioLoaded = async () => {
   if (audioRef.value && isMusicEnabled.value) {
     try {
-      // Unmute and play the audio
       audioRef.value.muted = false
       await audioRef.value.play()
       setMusicPlaying(true)
       setMusicAvailable(true)
     } catch {
-      console.log('Autoplay was prevented by browser policy. User interaction required.')
+      console.log('Autoplay prevented by browser.')
       setMusicPlaying(false)
       setMusicAvailable(false)
     }
   }
 }
 
-// Watch for music enabled state changes
 watch(isMusicEnabled, async (enabled) => {
   if (audioRef.value) {
     if (enabled && !isMusicPlaying.value) {
@@ -53,8 +64,6 @@ watch(isMusicEnabled, async (enabled) => {
         setMusicAvailable(true)
       } catch (error) {
         console.log('Could not start music:', error)
-        setMusicPlaying(false)
-        setMusicAvailable(false)
       }
     } else if (!enabled && isMusicPlaying.value) {
       audioRef.value.pause()
@@ -63,46 +72,11 @@ watch(isMusicEnabled, async (enabled) => {
   }
 })
 
-async function initGame() {
-  await authService.loginWithTelegram()
-  setInterval(() => gameService.mine(), 60_000) // Ping every minute
-}
-
-// Auto-play background music when app mounts
 onMounted(async () => {
+  showLoader('Loading game...')
+  await preloadAllAssets()
   await initGame()
-  try {
-    // Authenticate via Telegram Mini App
-    const { data } = await authService.loginWithTelegram()
-    console.log('Authenticated as', data.user)
-
-    // Fetch user info from your API
-    // const users = await userService.getAll()
-    // console.log('Users:', users.data)
-  } catch (err) {
-    console.error('Auth failed:', err)
-  }
-  // Initialize loader
-  showLoader('Initializing Bruno Earning...')
-
-  try {
-    // Preload all assets with real progress tracking
-    await preloadAllAssets()
-
-    // Wait a moment to show 100% completion
-    setTimeout(() => {
-      hideLoader()
-    }, 500)
-  } catch (error) {
-    console.error('Error loading assets:', error)
-    // Even if some assets fail, continue to the game
-    setTimeout(() => {
-      hideLoader()
-    }, 1000)
-  }
-
-  // The audio will auto-play when loaded due to the autoplay attribute
-  // and the handleAudioLoaded function will handle unmuting and playing
+  setTimeout(hideLoader, 500)
 })
 </script>
 

@@ -1,9 +1,14 @@
+// src/api/gameService.ts
 import apiClient from './axios'
-import type { ApiResponse, User } from './types'
 
 export const gameService = {
-  async mine(): Promise<User> {
-    const response = await apiClient.post<ApiResponse<User>>('/game/mine')
-    return response.data.data
+  async mine() {
+    try {
+      const res = await apiClient.post('/game/mine')
+      console.log('Mining tick:', res.data)
+      return res.data
+    } catch (err) {
+      console.error('Mining error:', err)
+    }
   },
 }
