@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
-import { socket } from '@/api/socket'
+import { ref, onMounted } from 'vue'
 
 import { CoinIcon, WidthdrawIcon } from '@/assets/icons'
 import {
@@ -27,18 +26,27 @@ const user = ref<User | null>(null)
 const isBottlePopupOpen = ref(false)
 const isSpinPopupOpen = ref(false)
 
-async function getUserData() {
+const getUserData = async () => {
   const response = await userService.getCurrentUser()
   user.value = response.data
 }
 
-async function startMining() {
+const startMining = async () => {
   await gameService.mine()
 }
 
-async function collectCoins() {
-  const data = await gameService.collect()
-  alert(`Collected ${data.collected.toFixed(2)} coins! Total: ${data.totalCoins.toFixed(2)}`)
+const miningLoop = async () => {
+  try {
+    await startMining()
+  } catch (error) {
+    console.log('Mining error: ', error)
+  } finally {
+    setTimeout(miningLoop, 5000)
+  }
+}
+
+const collectCoins = async () => {
+  await gameService.collect()
   await getUserData()
 }
 
@@ -47,54 +55,9 @@ const closeBottlePopup = () => (isBottlePopupOpen.value = false)
 const openSpinPopup = () => (isSpinPopupOpen.value = true)
 const closeSpinPopup = () => (isSpinPopupOpen.value = false)
 
-function setupSocketListeners() {
-  if (!user.value) return
-
-  socket.on('connect', () => {
-    console.log('🟢 Connected to WebSocket')
-  })
-
-  socket.on(
-    `user:${user.value.id}:tempCoins`,
-    (data: { tempCoins: number; mined: number; vaultFull: boolean }) => {
-      if (user.value) {
-        user.value.tempCoins = data.tempCoins
-      }
-      console.log('Received tempCoins update:', data)
-    },
-  )
-
-  socket.on(
-    `user:${user.value.id}:collected`,
-    (data: { collected: number; coins: number; level: number }) => {
-      if (user.value) {
-        user.value.coins = data.coins
-        user.value.level = data.level
-        user.value.tempCoins = 0
-      }
-      console.log('Received collection update:', data)
-    },
-  )
-
-  socket.on('disconnect', () => {
-    console.log('🔴 WebSocket disconnected')
-  })
-}
-
 onMounted(async () => {
   await getUserData()
-  setupSocketListeners()
-  startMining()
-})
-
-onUnmounted(() => {
-  if (user.value) {
-    socket.off(`user:${user.value.id}:tempCoins`)
-    socket.off(`user:${user.value.id}:collected`)
-  }
-
-  socket.off('connect')
-  socket.off('disconnect')
+  miningLoop()
 })
 </script>
 
@@ -109,7 +72,7 @@ onUnmounted(() => {
         class="flex items-center p-2 bg-[#FAC487] gap-2 border border-[#000]"
       >
         <CoinIcon class="w-6" />
-        <p class="font-bold">{{ user?.coins?.toFixed(2) }}</p>
+        <p class="font-bold">{{ user?.coins }}</p>
         <WidthdrawIcon class="ms-1 mt-1 w-7" />
       </RouterLink>
 
@@ -179,7 +142,7 @@ onUnmounted(() => {
           </svg>
 
           <span class="absolute inset-0 flex items-center justify-center font-bold">
-            {{ user?.tempCoins?.toFixed(2) }}
+            {{ user?.tempCoins }}
           </span>
         </div>
       </div>

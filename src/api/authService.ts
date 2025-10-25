@@ -1,9 +1,9 @@
 import apiClient from './axios'
 import WebApp from '@twa-dev/sdk'
-import type { TelegramAuthResponse } from './types'
+import type { ApiResponse, AuthResponse } from './types'
 
 export const authService = {
-  async loginWithTelegram() {
+  loginWithTelegram: async (): Promise<ApiResponse<AuthResponse>> => {
     try {
       const initData = WebApp.initData
       const ref = new URLSearchParams(window.location.search).get('ref')
@@ -12,17 +12,15 @@ export const authService = {
         throw new Error('Telegram WebApp initData is missing.')
       }
 
-      const response = await apiClient.post<{ data: TelegramAuthResponse }>('/auth/telegram', {
+      const response = await apiClient.post<ApiResponse<AuthResponse>>('/auth', {
         initData,
         ref,
       })
 
-      const { token, user } = response.data.data
+      localStorage.setItem('token', response.data.data.token)
+      localStorage.setItem('user', JSON.stringify(response.data.data.user))
 
-      localStorage.setItem('token', token)
-      localStorage.setItem('user', JSON.stringify(user))
-
-      return { token, user }
+      return response.data
     } catch (error) {
       console.error('Auth failed:', error)
       throw error

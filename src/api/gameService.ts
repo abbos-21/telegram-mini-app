@@ -1,12 +1,13 @@
 import apiClient from './axios'
+import type { ApiResponse, GameCollectResponse, GameMineResponse } from './types'
 
 export const gameService = {
-  async mine() {
-    const res = await apiClient.post('/game/mine')
-    return res.data.data
+  mine: async (): Promise<ApiResponse<GameMineResponse>> => {
+    const response = await apiClient.post<ApiResponse<GameMineResponse>>('/game/mine')
+    return response.data
   },
-  async collect() {
-    const res = await apiClient.post('/game/collect')
-    return res.data.data
+  collect: async (): Promise<ApiResponse<GameCollectResponse>> => {
+    const response = await apiClient.post<ApiResponse<GameCollectResponse>>('/game/collect')
+    return response.data
   },
 }

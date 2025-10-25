@@ -10,18 +10,6 @@ const audioRef = ref<HTMLAudioElement | null>(null)
 
 const loading = ref<boolean>(false)
 
-async function authenticate() {
-  try {
-    loading.value = true
-    const { user } = await authService.loginWithTelegram()
-    console.log('✅ Authenticated as', user)
-  } catch (err) {
-    console.error('Auth failed:', err)
-  } finally {
-    loading.value = false
-  }
-}
-
 const handleAudioEnded = () => setMusicPlaying(false)
 const handleAudioError = () => {
   console.log('Audio could not be loaded')
@@ -60,6 +48,18 @@ watch(isMusicEnabled, async (enabled) => {
     }
   }
 })
+
+const authenticate = async () => {
+  try {
+    loading.value = true
+    const response = await authService.loginWithTelegram()
+    console.log('✅ Authenticated as', response.data.user)
+  } catch (err) {
+    console.error('Auth failed:', err)
+  } finally {
+    loading.value = false
+  }
+}
 
 onMounted(async () => {
   await authenticate()

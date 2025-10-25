@@ -24,7 +24,17 @@ export interface ApiResponse<T> {
   success?: boolean
 }
 
-export interface TelegramAuthResponse {
+export interface AuthResponse {
   token: string
   user: User
+}
+
+export interface GameMineResponse extends User {
+  vaultFull: boolean
+  message: string
+}
+
+export interface GameCollectResponse {
+  totalCoins: number
+  level: number
 }
