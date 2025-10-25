@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
 import { authService } from './api/authService'
-import { gameService } from './api/gameService'
 import { RouterView, RouterLink } from 'vue-router'
 import { HomeImage, ShopImage, TaskImage, FriendsImage } from '@/assets/images'
 import { BgMusicAudio } from '@/assets/audios'
@@ -11,13 +10,11 @@ const audioRef = ref<HTMLAudioElement | null>(null)
 
 const loading = ref<boolean>(false)
 
-async function initGame() {
+async function authenticate() {
   try {
     loading.value = true
     const { user } = await authService.loginWithTelegram()
     console.log('✅ Authenticated as', user)
-    await gameService.mine()
-    // setInterval(() => gameService.mine(), 60_000)
   } catch (err) {
     console.error('Auth failed:', err)
   } finally {
@@ -65,7 +62,7 @@ watch(isMusicEnabled, async (enabled) => {
 })
 
 onMounted(async () => {
-  await initGame()
+  await authenticate()
 })
 </script>
 

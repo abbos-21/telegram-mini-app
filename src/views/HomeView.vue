@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { CoinIcon, WidthdrawIcon } from '@/assets/icons'
 import {
   UkFlagImage,
@@ -15,6 +15,44 @@ import HealthLevel from '@/components/HealthLevel.vue'
 import { RouterLink } from 'vue-router'
 import BottlePopup from '@/components/BottlePopup.vue'
 import SpinPopup from '@/components/SpinPopup.vue'
+
+import { gameService } from '@/api/gameService'
+import { userService } from '@/api/userService'
+import type { User } from '@/api/types'
+
+// const tempCoins = ref(0)
+// const vaultFull = ref(false)
+const user = ref<User | null>(null)
+
+async function getUserData() {
+  const response = await userService.getCurrentUser()
+  user.value = response.data
+}
+
+async function startMining() {
+  await gameService.mine()
+  // tempCoins.value = data.tempCoins
+  // vaultFull.value = data.vaultFull
+}
+
+const miningLoop = async () => {
+  try {
+    await startMining()
+    await getUserData()
+  } catch (err) {
+    console.error('Mining task failed:', err)
+  } finally {
+    setTimeout(miningLoop, 60_000)
+  }
+}
+
+async function collectCoins() {
+  const data = await gameService.collect()
+  alert(`Collected ${data.collected} coins! Total: ${data.totalCoins}`)
+  // tempCoins.value = 0
+  // vaultFull.value = false
+  await getUserData()
+}
 
 const isBottlePopupOpen = ref(false)
 const isSpinPopupOpen = ref(false)
@@ -34,6 +72,11 @@ const openSpinPopup = () => {
 const closeSpinPopup = () => {
   isSpinPopupOpen.value = false
 }
+
+onMounted(async () => {
+  await getUserData()
+  miningLoop()
+})
 </script>
 
 <template>
@@ -47,13 +90,13 @@ const closeSpinPopup = () => {
         class="flex items-center p-2 bg-[#FAC487] gap-2 border border-[#000]"
       >
         <CoinIcon class="w-6" />
-        <p class="font-bold">0</p>
+        <p class="font-bold">{{ user?.coins }}</p>
         <WidthdrawIcon class="ms-1 mt-1 w-7" />
       </RouterLink>
 
       <div class="flex flex-col gap-2 items-end">
         <div class="flex items-center justify-center p-2 bg-[#FAC487] border border-[#000]">
-          <p class="font-bold">Your level: 1</p>
+          <p class="font-bold">Your level: {{ user?.level }}</p>
         </div>
 
         <button
@@ -116,7 +159,9 @@ const closeSpinPopup = () => {
             </defs>
           </svg>
 
-          <span class="absolute inset-0 flex items-center justify-center font-bold">0.00</span>
+          <span class="absolute inset-0 flex items-center justify-center font-bold">{{
+            user?.tempCoins
+          }}</span>
         </div>
       </div>
 
@@ -162,6 +207,7 @@ const closeSpinPopup = () => {
     <div class="flex justify-center items-center">
       <button
         type="button"
+        @click="collectCoins"
         class="bg-cover bg-center bg-no-repeat pb-1 font-semibold text-2xl cursor-pointer w-[223px] h-[65px]"
         :style="{ backgroundImage: `url(${CollectBgImage})` }"
       >

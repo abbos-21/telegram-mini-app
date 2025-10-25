@@ -2,12 +2,11 @@ import apiClient from './axios'
 
 export const gameService = {
   async mine() {
-    try {
-      const res = await apiClient.post('/game/mine')
-      console.log('Mining tick:', res.data)
-      return res.data
-    } catch (err) {
-      console.error('Mining error:', err)
-    }
+    const res = await apiClient.post('/game/mine')
+    return res.data.data
+  },
+  async collect() {
+    const res = await apiClient.post('/game/collect')
+    return res.data.data
   },
 }
