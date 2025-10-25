@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
+import { socket } from '@/api/socket'
 
 import { CoinIcon, WidthdrawIcon } from '@/assets/icons'
 import {
@@ -25,6 +26,14 @@ import type { User } from '@/api/types'
 const user = ref<User | null>(null)
 const isBottlePopupOpen = ref(false)
 const isSpinPopupOpen = ref(false)
+const tempCoins = ref<number>(0.0)
+
+const EVENT_NAME = 'tempCoinsUpdated'
+const isConnected = ref<boolean>(socket.connected)
+
+const handleTempCoinsUpdate = (value: number) => {
+  tempCoins.value = value
+}
 
 const getUserData = async () => {
   const response = await userService.getCurrentUser()
@@ -36,15 +45,15 @@ const startMining = async () => {
   user.value = response.data
 }
 
-const miningLoop = async () => {
-  try {
-    await startMining()
-  } catch (error) {
-    console.log('Mining error: ', error)
-  } finally {
-    setTimeout(miningLoop, 10000)
-  }
-}
+// const miningLoop = async () => {
+//   try {
+//     await startMining()
+//   } catch (error) {
+//     console.log('Mining error: ', error)
+//   } finally {
+//     setTimeout(miningLoop, 10000)
+//   }
+// }
 
 const collectCoins = async () => {
   await gameService.collect()
@@ -56,9 +65,26 @@ const closeBottlePopup = () => (isBottlePopupOpen.value = false)
 const openSpinPopup = () => (isSpinPopupOpen.value = true)
 const closeSpinPopup = () => (isSpinPopupOpen.value = false)
 
+// onMounted(async () => {
+//   await getUserData()
+//   await startMining()
+// })
+
 onMounted(async () => {
   await getUserData()
-  miningLoop()
+  await startMining()
+
+  socket.on('connect', () => {
+    isConnected.value = true
+  })
+  socket.on('disconnect', () => {
+    isConnected.value = false
+  })
+  socket.on('tempCoinsUpdated', handleTempCoinsUpdate)
+})
+
+onUnmounted(() => {
+  socket.off(EVENT_NAME, handleTempCoinsUpdate)
 })
 </script>
 
@@ -145,7 +171,7 @@ onMounted(async () => {
           </svg>
 
           <span class="absolute inset-0 flex items-center justify-center font-bold">
-            {{ user?.tempCoins }}
+            {{ tempCoins }}
           </span>
         </div>
       </div>

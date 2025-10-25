@@ -5,6 +5,7 @@ import { socket } from '@/api/socket'
 
 // State for the counter value
 const counter = ref<number>(0)
+
 const connectionStatus = ref<string>('Connecting...')
 
 // The unique event name from the server
