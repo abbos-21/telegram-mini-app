@@ -50,7 +50,7 @@ const router = createRouter({
     {
       path: '/counter',
       name: 'counter',
-      component: CounterDisplay,
+      component: () => import('../views/CounterDisplay.vue'),
     },
   ],
 })
