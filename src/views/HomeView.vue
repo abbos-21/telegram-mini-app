@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import { io } from 'socket.io-client'
+import { socket } from '@/api/socket'
 
 import { CoinIcon, WidthdrawIcon } from '@/assets/icons'
 import {
@@ -23,15 +23,9 @@ import { gameService } from '@/api/gameService'
 import { userService } from '@/api/userService'
 import type { User } from '@/api/types'
 
-// 🪙 Reactive user data
 const user = ref<User | null>(null)
-
-// 🧠 Bottle & Spin popup states
 const isBottlePopupOpen = ref(false)
 const isSpinPopupOpen = ref(false)
-
-// 🔌 WebSocket setup
-let socket: ReturnType<typeof io> | null = null
 
 async function getUserData() {
   const response = await userService.getCurrentUser()
@@ -42,53 +36,65 @@ async function startMining() {
   await gameService.mine()
 }
 
-const miningLoop = async () => {
-  try {
-    await startMining()
-    await getUserData()
-  } catch (err) {
-    console.error('Mining task failed:', err)
-  } finally {
-    setTimeout(miningLoop, 60_000) // every 1 minute
-  }
-}
-
 async function collectCoins() {
   const data = await gameService.collect()
   alert(`Collected ${data.collected.toFixed(2)} coins! Total: ${data.totalCoins.toFixed(2)}`)
   await getUserData()
 }
 
-// 🎛 Popup controls
 const openBottlePopup = () => (isBottlePopupOpen.value = true)
 const closeBottlePopup = () => (isBottlePopupOpen.value = false)
 const openSpinPopup = () => (isSpinPopupOpen.value = true)
 const closeSpinPopup = () => (isSpinPopupOpen.value = false)
 
-onMounted(async () => {
-  await getUserData()
-  miningLoop()
-
-  // ✅ Connect WebSocket for live tempCoin updates
-  socket = io('http://localhost:8080')
+function setupSocketListeners() {
+  if (!user.value) return
 
   socket.on('connect', () => {
     console.log('🟢 Connected to WebSocket')
   })
 
-  socket.on('tempCoinsUpdate', (data: { userId: number; tempCoins: number }) => {
-    if (user.value && user.value.id === data.userId) {
-      user.value.tempCoins = data.tempCoins
-    }
-  })
+  socket.on(
+    `user:${user.value.id}:tempCoins`,
+    (data: { tempCoins: number; mined: number; vaultFull: boolean }) => {
+      if (user.value) {
+        user.value.tempCoins = data.tempCoins
+      }
+      console.log('Received tempCoins update:', data)
+    },
+  )
+
+  socket.on(
+    `user:${user.value.id}:collected`,
+    (data: { collected: number; coins: number; level: number }) => {
+      if (user.value) {
+        user.value.coins = data.coins
+        user.value.level = data.level
+        user.value.tempCoins = 0
+      }
+      console.log('Received collection update:', data)
+    },
+  )
 
   socket.on('disconnect', () => {
     console.log('🔴 WebSocket disconnected')
   })
+}
+
+onMounted(async () => {
+  await getUserData()
+  setupSocketListeners()
+  startMining()
 })
 
 onUnmounted(() => {
-  if (socket) socket.disconnect()
+  if (user.value) {
+    socket.off(`user:${user.value.id}:tempCoins`)
+    socket.off(`user:${user.value.id}:collected`)
+  }
+
+  socket.off('connect')
+  socket.off('disconnect')
 })
 </script>
 
