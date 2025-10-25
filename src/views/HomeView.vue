@@ -77,6 +77,8 @@ onMounted(async () => {
         <WidthdrawIcon class="ms-1 mt-1 w-7" />
       </RouterLink>
 
+      <RouterLink to="/counter">Counter</RouterLink>
+
       <div class="flex flex-col gap-2 items-end">
         <div class="flex items-center justify-center p-2 bg-[#FAC487] border border-[#000]">
           <p class="font-bold">Your level: {{ user?.level }}</p>
