@@ -79,12 +79,13 @@ onMounted(async () => {
     autoplay
     muted
     @loadeddata="handleAudioLoaded"
+    v-if="loading"
   >
     <source :src="BgMusicAudio" type="audio/mpeg" />
     Your browser does not support the audio element.
   </audio>
 
-  <div class="app-container">
+  <div class="app-container" v-if="loading">
     <div class="h-screen w-screen flex justify-center items-center">
       <div class="max-w-md w-full h-full relative">
         <RouterView />
@@ -122,6 +123,8 @@ onMounted(async () => {
       </div>
     </div>
   </div>
+
+  <div v-else>Loading...</div>
 </template>
 
 <style scoped>
