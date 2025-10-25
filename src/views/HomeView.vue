@@ -70,7 +70,7 @@ onMounted(async () => {
   miningLoop()
 
   // ✅ Connect WebSocket for live tempCoin updates
-  socket = io('http://localhost:5173')
+  socket = io('http://localhost:8080')
 
   socket.on('connect', () => {
     console.log('🟢 Connected to WebSocket')
