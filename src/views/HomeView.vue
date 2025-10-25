@@ -41,7 +41,7 @@ const miningLoop = async () => {
   } catch (error) {
     console.log('Mining error: ', error)
   } finally {
-    setTimeout(miningLoop, 5000)
+    setTimeout(miningLoop, 60_000)
   }
 }
 

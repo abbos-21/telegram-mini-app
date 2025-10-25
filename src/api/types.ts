@@ -30,7 +30,7 @@ export interface AuthResponse {
 }
 
 export interface GameMineResponse extends User {
-  vaultFull: boolean
+  vaultFull?: boolean
   message: string
 }
 
