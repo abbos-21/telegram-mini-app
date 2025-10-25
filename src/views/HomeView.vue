@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
+import { io } from 'socket.io-client'
+
 import { CoinIcon, WidthdrawIcon } from '@/assets/icons'
 import {
   UkFlagImage,
@@ -9,6 +11,7 @@ import {
   SpinImage,
   HomeBgImage,
 } from '@/assets/images'
+
 import { isMusicEnabled, isMusicAvailable, toggleMusic } from '@/stores/music'
 import EnergyLevel from '@/components/EnergyLevel.vue'
 import HealthLevel from '@/components/HealthLevel.vue'
@@ -20,9 +23,15 @@ import { gameService } from '@/api/gameService'
 import { userService } from '@/api/userService'
 import type { User } from '@/api/types'
 
-// const tempCoins = ref(0)
-// const vaultFull = ref(false)
+// 🪙 Reactive user data
 const user = ref<User | null>(null)
+
+// 🧠 Bottle & Spin popup states
+const isBottlePopupOpen = ref(false)
+const isSpinPopupOpen = ref(false)
+
+// 🔌 WebSocket setup
+let socket: ReturnType<typeof io> | null = null
 
 async function getUserData() {
   const response = await userService.getCurrentUser()
@@ -31,8 +40,6 @@ async function getUserData() {
 
 async function startMining() {
   await gameService.mine()
-  // tempCoins.value = data.tempCoins
-  // vaultFull.value = data.vaultFull
 }
 
 const miningLoop = async () => {
@@ -42,40 +49,46 @@ const miningLoop = async () => {
   } catch (err) {
     console.error('Mining task failed:', err)
   } finally {
-    setTimeout(miningLoop, 60_000)
+    setTimeout(miningLoop, 60_000) // every 1 minute
   }
 }
 
 async function collectCoins() {
   const data = await gameService.collect()
-  alert(`Collected ${data.collected} coins! Total: ${data.totalCoins}`)
-  // tempCoins.value = 0
-  // vaultFull.value = false
+  alert(`Collected ${data.collected.toFixed(2)} coins! Total: ${data.totalCoins.toFixed(2)}`)
   await getUserData()
 }
 
-const isBottlePopupOpen = ref(false)
-const isSpinPopupOpen = ref(false)
-
-const openBottlePopup = () => {
-  isBottlePopupOpen.value = true
-}
-
-const closeBottlePopup = () => {
-  isBottlePopupOpen.value = false
-}
-
-const openSpinPopup = () => {
-  isSpinPopupOpen.value = true
-}
-
-const closeSpinPopup = () => {
-  isSpinPopupOpen.value = false
-}
+// 🎛 Popup controls
+const openBottlePopup = () => (isBottlePopupOpen.value = true)
+const closeBottlePopup = () => (isBottlePopupOpen.value = false)
+const openSpinPopup = () => (isSpinPopupOpen.value = true)
+const closeSpinPopup = () => (isSpinPopupOpen.value = false)
 
 onMounted(async () => {
   await getUserData()
   miningLoop()
+
+  // ✅ Connect WebSocket for live tempCoin updates
+  socket = io('http://localhost:5173')
+
+  socket.on('connect', () => {
+    console.log('🟢 Connected to WebSocket')
+  })
+
+  socket.on('tempCoinsUpdate', (data: { userId: number; tempCoins: number }) => {
+    if (user.value && user.value.id === data.userId) {
+      user.value.tempCoins = data.tempCoins
+    }
+  })
+
+  socket.on('disconnect', () => {
+    console.log('🔴 WebSocket disconnected')
+  })
+})
+
+onUnmounted(() => {
+  if (socket) socket.disconnect()
 })
 </script>
 
@@ -90,7 +103,7 @@ onMounted(async () => {
         class="flex items-center p-2 bg-[#FAC487] gap-2 border border-[#000]"
       >
         <CoinIcon class="w-6" />
-        <p class="font-bold">{{ user?.coins }}</p>
+        <p class="font-bold">{{ user?.coins?.toFixed(2) }}</p>
         <WidthdrawIcon class="ms-1 mt-1 w-7" />
       </RouterLink>
 
@@ -159,13 +172,21 @@ onMounted(async () => {
             </defs>
           </svg>
 
-          <span class="absolute inset-0 flex items-center justify-center font-bold">{{
-            user?.tempCoins
-          }}</span>
+          <span class="absolute inset-0 flex items-center justify-center font-bold">
+            {{ user?.tempCoins?.toFixed(2) }}
+          </span>
         </div>
       </div>
 
-      <div class="flex justify-between">
+      <!-- 🚨 Vault full notice -->
+      <p
+        v-if="user && user.tempCoins >= user.vaultCapacity"
+        class="text-red-600 font-bold text-center mt-2"
+      >
+        Vault full! Collect your coins to continue mining.
+      </p>
+
+      <div class="flex justify-between mt-2">
         <div class="flex flex-col items-center">
           <HealthLevel
             :current-value="100"
