@@ -2,25 +2,18 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { socket } from '@/api/socket'
 
-// State for the counter value
 const counter = ref<number>(0)
 const connectionStatus = ref<string>('Connecting...')
 
-// The unique event name from the server
 const EVENT_NAME = 'counterUpdate'
 
-// Function to handle the incoming socket message
 const handleCounterUpdate = (value: number) => {
-  // Update the reactive counter variable
   counter.value = value
 }
 
-// Lifecycle hook to register the socket listener
 onMounted(() => {
-  // Listen for the specific event from the server
   socket.on(EVENT_NAME, handleCounterUpdate)
 
-  // Listen for connection status changes
   socket.on('connect', () => {
     connectionStatus.value = 'Connected ✅'
   })
@@ -29,7 +22,6 @@ onMounted(() => {
   })
 })
 
-// Lifecycle hook to clean up the listener to prevent memory leaks/multiple connections
 onUnmounted(() => {
   socket.off(EVENT_NAME, handleCounterUpdate)
 })
