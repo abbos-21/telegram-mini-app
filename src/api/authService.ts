@@ -1,11 +1,6 @@
-// src/api/authService.ts
 import apiClient from './axios'
 import WebApp from '@twa-dev/sdk'
-
-interface TelegramAuthResponse {
-  token: string
-  user: unknown
-}
+import type { TelegramAuthResponse } from './types'
 
 export const authService = {
   async loginWithTelegram() {

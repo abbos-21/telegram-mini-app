@@ -6,25 +6,22 @@ import { RouterView, RouterLink } from 'vue-router'
 import { HomeImage, ShopImage, TaskImage, FriendsImage } from '@/assets/images'
 import { BgMusicAudio } from '@/assets/audios'
 import { isMusicPlaying, isMusicEnabled, setMusicPlaying, setMusicAvailable } from '@/stores/music'
-import AppLoader from '@/components/AppLoader.vue'
-import { isLoading, hideLoader, showLoader } from '@/stores/loader'
-import {
-  preloadAllAssets,
-  loadingProgress,
-  loadingMessage as assetLoadingMessage,
-} from '@/utils/assetPreloader'
 
 const audioRef = ref<HTMLAudioElement | null>(null)
 
+const loading = ref<boolean>(false)
+
 async function initGame() {
   try {
+    loading.value = true
     const { user } = await authService.loginWithTelegram()
     console.log('✅ Authenticated as', user)
-
     await gameService.mine()
-    setInterval(() => gameService.mine(), 60_000)
+    // setInterval(() => gameService.mine(), 60_000)
   } catch (err) {
     console.error('Auth failed:', err)
+  } finally {
+    loading.value = false
   }
 }
 
@@ -68,21 +65,11 @@ watch(isMusicEnabled, async (enabled) => {
 })
 
 onMounted(async () => {
-  showLoader('Loading game...')
-  await preloadAllAssets()
   await initGame()
-  setTimeout(hideLoader, 500)
 })
 </script>
 
 <template>
-  <AppLoader
-    :is-loading="isLoading"
-    :progress="loadingProgress"
-    :loading-message="assetLoadingMessage"
-    @loaded="hideLoader"
-  />
-
   <audio
     ref="audioRef"
     loop
