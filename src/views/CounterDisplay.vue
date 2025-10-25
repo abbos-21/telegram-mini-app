@@ -11,7 +11,7 @@ const handleCounterUpdate = (value: number) => {
   counter.value = value
 }
 
-onMounted(() => {
+function startPolling() {
   socket.on(EVENT_NAME, handleCounterUpdate)
 
   socket.on('connect', () => {
@@ -20,11 +20,15 @@ onMounted(() => {
   socket.on('disconnect', () => {
     connectionStatus.value = 'Disconnected 🛑'
   })
-})
+}
 
-onUnmounted(() => {
+function stopPolling() {
   socket.off(EVENT_NAME, handleCounterUpdate)
-})
+}
+
+onMounted(() => {})
+
+onUnmounted(() => {})
 </script>
 
 <template>
@@ -32,6 +36,8 @@ onUnmounted(() => {
     <h1>Real-Time Counter from Loop</h1>
     <div id="counter-value">{{ counter }}</div>
     <p class="status">{{ connectionStatus }}</p>
+    <button @click="startPolling" type="button" class="p-2 bg-[green] text-white">Start</button>
+    <button @click="stopPolling" type="button" class="p-2 bg-[red] text-white">Stop</button>
   </div>
 </template>
 
