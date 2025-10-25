@@ -30,11 +30,14 @@ export interface AuthResponse {
 }
 
 export interface GameMineResponse extends User {
+  mined?: number
   vaultFull?: boolean
   message: string
 }
 
 export interface GameCollectResponse {
-  totalCoins: number
-  level: number
+  collected?: number
+  totalCoins?: number
+  level?: number
+  message?: string
 }

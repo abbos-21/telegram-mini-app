@@ -32,7 +32,8 @@ const getUserData = async () => {
 }
 
 const startMining = async () => {
-  await gameService.mine()
+  const response = await gameService.mine()
+  user.value = response.data
 }
 
 const miningLoop = async () => {
