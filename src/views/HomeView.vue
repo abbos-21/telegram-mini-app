@@ -32,13 +32,19 @@ const tempCoins = ref<number>(0)
 //   user.value = response.data
 // }
 
+let miningIntervalId: number | null = null
+
 const startMining = async () => {
+  if (miningIntervalId !== null) {
+    clearInterval(miningIntervalId)
+  }
+
   const response = await gameService.mine()
   const fixedTempCoins = response.data.tempCoins.toFixed(2)
   tempCoins.value = +fixedTempCoins
   user.value = response.data
 
-  setInterval(() => {
+  miningIntervalId = setInterval(() => {
     tempCoins.value += 0.01
   }, 1000)
 }
@@ -110,7 +116,7 @@ onMounted(async () => {
         <WidthdrawIcon class="ms-1 mt-1 w-7" />
       </RouterLink>
 
-      <RouterLink to="/counter">Counter</RouterLink>
+      <!-- <RouterLink to="/counter">Counter</RouterLink> -->
 
       <div class="flex flex-col gap-2 items-end">
         <div class="flex items-center justify-center p-2 bg-[#FAC487] border border-[#000]">
