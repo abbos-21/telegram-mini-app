@@ -150,7 +150,7 @@ onMounted(async () => {
     <div>
       <div class="flex justify-center items-center">
         <div class="w-[200px]">
-          <ProgressBar :current-value="tempCoins" :max-value="120" :min-value="0" />
+          <ProgressBar :current-value="+tempCoins.toFixed(2)" :max-value="120" :min-value="0" />
         </div>
       </div>
 
