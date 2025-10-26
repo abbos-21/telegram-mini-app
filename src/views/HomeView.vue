@@ -19,7 +19,7 @@ import BottlePopup from '@/components/BottlePopup.vue'
 import SpinPopup from '@/components/SpinPopup.vue'
 
 import { gameService } from '@/api/gameService'
-import { userService } from '@/api/userService'
+// import { userService } from '@/api/userService'
 import type { User } from '@/api/types'
 
 const user = ref<User | null>(null)
@@ -27,10 +27,10 @@ const isBottlePopupOpen = ref(false)
 const isSpinPopupOpen = ref(false)
 const tempCoins = ref<number>(0)
 
-const getUserData = async () => {
-  const response = await userService.getCurrentUser()
-  user.value = response.data
-}
+// const getUserData = async () => {
+//   const response = await userService.getCurrentUser()
+//   user.value = response.data
+// }
 
 const startMining = async () => {
   const response = await gameService.mine()
@@ -45,7 +45,7 @@ const startMining = async () => {
 
 const collectCoins = async () => {
   await gameService.collect()
-  await getUserData()
+  await startMining()
 }
 
 const openBottlePopup = () => (isBottlePopupOpen.value = true)

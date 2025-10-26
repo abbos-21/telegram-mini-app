@@ -35,9 +35,7 @@ export interface GameMineResponse extends User {
   message: string
 }
 
-export interface GameCollectResponse {
+export interface GameCollectResponse extends User {
   collected?: number
-  totalCoins?: number
-  level?: number
   message?: string
 }
