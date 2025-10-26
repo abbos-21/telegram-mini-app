@@ -178,7 +178,7 @@ onMounted(async () => {
           </svg>
 
           <span class="absolute inset-0 flex items-center justify-center font-bold">
-            {{ tempCoins }}
+            {{ tempCoins.toFixed(2) }}
           </span>
         </div>
       </div>
