@@ -25,6 +25,7 @@ import type { User } from '@/api/types'
 const user = ref<User | null>(null)
 const isBottlePopupOpen = ref(false)
 const isSpinPopupOpen = ref(false)
+const tempCoins = ref<number>(0)
 
 const getUserData = async () => {
   const response = await userService.getCurrentUser()
@@ -33,7 +34,8 @@ const getUserData = async () => {
 
 const startMining = async () => {
   const response = await gameService.mine()
-  tempCoins.value = response.data.tempCoins
+  const fixedTempCoins = response.data.tempCoins.toFixed(2)
+  tempCoins.value = +fixedTempCoins
   user.value = response.data
 
   setInterval(() => {
@@ -52,8 +54,6 @@ const openSpinPopup = () => (isSpinPopupOpen.value = true)
 const closeSpinPopup = () => (isSpinPopupOpen.value = false)
 
 // import { socket } from '@/api/socket'
-
-const tempCoins = ref<number>(0)
 
 // const connectionStatus = ref<string>('Connecting...')
 
