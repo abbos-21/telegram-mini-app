@@ -142,13 +142,6 @@ onMounted(async () => {
         </div>
       </div>
 
-      <p
-        v-if="user && tempCoins >= user.vaultCapacity"
-        class="text-red-600 font-bold text-center mt-2"
-      >
-        Vault full! Collect your coins to continue mining.
-      </p>
-
       <div class="flex justify-between mt-2">
         <div class="flex flex-col items-center">
           <HealthLevel
