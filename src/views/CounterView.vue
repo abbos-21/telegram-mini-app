@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
+
 import { socket } from '@/api/socket'
 
 const counter = ref<number>(0)

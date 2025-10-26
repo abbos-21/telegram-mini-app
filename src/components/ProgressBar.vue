@@ -1,0 +1,61 @@
+<script setup lang="ts">
+import { computed } from 'vue'
+
+interface Props {
+  currentValue: number
+  maxValue: number
+  minValue?: number
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  minValue: 0,
+})
+
+const progressPercentage = computed(() => {
+  const range = props.maxValue - props.minValue
+  const current = props.currentValue - props.minValue
+  return Math.min(100, Math.max(0, (current / range) * 100))
+})
+</script>
+
+<template>
+  <div class="container">
+    <div class="progress relative">
+      <span class="absolute inset-0 flex items-center justify-center">{{ currentValue }}</span>
+      <div class="progress-bar" :style="{ width: `${progressPercentage}%` }"></div>
+    </div>
+  </div>
+</template>
+
+<style scoped lang="scss">
+.container {
+  font-weight: bold;
+  color: #fff9e3;
+}
+
+.progress {
+  padding: 6px;
+  background: rgba(0, 0, 0, calc(0.25 + 0.25 / 4));
+  border-radius: 8px;
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.25),
+    0 1px rgba(255, 255, 255, 0.08);
+}
+
+.progress-bar {
+  height: 24px;
+  background-color: #fcbc51;
+  border-radius: 6px;
+  transition: width 0.4s linear;
+  background-image: linear-gradient(
+    45deg,
+    rgb(252, 163, 17) 25%,
+    transparent 25%,
+    transparent 50%,
+    rgb(252, 163, 17) 50%,
+    rgb(252, 163, 17) 75%,
+    transparent 75%,
+    transparent
+  );
+}
+</style>

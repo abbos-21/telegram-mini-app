@@ -21,6 +21,7 @@ import SpinPopup from '@/components/SpinPopup.vue'
 import { gameService } from '@/api/gameService'
 // import { userService } from '@/api/userService'
 import type { User } from '@/api/types'
+import ProgressBar from '@/components/ProgressBar.vue'
 
 const user = ref<User | null>(null)
 const isBottlePopupOpen = ref(false)
@@ -148,44 +149,8 @@ onMounted(async () => {
 
     <div>
       <div class="flex justify-center items-center">
-        <div class="relative w-[214px] h-[37px]">
-          <svg
-            width="214"
-            height="37"
-            viewBox="0 0 214 37"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <g clip-path="url(#clip0_608_57)">
-              <path
-                d="M193.56 0.991211C195.508 0.991264 197.283 1.70951 198.657 3.09272C200.389 4.83431 203.079 7.67949 205.659 10.9722C208.229 14.2519 210.739 18.0376 212.051 21.6566C213.357 25.2555 213.567 28.973 211.051 31.7686C208.6 34.4912 203.829 36.0091 196.091 36.0091H19.3339C17.2749 36.0091 15.3897 35.199 14.0031 33.6733C12.3605 31.8661 9.88787 29.0003 7.54287 25.7132C5.20634 22.438 2.95366 18.6857 1.8013 15.1121C0.656258 11.561 0.522202 7.92448 2.85208 5.18455C5.14514 2.48799 9.55987 0.991251 16.6359 0.991211H193.56Z"
-                fill="url(#paint0_linear_608_57)"
-                stroke="black"
-                stroke-width="2"
-                stroke-linejoin="round"
-              />
-            </g>
-            <defs>
-              <linearGradient
-                id="paint0_linear_608_57"
-                x1="212"
-                y1="18.5001"
-                x2="1.99987"
-                y2="18.5001"
-                gradientUnits="userSpaceOnUse"
-              >
-                <stop stop-color="white" stop-opacity="0" />
-                <stop offset="1" stop-color="#F0A206" />
-              </linearGradient>
-              <clipPath id="clip0_608_57">
-                <rect width="214" height="37" fill="white" />
-              </clipPath>
-            </defs>
-          </svg>
-
-          <span class="absolute inset-0 flex items-center justify-center font-bold">
-            {{ tempCoins.toFixed(2) }}
-          </span>
+        <div class="w-[200px]">
+          <ProgressBar :current-value="tempCoins" :max-value="120" :min-value="0" />
         </div>
       </div>
 
