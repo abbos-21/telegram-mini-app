@@ -164,7 +164,7 @@ onUnmounted(() => {
           </svg>
 
           <span class="absolute inset-0 flex items-center justify-center font-bold">
-            {{ tempCoins }}
+            {{ tempCoins }}; {{ user?.tempCoins }}
           </span>
         </div>
       </div>
