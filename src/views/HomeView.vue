@@ -19,7 +19,6 @@ import BottlePopup from '@/components/BottlePopup.vue'
 import SpinPopup from '@/components/SpinPopup.vue'
 
 import { gameService } from '@/api/gameService'
-// import { userService } from '@/api/userService'
 import type { User } from '@/api/types'
 import ProgressBar from '@/components/ProgressBar.vue'
 
@@ -27,11 +26,6 @@ const user = ref<User | null>(null)
 const isBottlePopupOpen = ref(false)
 const isSpinPopupOpen = ref(false)
 const tempCoins = ref<number>(0)
-
-// const getUserData = async () => {
-//   const response = await userService.getCurrentUser()
-//   user.value = response.data
-// }
 
 let miningIntervalId: number | null = null
 
@@ -71,6 +65,11 @@ const startMining = async () => {
 }
 
 const collectCoins = async () => {
+  if (!user.value || tempCoins.value < user.value.vaultCapacity) {
+    console.log('Vault not full. Collection prevented.')
+    return
+  }
+
   if (miningIntervalId !== null) {
     clearInterval(miningIntervalId)
     miningIntervalId = null
@@ -84,46 +83,9 @@ const closeBottlePopup = () => (isBottlePopupOpen.value = false)
 const openSpinPopup = () => (isSpinPopupOpen.value = true)
 const closeSpinPopup = () => (isSpinPopupOpen.value = false)
 
-// import { socket } from '@/api/socket'
-
-// const connectionStatus = ref<string>('Connecting...')
-
-// const EVENT_NAME = 'tempCoinsUpdate'
-
-// const handleCounterUpdate = (value: number) => {
-//   tempCoins.value = value
-// }
-
-// const miningLoop = async () => {
-//   try {
-//     await startMining()
-//   } catch (err) {
-//     console.log('Mining loop error: ', err)
-//   } finally {
-//     setTimeout(miningLoop, 1000)
-//   }
-// }
-
 onMounted(async () => {
   await startMining()
-
-  // if (socket.connected) {
-  //   connectionStatus.value = 'Connected ✅'
-  // }
-
-  // socket.on(EVENT_NAME, handleCounterUpdate)
-
-  // socket.on('connect', () => {
-  //   connectionStatus.value = 'Connected ✅'
-  // })
-  // socket.on('disconnect', () => {
-  //   connectionStatus.value = 'Disconnected 🛑'
-  // })
 })
-
-// onUnmounted(() => {
-//   socket.off(EVENT_NAME, handleCounterUpdate)
-// })
 </script>
 
 <template>
@@ -140,8 +102,6 @@ onMounted(async () => {
         <p class="font-bold">{{ user?.coins }}</p>
         <WidthdrawIcon class="ms-1 mt-1 w-7" />
       </RouterLink>
-
-      <!-- <RouterLink to="/counter">Counter</RouterLink> -->
 
       <div class="flex flex-col gap-2 items-end">
         <div class="flex items-center justify-center p-2 bg-[#FAC487] border border-[#000]">
@@ -174,17 +134,20 @@ onMounted(async () => {
     <div>
       <div class="flex justify-center items-center">
         <div class="w-[200px]">
-          <ProgressBar :current-value="+tempCoins.toFixed(2)" :max-value="120" :min-value="0" />
+          <ProgressBar
+            :current-value="+tempCoins.toFixed(2)"
+            :max-value="user?.vaultCapacity || 100"
+            :min-value="0"
+          />
         </div>
       </div>
 
-      <!-- 🚨 Vault full notice
       <p
-        v-if="user && user.tempCoins >= user.vaultCapacity"
+        v-if="user && tempCoins >= user.vaultCapacity"
         class="text-red-600 font-bold text-center mt-2"
       >
         Vault full! Collect your coins to continue mining.
-      </p> -->
+      </p>
 
       <div class="flex justify-between mt-2">
         <div class="flex flex-col items-center">
@@ -229,7 +192,12 @@ onMounted(async () => {
       <button
         type="button"
         @click="collectCoins"
-        class="bg-cover bg-center bg-no-repeat pb-1 font-semibold text-2xl cursor-pointer w-[223px] h-[65px]"
+        :disabled="!user || tempCoins < user.vaultCapacity"
+        class="bg-cover bg-center bg-no-repeat pb-1 font-semibold text-2xl w-[223px] h-[65px]"
+        :class="{
+          'cursor-not-allowed opacity-50': user && tempCoins < user.vaultCapacity,
+          'cursor-pointer': user && tempCoins >= user.vaultCapacity,
+        }"
         :style="{ backgroundImage: `url(${CollectBgImage})` }"
       >
         Collect
@@ -237,10 +205,8 @@ onMounted(async () => {
     </div>
   </div>
 
-  <!-- Bottle Popup -->
   <BottlePopup :is-open="isBottlePopupOpen" @close="closeBottlePopup" />
 
-  <!-- Spin Popup -->
   <SpinPopup :is-open="isSpinPopupOpen" @close="closeSpinPopup" />
 </template>
 
