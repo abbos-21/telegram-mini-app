@@ -58,9 +58,18 @@ const handleCounterUpdate = (value: number) => {
   tempCoins.value = value
 }
 
+const miningLoop = async () => {
+  try {
+    await startMining()
+  } catch (err) {
+    console.log('Mining loop error: ', err)
+  } finally {
+    setTimeout(miningLoop, 1000)
+  }
+}
+
 onMounted(async () => {
-  await getUserData()
-  await startMining()
+  miningLoop()
 
   if (socket.connected) {
     connectionStatus.value = 'Connected ✅'
