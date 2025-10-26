@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted } from 'vue'
 
 import { CoinIcon, WidthdrawIcon } from '@/assets/icons'
 import {
@@ -51,17 +51,17 @@ const closeBottlePopup = () => (isBottlePopupOpen.value = false)
 const openSpinPopup = () => (isSpinPopupOpen.value = true)
 const closeSpinPopup = () => (isSpinPopupOpen.value = false)
 
-import { socket } from '@/api/socket'
+// import { socket } from '@/api/socket'
 
 const tempCoins = ref<number>(0)
 
-const connectionStatus = ref<string>('Connecting...')
+// const connectionStatus = ref<string>('Connecting...')
 
-const EVENT_NAME = 'tempCoinsUpdate'
+// const EVENT_NAME = 'tempCoinsUpdate'
 
-const handleCounterUpdate = (value: number) => {
-  tempCoins.value = value
-}
+// const handleCounterUpdate = (value: number) => {
+//   tempCoins.value = value
+// }
 
 // const miningLoop = async () => {
 //   try {
@@ -76,23 +76,23 @@ const handleCounterUpdate = (value: number) => {
 onMounted(async () => {
   await startMining()
 
-  if (socket.connected) {
-    connectionStatus.value = 'Connected ✅'
-  }
+  // if (socket.connected) {
+  //   connectionStatus.value = 'Connected ✅'
+  // }
 
-  socket.on(EVENT_NAME, handleCounterUpdate)
+  // socket.on(EVENT_NAME, handleCounterUpdate)
 
-  socket.on('connect', () => {
-    connectionStatus.value = 'Connected ✅'
-  })
-  socket.on('disconnect', () => {
-    connectionStatus.value = 'Disconnected 🛑'
-  })
+  // socket.on('connect', () => {
+  //   connectionStatus.value = 'Connected ✅'
+  // })
+  // socket.on('disconnect', () => {
+  //   connectionStatus.value = 'Disconnected 🛑'
+  // })
 })
 
-onUnmounted(() => {
-  socket.off(EVENT_NAME, handleCounterUpdate)
-})
+// onUnmounted(() => {
+//   socket.off(EVENT_NAME, handleCounterUpdate)
+// })
 </script>
 
 <template>
