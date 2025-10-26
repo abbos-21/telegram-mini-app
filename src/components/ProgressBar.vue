@@ -43,7 +43,7 @@ const progressPercentage = computed(() => {
 }
 
 .progress-bar {
-  height: 24px;
+  height: 20px;
   background-color: #fcbc51;
   border-radius: 6px;
   transition: width 0.4s linear;

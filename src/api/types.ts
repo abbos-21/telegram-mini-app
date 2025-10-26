@@ -11,6 +11,7 @@ export interface User {
   coins: number
   level: number
   miningStarted: string
+  miningRate: number
   referredById: number
   referredBy: User
   referrals: User[]

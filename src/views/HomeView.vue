@@ -38,19 +38,43 @@ let miningIntervalId: number | null = null
 const startMining = async () => {
   if (miningIntervalId !== null) {
     clearInterval(miningIntervalId)
+    miningIntervalId = null
   }
 
   const response = await gameService.mine()
+  const miningRate = response.data.miningRate
+  const vaultCapacity = response.data.vaultCapacity
   const fixedTempCoins = response.data.tempCoins.toFixed(2)
   tempCoins.value = +fixedTempCoins
   user.value = response.data
 
   miningIntervalId = setInterval(() => {
-    tempCoins.value += 0.01
+    if (tempCoins.value < vaultCapacity) {
+      tempCoins.value += miningRate
+      if (tempCoins.value >= vaultCapacity) {
+        tempCoins.value = vaultCapacity
+
+        if (miningIntervalId !== null) {
+          clearInterval(miningIntervalId)
+          miningIntervalId = null
+          console.log('Mining stopped: Vault capacity reached.')
+        }
+      }
+    } else {
+      if (miningIntervalId !== null) {
+        clearInterval(miningIntervalId)
+        miningIntervalId = null
+        console.log('Mining stopped: Vault capacity reached.')
+      }
+    }
   }, 1000)
 }
 
 const collectCoins = async () => {
+  if (miningIntervalId !== null) {
+    clearInterval(miningIntervalId)
+    miningIntervalId = null
+  }
   await gameService.collect()
   await startMining()
 }
