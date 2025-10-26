@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import { socket } from '@/api/socket'
 
 import { CoinIcon, WidthdrawIcon } from '@/assets/icons'
 import {
@@ -26,14 +25,6 @@ import type { User } from '@/api/types'
 const user = ref<User | null>(null)
 const isBottlePopupOpen = ref(false)
 const isSpinPopupOpen = ref(false)
-const tempCoins = ref<number>(0.0)
-
-const EVENT_NAME = 'tempCoinsUpdated'
-const isConnected = ref<boolean>(socket.connected)
-
-const handleTempCoinsUpdate = (value: number) => {
-  tempCoins.value = value
-}
 
 const getUserData = async () => {
   const response = await userService.getCurrentUser()
@@ -45,16 +36,6 @@ const startMining = async () => {
   user.value = response.data
 }
 
-// const miningLoop = async () => {
-//   try {
-//     await startMining()
-//   } catch (error) {
-//     console.log('Mining error: ', error)
-//   } finally {
-//     setTimeout(miningLoop, 10000)
-//   }
-// }
-
 const collectCoins = async () => {
   await gameService.collect()
   await getUserData()
@@ -65,26 +46,38 @@ const closeBottlePopup = () => (isBottlePopupOpen.value = false)
 const openSpinPopup = () => (isSpinPopupOpen.value = true)
 const closeSpinPopup = () => (isSpinPopupOpen.value = false)
 
-// onMounted(async () => {
-//   await getUserData()
-//   await startMining()
-// })
+import { socket } from '@/api/socket'
+
+const tempCoins = ref<number>(0)
+
+const connectionStatus = ref<string>('Connecting...')
+
+const EVENT_NAME = 'tempCoinsUpdate'
+
+const handleCounterUpdate = (value: number) => {
+  tempCoins.value = value
+}
 
 onMounted(async () => {
   await getUserData()
   await startMining()
 
+  if (socket.connected) {
+    connectionStatus.value = 'Connected ✅'
+  }
+
+  socket.on(EVENT_NAME, handleCounterUpdate)
+
   socket.on('connect', () => {
-    isConnected.value = true
+    connectionStatus.value = 'Connected ✅'
   })
   socket.on('disconnect', () => {
-    isConnected.value = false
+    connectionStatus.value = 'Disconnected 🛑'
   })
-  socket.on('tempCoinsUpdated', handleTempCoinsUpdate)
 })
 
 onUnmounted(() => {
-  socket.off(EVENT_NAME, handleTempCoinsUpdate)
+  socket.off(EVENT_NAME, handleCounterUpdate)
 })
 </script>
 
@@ -176,13 +169,13 @@ onUnmounted(() => {
         </div>
       </div>
 
-      <!-- 🚨 Vault full notice -->
+      <!-- 🚨 Vault full notice
       <p
         v-if="user && user.tempCoins >= user.vaultCapacity"
         class="text-red-600 font-bold text-center mt-2"
       >
         Vault full! Collect your coins to continue mining.
-      </p>
+      </p> -->
 
       <div class="flex justify-between mt-2">
         <div class="flex flex-col items-center">

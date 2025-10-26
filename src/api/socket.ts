@@ -3,7 +3,6 @@ import { io } from 'socket.io-client'
 const URL = 'http://localhost:8080'
 
 const token = localStorage.getItem('token')
-console.log(token)
 
 export const socket = io(URL, {
   autoConnect: true,
