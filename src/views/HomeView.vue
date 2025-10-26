@@ -33,7 +33,12 @@ const getUserData = async () => {
 
 const startMining = async () => {
   const response = await gameService.mine()
+  tempCoins.value = response.data.tempCoins
   user.value = response.data
+
+  setInterval(() => {
+    tempCoins.value += 0.01
+  }, 1000)
 }
 
 const collectCoins = async () => {
@@ -58,18 +63,18 @@ const handleCounterUpdate = (value: number) => {
   tempCoins.value = value
 }
 
-const miningLoop = async () => {
-  try {
-    await startMining()
-  } catch (err) {
-    console.log('Mining loop error: ', err)
-  } finally {
-    setTimeout(miningLoop, 1000)
-  }
-}
+// const miningLoop = async () => {
+//   try {
+//     await startMining()
+//   } catch (err) {
+//     console.log('Mining loop error: ', err)
+//   } finally {
+//     setTimeout(miningLoop, 1000)
+//   }
+// }
 
 onMounted(async () => {
-  miningLoop()
+  await startMining()
 
   if (socket.connected) {
     connectionStatus.value = 'Connected ✅'
@@ -173,7 +178,7 @@ onUnmounted(() => {
           </svg>
 
           <span class="absolute inset-0 flex items-center justify-center font-bold">
-            {{ tempCoins }}; {{ user?.tempCoins }}
+            {{ tempCoins }}
           </span>
         </div>
       </div>
