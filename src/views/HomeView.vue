@@ -25,57 +25,72 @@ import ProgressBar from '@/components/ProgressBar.vue'
 const user = ref<User | null>(null)
 const isBottlePopupOpen = ref(false)
 const isSpinPopupOpen = ref(false)
-const tempCoins = ref<number>(0)
+// const tempCoins = ref<number>(0)
 
-let miningIntervalId: number | null = null
+// let miningIntervalId: number | null = null
 
-const startMining = async () => {
-  if (miningIntervalId !== null) {
-    clearInterval(miningIntervalId)
-    miningIntervalId = null
+// const startMining = async () => {
+//   if (miningIntervalId !== null) {
+//     clearInterval(miningIntervalId)
+//     miningIntervalId = null
+//   }
+
+//   const response = await gameService.mine()
+//   const miningRate = response.data.miningRate
+//   const vaultCapacity = response.data.vaultCapacity
+//   const fixedTempCoins = response.data.tempCoins.toFixed(2)
+//   tempCoins.value = +fixedTempCoins
+//   user.value = response.data
+
+//   miningIntervalId = setInterval(() => {
+//     if (tempCoins.value < vaultCapacity) {
+//       tempCoins.value += miningRate
+//       if (tempCoins.value >= vaultCapacity) {
+//         tempCoins.value = vaultCapacity
+
+//         if (miningIntervalId !== null) {
+//           clearInterval(miningIntervalId)
+//           miningIntervalId = null
+//           console.log('Mining stopped: Vault capacity reached.')
+//         }
+//       }
+//     } else {
+//       if (miningIntervalId !== null) {
+//         clearInterval(miningIntervalId)
+//         miningIntervalId = null
+//         console.log('Mining stopped: Vault capacity reached.')
+//       }
+//     }
+//   }, 1000)
+// }
+
+// const collectCoins = async () => {
+//   if (!user.value || tempCoins.value < user.value.vaultCapacity) {
+//     console.log('Vault not full. Collection prevented.')
+//     return
+//   }
+
+//   if (miningIntervalId !== null) {
+//     clearInterval(miningIntervalId)
+//     miningIntervalId = null
+//   }
+//   await gameService.collect()
+//   await startMining()
+// }
+
+const miningLoop = async () => {
+  try {
+    const response = await gameService.mine()
+    user.value = response.data
+  } catch (err) {
+    console.log('Mining loop error: ', err)
+  } finally {
+    setTimeout(miningLoop, 1000)
   }
-
-  const response = await gameService.mine()
-  const miningRate = response.data.miningRate
-  const vaultCapacity = response.data.vaultCapacity
-  const fixedTempCoins = response.data.tempCoins.toFixed(2)
-  tempCoins.value = +fixedTempCoins
-  user.value = response.data
-
-  miningIntervalId = setInterval(() => {
-    if (tempCoins.value < vaultCapacity) {
-      tempCoins.value += miningRate
-      if (tempCoins.value >= vaultCapacity) {
-        tempCoins.value = vaultCapacity
-
-        if (miningIntervalId !== null) {
-          clearInterval(miningIntervalId)
-          miningIntervalId = null
-          console.log('Mining stopped: Vault capacity reached.')
-        }
-      }
-    } else {
-      if (miningIntervalId !== null) {
-        clearInterval(miningIntervalId)
-        miningIntervalId = null
-        console.log('Mining stopped: Vault capacity reached.')
-      }
-    }
-  }, 1000)
 }
 
 const collectCoins = async () => {
-  if (!user.value || tempCoins.value < user.value.vaultCapacity) {
-    console.log('Vault not full. Collection prevented.')
-    return
-  }
-
-  if (miningIntervalId !== null) {
-    clearInterval(miningIntervalId)
-    miningIntervalId = null
-  }
   await gameService.collect()
-  await startMining()
 }
 
 const openBottlePopup = () => (isBottlePopupOpen.value = true)
@@ -83,8 +98,8 @@ const closeBottlePopup = () => (isBottlePopupOpen.value = false)
 const openSpinPopup = () => (isSpinPopupOpen.value = true)
 const closeSpinPopup = () => (isSpinPopupOpen.value = false)
 
-onMounted(async () => {
-  await startMining()
+onMounted(() => {
+  miningLoop()
 })
 </script>
 
@@ -135,7 +150,7 @@ onMounted(async () => {
       <div class="flex justify-center items-center">
         <div class="w-[200px]">
           <ProgressBar
-            :current-value="+tempCoins.toFixed(2)"
+            :current-value="user?.tempCoins as number"
             :max-value="user?.vaultCapacity || 100"
             :min-value="0"
           />
@@ -182,7 +197,7 @@ onMounted(async () => {
     </div>
 
     <div class="flex justify-center items-center">
-      <button
+      <!-- <button
         type="button"
         @click="collectCoins"
         :disabled="!user || tempCoins < user.vaultCapacity"
@@ -190,6 +205,20 @@ onMounted(async () => {
         :class="{
           'cursor-not-allowed opacity-50': user && tempCoins < user.vaultCapacity,
           'cursor-pointer': user && tempCoins >= user.vaultCapacity,
+        }"
+        :style="{ backgroundImage: `url(${CollectBgImage})` }"
+      >
+        Collect
+      </button> -->
+
+      <button
+        type="button"
+        @click="collectCoins"
+        :disabled="!user || user.tempCoins < user.vaultCapacity"
+        class="bg-cover bg-center bg-no-repeat pb-1 font-semibold text-2xl w-[223px] h-[65px]"
+        :class="{
+          'cursor-not-allowed opacity-50': user && user.tempCoins < user.vaultCapacity,
+          'cursor-pointer': user && user.tempCoins >= user.vaultCapacity,
         }"
         :style="{ backgroundImage: `url(${CollectBgImage})` }"
       >
