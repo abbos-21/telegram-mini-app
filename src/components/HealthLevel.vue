@@ -1,7 +1,7 @@
 <template>
   <div class="health-container-vertical">
     <div class="health-label">
-      <span class="health-text">{{ currentValue }}%</span>
+      <span class="health-text">{{ Math.round(percentage) }}%</span>
     </div>
 
     <div class="health-bar" :class="healthBarClass">

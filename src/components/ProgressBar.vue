@@ -21,7 +21,9 @@ const progressPercentage = computed(() => {
 <template>
   <div class="container">
     <div class="progress relative">
-      <span class="absolute inset-0 flex items-center justify-center">{{ currentValue }}</span>
+      <span class="absolute inset-0 flex items-center justify-center">{{
+        currentValue.toFixed(2)
+      }}</span>
       <div class="progress-bar" :style="{ width: `${progressPercentage}%` }"></div>
     </div>
   </div>

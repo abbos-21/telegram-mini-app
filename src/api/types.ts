@@ -20,6 +20,8 @@ export interface User {
   vaultCapacity: number
   energy: number
   health: number
+  energyMax: number
+  healthMax: number
 }
 
 export interface ApiResponse<T> {
