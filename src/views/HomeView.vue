@@ -160,8 +160,8 @@ onMounted(() => {
       <div class="flex justify-between mt-2">
         <div class="flex flex-col items-center">
           <HealthLevel
-            :current-value="100"
-            :max-value="100"
+            :current-value="user?.energy"
+            :max-value="60"
             :min-value="0"
             color="green"
             size="medium"

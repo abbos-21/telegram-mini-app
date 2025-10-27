@@ -18,6 +18,8 @@ export interface User {
   lastMiningTick: string
   tempCoins: number
   vaultCapacity: number
+  energy: number
+  health: number
 }
 
 export interface ApiResponse<T> {
