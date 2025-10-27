@@ -98,6 +98,11 @@ const closeBottlePopup = () => (isBottlePopupOpen.value = false)
 const openSpinPopup = () => (isSpinPopupOpen.value = true)
 const closeSpinPopup = () => (isSpinPopupOpen.value = false)
 
+const formatValue = (value: number) => {
+  const formattedValue = value.toFixed(2)
+  return +formattedValue
+}
+
 onMounted(() => {
   miningLoop()
 })
@@ -150,8 +155,8 @@ onMounted(() => {
       <div class="flex justify-center items-center">
         <div class="w-[200px]">
           <ProgressBar
-            :current-value="user?.tempCoins as number"
-            :max-value="user?.vaultCapacity || 100"
+            :current-value="formatValue(user?.tempCoins as number)"
+            :max-value="user?.vaultCapacity as number"
             :min-value="0"
           />
         </div>
@@ -160,7 +165,7 @@ onMounted(() => {
       <div class="flex justify-between mt-2">
         <div class="flex flex-col items-center">
           <HealthLevel
-            :current-value="Number(user?.health.toFixed(2))"
+            :current-value="formatValue(user?.health as number)"
             :max-value="60"
             :min-value="0"
             color="green"
@@ -172,7 +177,7 @@ onMounted(() => {
 
         <div class="flex flex-col items-center">
           <EnergyLevel
-            :current-value="Number(user?.energy.toFixed(2))"
+            :current-value="formatValue(user?.energy as number)"
             :max-value="60"
             :min-value="0"
             unit="min"
