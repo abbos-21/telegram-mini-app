@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
+import { useGame } from '@/composables/useGame'
+import { RouterLink } from 'vue-router'
 
 import { CoinIcon, WidthdrawIcon } from '@/assets/icons'
 import {
@@ -14,32 +16,13 @@ import {
 import { isMusicEnabled, isMusicAvailable, toggleMusic } from '@/stores/music'
 import EnergyLevel from '@/components/EnergyLevel.vue'
 import HealthLevel from '@/components/HealthLevel.vue'
-import { RouterLink } from 'vue-router'
 import BottlePopup from '@/components/BottlePopup.vue'
 import SpinPopup from '@/components/SpinPopup.vue'
-
-import { gameService } from '@/api/gameService'
-import type { User } from '@/api/types'
 import ProgressBar from '@/components/ProgressBar.vue'
 
-const user = ref<User | null>(null)
+const { user, mine, collect, sync } = useGame()
 const isBottlePopupOpen = ref(false)
 const isSpinPopupOpen = ref(false)
-
-const miningLoop = async () => {
-  try {
-    const response = await gameService.sync()
-    user.value = response.data
-  } catch (err) {
-    console.log('Mining loop error: ', err)
-  } finally {
-    setTimeout(miningLoop, 5000)
-  }
-}
-
-const collectCoins = async () => {
-  await gameService.collect()
-}
 
 const openBottlePopup = () => (isBottlePopupOpen.value = true)
 const closeBottlePopup = () => (isBottlePopupOpen.value = false)
@@ -47,8 +30,8 @@ const openSpinPopup = () => (isSpinPopupOpen.value = true)
 const closeSpinPopup = () => (isSpinPopupOpen.value = false)
 
 onMounted(async () => {
-  miningLoop()
-  await gameService.mine()
+  await sync()
+  await mine()
 })
 </script>
 
@@ -63,18 +46,16 @@ onMounted(async () => {
         class="flex items-center p-2 bg-[#FAC487] gap-2 border border-[#000]"
       >
         <CoinIcon class="w-6" />
-        <p class="font-bold">{{ user?.coins }}</p>
+        <p class="font-bold">{{ user?.coins ?? 0 }}</p>
         <WidthdrawIcon class="ms-1 mt-1 w-7" />
       </RouterLink>
 
       <div class="flex flex-col gap-2 items-end">
         <div class="flex items-center justify-center p-2 bg-[#FAC487] border border-[#000]">
-          <p class="font-bold">Your level: {{ user?.level }}</p>
+          <p class="font-bold">Your level: {{ user?.level ?? 0 }}</p>
         </div>
 
-        <button
-          class="flex items-center justify-center bg-[#FAC487] border border-[#000] cursor-pointer pe-2"
-        >
+        <button class="flex items-center justify-center bg-[#FAC487] border border-[#000] pe-2">
           <img :src="UkFlagImage" class="w-10 h-10" alt="" />
           <span class="font-bold">EN</span>
         </button>
@@ -99,39 +80,30 @@ onMounted(async () => {
       <div class="flex justify-center items-center">
         <div class="w-[200px]">
           <ProgressBar
-            :current-value="user?.tempCoins as number"
-            :max-value="user?.vaultCapacity as number"
+            :current-value="user?.tempCoins ?? 0"
+            :max-value="user?.vaultCapacity ?? 100"
             :min-value="0"
           />
         </div>
       </div>
 
       <div class="flex justify-between mt-2">
-        <div class="flex flex-col items-center">
-          <HealthLevel
-            :current-value="user?.currentHealth"
-            :max-value="user?.maxHealth"
-            :min-value="0"
-            color="green"
-            size="medium"
-            :show-glow="true"
-            :animated="true"
-          />
-        </div>
-
-        <div class="flex flex-col items-center">
-          <EnergyLevel
-            :current-value="user?.currentEnergy"
-            :max-value="user?.maxEnergy"
-            :min-value="0"
-            unit="min"
-            color="blue"
-            size="medium"
-            :show-glow="true"
-            :show-stats="false"
-            :animated="true"
-          />
-        </div>
+        <HealthLevel
+          :current-value="user?.currentHealth"
+          :max-value="user?.maxHealth"
+          color="green"
+          size="medium"
+          :show-glow="true"
+          :animated="true"
+        />
+        <EnergyLevel
+          :current-value="user?.currentEnergy"
+          :max-value="user?.maxEnergy"
+          color="blue"
+          size="medium"
+          :show-glow="true"
+          :animated="true"
+        />
       </div>
     </div>
 
@@ -146,23 +118,9 @@ onMounted(async () => {
     </div>
 
     <div class="flex justify-center items-center">
-      <!-- <button
-        type="button"
-        @click="collectCoins"
-        :disabled="!user || tempCoins < user.vaultCapacity"
-        class="bg-cover bg-center bg-no-repeat pb-1 font-semibold text-2xl w-[223px] h-[65px]"
-        :class="{
-          'cursor-not-allowed opacity-50': user && tempCoins < user.vaultCapacity,
-          'cursor-pointer': user && tempCoins >= user.vaultCapacity,
-        }"
-        :style="{ backgroundImage: `url(${CollectBgImage})` }"
-      >
-        Collect
-      </button> -->
-
       <button
         type="button"
-        @click="collectCoins"
+        @click="collect"
         :disabled="!user || user.tempCoins < user.vaultCapacity"
         class="bg-cover bg-center bg-no-repeat pb-1 font-semibold text-2xl w-[223px] h-[65px]"
         :class="{
@@ -177,7 +135,6 @@ onMounted(async () => {
   </div>
 
   <BottlePopup :is-open="isBottlePopupOpen" @close="closeBottlePopup" />
-
   <SpinPopup :is-open="isSpinPopupOpen" @close="closeSpinPopup" />
 </template>
 
@@ -185,15 +142,9 @@ onMounted(async () => {
 .music-button {
   transition: opacity 0.2s ease;
 }
-
-.music-button:hover {
-  opacity: 0.8;
-}
-
 .music-disabled {
   opacity: 0.7;
 }
-
 .diagonal-line {
   width: 40px;
   height: 2px;
