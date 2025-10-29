@@ -12,7 +12,6 @@ const startMiningSimulation = () => {
   miningInterval = setInterval(() => {
     if (!user.value) return
 
-    // Simulate coins locally
     user.value.tempCoins += user.value.miningRate
 
     if (user.value.tempCoins >= user.value.vaultCapacity) {
@@ -36,8 +35,8 @@ export function useGame() {
 
   const collect = async () => {
     const res = await gameService.collect()
-    user.value = res.data
-    startMiningSimulation() // restart if possible
+    user.value = res.data.user
+    startMiningSimulation()
   }
 
   const sync = async () => {
