@@ -121,7 +121,7 @@ onMounted(async () => {
       <button
         type="button"
         @click="collect"
-        :disabled="!user || user.tempCoins < user.vaultCapacity"
+        :disabled="!user || user.tempCoins < user.vaultCapacity * 0.1"
         class="bg-cover bg-center bg-no-repeat pb-1 font-semibold text-2xl w-[223px] h-[65px]"
         :class="{
           'cursor-not-allowed opacity-50': user && user.tempCoins < user.vaultCapacity,
