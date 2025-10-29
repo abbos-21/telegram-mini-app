@@ -19,7 +19,7 @@ export const gameService = {
     return response.data
   },
   recoverEnergy: async (): Promise<ApiResponse<User>> => {
-    const response = await apiClient.post<ApiResponse<User>>('/game/recover-health')
+    const response = await apiClient.post<ApiResponse<User>>('/game/recover-energy')
     return response.data
   },
 }
