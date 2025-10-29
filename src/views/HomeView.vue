@@ -47,8 +47,8 @@ const openSpinPopup = () => (isSpinPopupOpen.value = true)
 const closeSpinPopup = () => (isSpinPopupOpen.value = false)
 
 onMounted(async () => {
+  miningLoop()
   await gameService.mine()
-  setTimeout(miningLoop, 5000)
 })
 </script>
 
