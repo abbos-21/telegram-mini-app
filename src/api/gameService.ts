@@ -14,4 +14,12 @@ export const gameService = {
     const response = await apiClient.post<ApiResponse<User>>('/game/sync')
     return response.data
   },
+  recoverHealth: async (): Promise<ApiResponse<User>> => {
+    const response = await apiClient.post<ApiResponse<User>>('/game/recover-health')
+    return response.data
+  },
+  recoverEnergy: async (): Promise<ApiResponse<User>> => {
+    const response = await apiClient.post<ApiResponse<User>>('/game/recover-health')
+    return response.data
+  },
 }

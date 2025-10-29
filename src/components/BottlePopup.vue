@@ -3,6 +3,11 @@ import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { CoinIcon, CloseIcon, AdIcon, LeftArrowIcon, RightArrowIcon } from '@/assets/icons'
 import { HeartImage, FlashImage } from '@/assets/images'
 
+import { useGame } from '@/composables/useGame'
+
+// Destructuring the functions needed to perform the recovery
+const { recoverEnergy, recoverHealth } = useGame()
+
 interface Props {
   isOpen: boolean
 }
@@ -22,18 +27,22 @@ const sections = ref([
     title: 'Refill health',
     content: 'Fill health tank completely to continue coin mining.',
     image: HeartImage,
+    // Add an action key to make the logic cleaner in the functions
+    action: 'health',
   },
   {
     id: 2,
     title: 'Refill energy',
     content: 'Fill energy tank completely to continue coin mining.',
     image: FlashImage,
+    // Add an action key to make the logic cleaner in the functions
+    action: 'energy',
   },
 ])
 
 const currentSectionData = computed(() => {
   const section = sections.value[currentSection.value]
-  return section || { id: 0, title: '', content: '', image: '' }
+  return section || { id: 0, title: '', content: '', image: '', action: '' }
 })
 
 const nextSection = () => {
@@ -56,16 +65,42 @@ const closePopup = () => {
   emit('close')
 }
 
+/**
+ * Handles buying the current section's refill (health or energy) with coins.
+ */
 const buyWithCoins = () => {
-  // Handle buying health/energy with 25 coins
-  console.log('Buying with 25 coins')
-  // Add your logic here
+  console.log('Buying with 25 coins for:', currentSectionData.value.title)
+
+  if (currentSectionData.value.action === 'health') {
+    // Logic for buying health
+    // You'd typically check for sufficient coins here before calling recoverHealth
+    recoverHealth()
+  } else if (currentSectionData.value.action === 'energy') {
+    // Logic for buying energy
+    // You'd typically check for sufficient coins here before calling recoverEnergy
+    recoverEnergy()
+  }
+  // Optionally close the popup after purchase
+  closePopup()
 }
 
+/**
+ * Handles watching an ad for the current section's free refill (health or energy).
+ */
 const watchAd = () => {
-  // Handle watching ad for free refill
-  console.log('Watching ad for free refill')
-  // Add your logic here
+  console.log('Watching ad for free refill for:', currentSectionData.value.title)
+
+  if (currentSectionData.value.action === 'health') {
+    // Logic for watching ad for health
+    // You'd typically call a function to show the ad, then call recoverHealth on success
+    recoverHealth()
+  } else if (currentSectionData.value.action === 'energy') {
+    // Logic for watching ad for energy
+    // You'd typically call a function to show the ad, then call recoverEnergy on success
+    recoverEnergy()
+  }
+  // Optionally close the popup after a successful ad view
+  closePopup()
 }
 
 // Reset to first section when popup opens
@@ -113,19 +148,16 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <!-- Overlay -->
   <Transition name="overlay">
     <div
       v-if="isOpen"
       class="fixed inset-0 blur-overlay flex items-center justify-center z-50"
       @click="closePopup"
     >
-      <!-- Popup Container -->
       <div
         class="bg-[#FAC487] border-2 border-black rounded-lg p-6 max-w-sm w-full mx-4 relative shadow-2xl popup-container"
         @click.stop
       >
-        <!-- Close Button -->
         <button
           @click="closePopup"
           class="absolute -top-3 -right-3 w-12 h-10 bg-gradient-to-b from-red-400 to-red-600 text-white rounded-lg flex items-center justify-center border-2 border-black shadow-lg"
@@ -133,9 +165,7 @@ onUnmounted(() => {
           <CloseIcon class="w-6 h-6" />
         </button>
 
-        <!-- Carousel Content -->
         <div class="mt-4">
-          <!-- Section Image -->
           <div class="flex justify-center mb-4">
             <div
               class="w-24 h-24 bg-white border-2 border-black rounded-full flex items-center justify-center"
@@ -148,21 +178,17 @@ onUnmounted(() => {
             </div>
           </div>
 
-          <!-- Section Title -->
           <h3 class="text-xl font-bold text-center mb-3 text-black">
             {{ currentSectionData.title }}
           </h3>
 
-          <!-- Section Content -->
           <div class="bg-white border border-black rounded-lg p-4 mb-4">
             <p class="text-center text-gray-800 leading-relaxed">
               {{ currentSectionData.content }}
             </p>
           </div>
 
-          <!-- Action Buttons -->
           <div class="flex gap-3 mb-4">
-            <!-- Buy with Coins Button -->
             <button
               @click="buyWithCoins"
               class="flex-1 bg-[#D68C62] border-2 border-black rounded-lg p-3 flex items-center justify-center gap-2 hover:bg-[#C47A4F] transition-colors shadow-lg"
@@ -171,7 +197,6 @@ onUnmounted(() => {
               <span class="font-bold text-black">25</span>
             </button>
 
-            <!-- Watch Ad Button -->
             <button
               @click="watchAd"
               class="flex-1 bg-[#4CAF50] border-2 border-black rounded-lg p-3 flex items-center justify-center gap-2 hover:bg-[#45a049] transition-colors shadow-lg"
@@ -181,9 +206,7 @@ onUnmounted(() => {
             </button>
           </div>
 
-          <!-- Navigation Arrows -->
           <div class="flex justify-between items-center">
-            <!-- Left Arrow -->
             <button
               @click="prevSection"
               class="w-12 h-12 bg-[#D68C62] border-2 border-black rounded-full flex items-center justify-center hover:bg-[#C47A4F] transition-colors shadow-lg"
@@ -191,7 +214,6 @@ onUnmounted(() => {
               <LeftArrowIcon class="w-6 h-6 text-black" />
             </button>
 
-            <!-- Section Indicators -->
             <div class="flex space-x-2">
               <div
                 v-for="(section, index) in sections"
@@ -201,7 +223,6 @@ onUnmounted(() => {
               ></div>
             </div>
 
-            <!-- Right Arrow -->
             <button
               @click="nextSection"
               class="w-12 h-12 bg-[#D68C62] border-2 border-black rounded-full flex items-center justify-center hover:bg-[#C47A4F] transition-colors shadow-lg"
@@ -210,7 +231,6 @@ onUnmounted(() => {
             </button>
           </div>
 
-          <!-- Section Counter -->
           <div class="text-center mt-3">
             <span
               class="bg-white border border-black rounded-full px-3 py-1 text-sm font-bold text-gray-800"
@@ -225,6 +245,7 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
+/* Your CSS styles remain the same */
 /* Blur overlay effect */
 .blur-overlay {
   background: rgba(0, 0, 0, 0.2);

@@ -45,6 +45,18 @@ export function useGame() {
     if (user.value.isMining) startMiningSimulation()
   }
 
+  const recoverEnergy = async () => {
+    const res = await gameService.recoverEnergy()
+    user.value = res.data
+    if (user.value.isMining) startMiningSimulation()
+  }
+
+  const recoverHealth = async () => {
+    const res = await gameService.recoverHealth()
+    user.value = res.data
+    if (user.value.isMining) startMiningSimulation()
+  }
+
   onUnmounted(stopMiningSimulation)
 
   return {
@@ -52,6 +64,8 @@ export function useGame() {
     mine,
     collect,
     sync,
+    recoverEnergy,
+    recoverHealth,
     isMining: computed(() => user.value?.isMining ?? false),
   }
 }
