@@ -25,67 +25,15 @@ import ProgressBar from '@/components/ProgressBar.vue'
 const user = ref<User | null>(null)
 const isBottlePopupOpen = ref(false)
 const isSpinPopupOpen = ref(false)
-// const tempCoins = ref<number>(0)
-
-// let miningIntervalId: number | null = null
-
-// const startMining = async () => {
-//   if (miningIntervalId !== null) {
-//     clearInterval(miningIntervalId)
-//     miningIntervalId = null
-//   }
-
-//   const response = await gameService.mine()
-//   const miningRate = response.data.miningRate
-//   const vaultCapacity = response.data.vaultCapacity
-//   const fixedTempCoins = response.data.tempCoins.toFixed(2)
-//   tempCoins.value = +fixedTempCoins
-//   user.value = response.data
-
-//   miningIntervalId = setInterval(() => {
-//     if (tempCoins.value < vaultCapacity) {
-//       tempCoins.value += miningRate
-//       if (tempCoins.value >= vaultCapacity) {
-//         tempCoins.value = vaultCapacity
-
-//         if (miningIntervalId !== null) {
-//           clearInterval(miningIntervalId)
-//           miningIntervalId = null
-//           console.log('Mining stopped: Vault capacity reached.')
-//         }
-//       }
-//     } else {
-//       if (miningIntervalId !== null) {
-//         clearInterval(miningIntervalId)
-//         miningIntervalId = null
-//         console.log('Mining stopped: Vault capacity reached.')
-//       }
-//     }
-//   }, 1000)
-// }
-
-// const collectCoins = async () => {
-//   if (!user.value || tempCoins.value < user.value.vaultCapacity) {
-//     console.log('Vault not full. Collection prevented.')
-//     return
-//   }
-
-//   if (miningIntervalId !== null) {
-//     clearInterval(miningIntervalId)
-//     miningIntervalId = null
-//   }
-//   await gameService.collect()
-//   await startMining()
-// }
 
 const miningLoop = async () => {
   try {
-    const response = await gameService.mine()
+    const response = await gameService.sync()
     user.value = response.data
   } catch (err) {
     console.log('Mining loop error: ', err)
   } finally {
-    setTimeout(miningLoop, 1000)
+    setTimeout(miningLoop, 5000)
   }
 }
 
@@ -98,8 +46,9 @@ const closeBottlePopup = () => (isBottlePopupOpen.value = false)
 const openSpinPopup = () => (isSpinPopupOpen.value = true)
 const closeSpinPopup = () => (isSpinPopupOpen.value = false)
 
-onMounted(() => {
-  miningLoop()
+onMounted(async () => {
+  await gameService.mine()
+  setTimeout(miningLoop, 5000)
 })
 </script>
 
@@ -160,8 +109,8 @@ onMounted(() => {
       <div class="flex justify-between mt-2">
         <div class="flex flex-col items-center">
           <HealthLevel
-            :current-value="user?.health"
-            :max-value="user?.healthMax"
+            :current-value="user?.currentHealth"
+            :max-value="user?.maxHealth"
             :min-value="0"
             color="green"
             size="medium"
@@ -172,8 +121,8 @@ onMounted(() => {
 
         <div class="flex flex-col items-center">
           <EnergyLevel
-            :current-value="user?.energy"
-            :max-value="user?.energyMax"
+            :current-value="user?.currentEnergy"
+            :max-value="user?.maxEnergy"
             :min-value="0"
             unit="min"
             color="blue"

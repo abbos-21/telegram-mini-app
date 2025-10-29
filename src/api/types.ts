@@ -10,7 +10,6 @@ export interface User {
   updatedAt: string
   coins: number
   level: number
-  miningStarted: string
   miningRate: number
   referredById: number
   referredBy: User
@@ -18,15 +17,19 @@ export interface User {
   lastMiningTick: string
   tempCoins: number
   vaultCapacity: number
-  energy: number
-  health: number
-  energyMax: number
-  healthMax: number
+  currentEnergy: number
+  currentHealth: number
+  maxEnergy: number
+  maxHealth: number
+  healthPerSecond: number
+  energyPerSecond: number
+  isMining: boolean
 }
 
 export interface ApiResponse<T> {
   data: T
   success?: boolean
+  message?: string
 }
 
 export interface AuthResponse {
