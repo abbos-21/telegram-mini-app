@@ -1,7 +1,7 @@
 <template>
   <div class="energy-container-vertical">
     <div class="energy-label">
-      <span class="energy-text">{{ Math.round(currentValue) }} {{ unit }}</span>
+      <span class="energy-text">{{ Math.round(currentValue / 60) }} {{ unit }}</span>
     </div>
 
     <div class="energy-bar" :class="energyBarClass">
