@@ -43,10 +43,22 @@ const runChainUntilSuccess = async (functions: Array<() => Promise<unknown>>) =>
   console.error('FAILURE: All functions in the chain failed to execute successfully.')
 }
 
+const syncLoop = async () => {
+  try {
+    await sync()
+  } catch (err) {
+    console.log('Sync error: ', err)
+  } finally {
+    setTimeout(syncLoop, 5000)
+  }
+}
+
 onMounted(async () => {
   const functionChain = [sync, mine, getUserData]
 
   await runChainUntilSuccess(functionChain)
+
+  setTimeout(syncLoop, 5000)
 })
 </script>
 
@@ -61,7 +73,7 @@ onMounted(async () => {
         class="flex items-center p-2 bg-[#FAC487] gap-2 border border-[#000]"
       >
         <CoinIcon class="w-6" />
-        <p class="font-bold">{{ user?.coins ?? 0 }}</p>
+        <p class="font-bold">{{ user?.coins.toFixed(2) ?? 0 }}</p>
         <WidthdrawIcon class="ms-1 mt-1 w-7" />
       </RouterLink>
 
