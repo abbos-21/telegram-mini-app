@@ -4,6 +4,8 @@ import type {
   GameCollectCoinsApiResponse,
   GameSyncApiResponse,
   GameRecoveryApiResponse,
+  GameSpinWheelSpinApiResponse,
+  GameSpinWheelStatusApiResponse,
 } from './types'
 
 export const gameService = {
@@ -25,6 +27,15 @@ export const gameService = {
   },
   recoverEnergy: async (): Promise<GameRecoveryApiResponse> => {
     const response = await apiClient.post<GameRecoveryApiResponse>('/game/recover-energy')
+    return response.data
+  },
+
+  getSpinWheelStatus: async (): Promise<GameSpinWheelStatusApiResponse> => {
+    const response = await apiClient.get<GameSpinWheelStatusApiResponse>('/game/spin-wheel/status')
+    return response.data
+  },
+  spinWheel: async (): Promise<GameSpinWheelSpinApiResponse> => {
+    const response = await apiClient.post<GameSpinWheelSpinApiResponse>('/game/spin-wheel')
     return response.data
   },
 }

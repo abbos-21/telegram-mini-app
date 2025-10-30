@@ -58,3 +58,22 @@ export type GameCollectCoinsApiResponse = ApiResponse<GameCollectCoinsResponseDa
 
 export type GameRecoveryResponseData = UserDataResponse
 export type GameRecoveryApiResponse = ApiResponse<GameRecoveryResponseData>
+
+export interface GameSpinWheelStatusApiResponse {
+  status: string
+  data: {
+    canSpin: boolean
+    remaining?: {
+      hours: number
+      minutes: number
+    }
+  }
+}
+
+export interface GameSpinWheelSpinApiResponse {
+  status: string
+  data: {
+    prize: number
+    nextSpinAt: string
+  }
+}

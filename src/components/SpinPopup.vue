@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import { ref, watch, onMounted, onUnmounted } from 'vue'
-import { CoinIcon, CloseIcon } from '@/assets/icons'
-import { SpinImage } from '@/assets/images'
 import SpinWheel from './SpinWheel.vue'
+import { CloseIcon } from '@/assets/icons'
 
 interface Props {
   isOpen: boolean
@@ -12,7 +10,7 @@ interface Emits {
   (e: 'close'): void
 }
 
-const props = defineProps<Props>()
+defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 const closePopup = () => {
