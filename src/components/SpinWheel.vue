@@ -31,52 +31,41 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, type CSSProperties } from 'vue'
 import { useSpinWheel } from '@/composables/useSpinWheel'
+import { useGame } from '@/composables/useGame'
 
 interface Segment {
   label: string
   color: string
 }
 
-const props = defineProps<{
-  segments?: Segment[]
-  size?: number
-  spins?: number
-  duration?: number
-}>()
-
 const emit = defineEmits<{
   (e: 'finish', payload: { index: number; label: string }): void
 }>()
 
-// 🎮 Spin Wheel composable
 const { canSpin, cooldownRemaining, spin, fetchStatus } = useSpinWheel()
+const { sync } = useGame()
 
-// 🧩 Defaults
-const segments = computed<Segment[]>(
-  () =>
-    props.segments ?? [
-      { label: '5 🪙', color: '#F44336' },
-      { label: '10 🪙', color: '#E91E63' },
-      { label: '15 🪙', color: '#9C27B0' },
-      { label: '20 🪙', color: '#3F51B5' },
-      { label: '25 🪙', color: '#03A9F4' },
-      { label: '30 🪙', color: '#4CAF50' },
-      { label: '35 🪙', color: '#FF9800' },
-      { label: '40 🪙', color: '#8BC34A' },
-    ],
-)
-const size = computed(() => props.size ?? 300)
-const spins = computed(() => props.spins ?? 5)
-const duration = computed(() => props.duration ?? 4000)
+const segments = computed<Segment[]>(() => [
+  { label: '5 🪙', color: '#F44336' },
+  { label: '10 🪙', color: '#E91E63' },
+  { label: '15 🪙', color: '#9C27B0' },
+  { label: '20 🪙', color: '#3F51B5' },
+  { label: '25 🪙', color: '#03A9F4' },
+  { label: '30 🪙', color: '#4CAF50' },
+  { label: '35 🪙', color: '#FF9800' },
+  { label: '40 🪙', color: '#8BC34A' },
+])
+
+const size = 300
+const spins = 5
+const duration = 4000
 
 const wheelRef = ref<HTMLDivElement | null>(null)
 const spinning = ref(false)
 const currentRotation = ref(0)
-const targetRotation = ref(0)
 const result = ref<number | null>(null)
 
 const degPer = computed(() => 360 / segments.value.length)
-
 const wheelBackground = computed(() => {
   const parts = segments.value.map(
     (s, i) => `${s.color} ${i * degPer.value}deg ${(i + 1) * degPer.value}deg`,
@@ -85,30 +74,29 @@ const wheelBackground = computed(() => {
 })
 
 const wheelStyle = computed<CSSProperties>(() => ({
-  width: `${size.value}px`,
-  height: `${size.value}px`,
+  width: `${size}px`,
+  height: `${size}px`,
   borderRadius: '50%',
   background: wheelBackground.value,
   transform: `rotate(${currentRotation.value}deg)`,
-  transition: spinning.value ? `transform ${duration.value}ms cubic-bezier(.22,.9,.31,1)` : 'none',
+  transition: spinning.value ? `transform ${duration}ms cubic-bezier(.22,.9,.31,1)` : 'none',
   position: 'relative',
   overflow: 'hidden',
 }))
 
-const resultLabel = computed(() => {
-  if (result.value === null) return ''
-  return segments.value[result.value]?.label ?? ''
-})
+const resultLabel = computed(() =>
+  result.value !== null ? (segments.value[result.value]?.label ?? '') : '',
+)
 
 function labelStyle(index: number): CSSProperties {
   const rotation = degPer.value * index + degPer.value / 2
-  const distanceFromCenter = size.value * 0.42
+  const distance = size * 0.42
   return {
     position: 'absolute',
     top: '50%',
     left: '50%',
     transformOrigin: '0 0',
-    transform: `rotate(${rotation}deg) translate(${distanceFromCenter}px, -50%) rotate(90deg)`,
+    transform: `rotate(${rotation}deg) translate(${distance}px, -50%) rotate(90deg)`,
     textAlign: 'center',
     fontSize: '14px',
     color: '#fff',
@@ -119,12 +107,12 @@ function labelStyle(index: number): CSSProperties {
 }
 
 function randomJitter(): number {
-  const maxJitter = Math.max(0, degPer.value - 8)
-  return Math.random() * maxJitter
+  return Math.random() * (degPer.value - 8)
 }
 
 async function handleSpin() {
   if (spinning.value || !canSpin.value) return
+
   spinning.value = true
   result.value = null
 
@@ -140,22 +128,27 @@ async function handleSpin() {
 
   const segmentCenter = index * degPer.value + degPer.value / 2
   const rotationNeededMod = (270 - segmentCenter + 360) % 360
-  const fullRotation = spins.value * 360
+  const fullRotation = spins * 360
 
-  targetRotation.value = currentRotation.value + fullRotation + rotationNeededMod + randomJitter()
-  currentRotation.value = Math.round(targetRotation.value * 1000) / 1000
+  currentRotation.value += fullRotation + rotationNeededMod + randomJitter()
 }
 
-function onTransitionEnd(e: TransitionEvent) {
+async function onTransitionEnd(e: TransitionEvent) {
   if (e.propertyName !== 'transform') return
   spinning.value = false
 
   const normalized = ((currentRotation.value % 360) + 360) % 360
-  const centerAngleAtTop = (270 - normalized + 360) % 360
-  const idx = Math.floor(centerAngleAtTop / degPer.value) % segments.value.length
+  const centerAngle = (270 - normalized + 360) % 360
+  const idx = Math.floor(centerAngle / degPer.value) % segments.value.length
 
   result.value = idx
   emit('finish', { index: idx, label: segments.value[idx]?.label ?? '' })
+
+  try {
+    await sync()
+  } catch (err) {
+    console.error('❌ Sync after spin failed:', err)
+  }
 }
 
 onMounted(fetchStatus)
