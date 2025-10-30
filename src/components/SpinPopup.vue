@@ -19,18 +19,11 @@ const { sync } = useGame()
 const isSpinning = ref(false)
 const hasFinished = ref(false)
 
-/**
- * Handles closing of popup.
- * Prevents closing while wheel is spinning.
- * Automatically syncs if popup was closed right after finishing.
- */
 const closePopup = async () => {
   if (isSpinning.value) return
 
   emit('close')
 
-  // If the user closes popup immediately after spin finishes,
-  // ensure sync() is called one last time.
   if (hasFinished.value) {
     try {
       await sync()
@@ -41,9 +34,6 @@ const closePopup = async () => {
   }
 }
 
-/**
- * Called from <SpinWheel /> when spinning starts or stops.
- */
 const handleSpinning = (value: boolean) => {
   isSpinning.value = value
   if (!value) {
@@ -68,23 +58,15 @@ const handleSpinning = (value: boolean) => {
           @click="closePopup"
           :disabled="isSpinning"
           :class="[
-            'absolute -top-3 -right-3 w-12 h-10 rounded-lg flex items-center justify-center border-2 border-black shadow-lg transition-transform',
+            'absolute -top-3 -right-3 w-12 h-10 rounded-lg flex items-center justify-center border-2 border-black shadow-lg transition-transform z-30',
             isSpinning
-              ? 'bg-gray-400 cursor-not-allowed opacity-70'
+              ? 'bg-gray-400 cursor-not-allowed'
               : 'bg-gradient-to-b from-red-400 to-red-600 text-white hover:scale-105 active:scale-95',
           ]"
           title="Close"
         >
           <CloseIcon class="w-6 h-6" />
         </button>
-
-        <!-- Overlay shown while spinning -->
-        <div
-          v-if="isSpinning"
-          class="absolute inset-0 bg-black/10 backdrop-blur-[2px] rounded-lg flex items-center justify-center z-20"
-        >
-          <span class="text-black/80 font-semibold text-lg animate-pulse"> Spinning... </span>
-        </div>
 
         <SpinWheel @spinning="handleSpinning" />
       </div>
