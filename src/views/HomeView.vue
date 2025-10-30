@@ -44,7 +44,7 @@ const runChainUntilSuccess = async (functions: Array<() => Promise<unknown>>) =>
 }
 
 onMounted(async () => {
-  const functionChain = [mine, sync, getUserData]
+  const functionChain = [sync, mine, getUserData]
 
   await runChainUntilSuccess(functionChain)
 })
