@@ -55,7 +55,7 @@ const segments = computed<Segment[]>(() => [
   { label: '40 🪙', color: '#8BC34A' },
 ])
 
-const size = 300
+const size = 250
 const spins = 5
 const duration = 4000
 
