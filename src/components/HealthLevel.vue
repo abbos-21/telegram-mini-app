@@ -9,7 +9,6 @@
         <div class="health-glow" v-if="showGlow"></div>
       </div>
 
-      <!-- Segments for visual appeal -->
       <div class="health-segments-vertical">
         <div
           v-for="segment in segments"
@@ -79,7 +78,6 @@ const segments = computed(() => {
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  font-family: 'Arial', sans-serif;
 }
 
 .health-label {
@@ -105,7 +103,6 @@ const segments = computed(() => {
   align-items: stretch;
 }
 
-/* Sizes */
 .health-bar-small {
   width: 12px;
   height: 60px;
@@ -117,8 +114,8 @@ const segments = computed(() => {
 }
 
 .health-bar-large {
-  width: 20px;
-  height: 150px;
+  width: 25px;
+  height: 250px;
 }
 
 @media only screen and (max-height: 700px) {
@@ -127,7 +124,6 @@ const segments = computed(() => {
   }
 }
 
-/* Color Borders */
 .health-bar-green {
   border-color: #16a34a;
 }
@@ -148,7 +144,6 @@ const segments = computed(() => {
   position: relative;
 }
 
-/* Fill Gradients */
 .health-fill-green {
   background: linear-gradient(180deg, #22c55e 0%, #15803d 100%);
 }
@@ -174,7 +169,6 @@ const segments = computed(() => {
   animation: shimmer 2s infinite;
 }
 
-/* Segments */
 .health-segments-vertical {
   position: absolute;
   inset: 0;
@@ -195,7 +189,6 @@ const segments = computed(() => {
   background: rgba(255, 255, 255, 0.1);
 }
 
-/* Icon */
 .health-icon img {
   display: block;
   filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.5));

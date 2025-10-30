@@ -1,25 +1,30 @@
 import apiClient from './axios'
-import type { ApiResponse, GameCollectResponse, GameMineResponse, User } from './types'
+import type {
+  GameStartMiningApiResponse,
+  GameCollectCoinsApiResponse,
+  GameSyncApiResponse,
+  GameRecoveryApiResponse,
+} from './types'
 
 export const gameService = {
-  mine: async (): Promise<ApiResponse<GameMineResponse>> => {
-    const response = await apiClient.post<ApiResponse<GameMineResponse>>('/game/start-mining')
+  mine: async (): Promise<GameStartMiningApiResponse> => {
+    const response = await apiClient.post<GameStartMiningApiResponse>('/game/start-mining')
     return response.data
   },
-  collect: async (): Promise<ApiResponse<GameCollectResponse>> => {
-    const response = await apiClient.post<ApiResponse<GameCollectResponse>>('/game/collect-coins')
+  collect: async (): Promise<GameCollectCoinsApiResponse> => {
+    const response = await apiClient.post<GameCollectCoinsApiResponse>('/game/collect-coins')
     return response.data
   },
-  sync: async (): Promise<ApiResponse<User>> => {
-    const response = await apiClient.post<ApiResponse<User>>('/game/sync')
+  sync: async (): Promise<GameSyncApiResponse> => {
+    const response = await apiClient.post<GameSyncApiResponse>('/game/sync')
     return response.data
   },
-  recoverHealth: async (): Promise<ApiResponse<User>> => {
-    const response = await apiClient.post<ApiResponse<User>>('/game/recover-health')
+  recoverHealth: async (): Promise<GameRecoveryApiResponse> => {
+    const response = await apiClient.post<GameRecoveryApiResponse>('/game/recover-health')
     return response.data
   },
-  recoverEnergy: async (): Promise<ApiResponse<User>> => {
-    const response = await apiClient.post<ApiResponse<User>>('/game/recover-energy')
+  recoverEnergy: async (): Promise<GameRecoveryApiResponse> => {
+    const response = await apiClient.post<GameRecoveryApiResponse>('/game/recover-energy')
     return response.data
   },
 }

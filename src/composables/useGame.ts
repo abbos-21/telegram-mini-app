@@ -1,6 +1,7 @@
 import { ref, computed, onUnmounted } from 'vue'
 import { gameService } from '@/api/gameService'
 import type { User } from '@/api/types'
+import { userService } from '@/api/userService'
 
 const user = ref<User | null>(null)
 let miningInterval: ReturnType<typeof setInterval> | null = null
@@ -29,7 +30,7 @@ const stopMiningSimulation = () => {
 export function useGame() {
   const mine = async () => {
     const res = await gameService.mine()
-    user.value = res.data
+    user.value = res.data.user
     startMiningSimulation()
   }
 
@@ -41,19 +42,26 @@ export function useGame() {
 
   const sync = async () => {
     const res = await gameService.sync()
-    user.value = res.data
+    user.value = res.data.user
     if (user.value.isMining) startMiningSimulation()
+  }
+
+  const getUserData = async () => {
+    const res = await userService.getCurrentUser()
+    user.value = res.data.user
   }
 
   const recoverEnergy = async () => {
     const res = await gameService.recoverEnergy()
-    user.value = res.data
+    user.value = res.data.user
+    await mine()
     if (user.value.isMining) startMiningSimulation()
   }
 
   const recoverHealth = async () => {
     const res = await gameService.recoverHealth()
-    user.value = res.data
+    user.value = res.data.user
+    await mine()
     if (user.value.isMining) startMiningSimulation()
   }
 
@@ -66,6 +74,7 @@ export function useGame() {
     sync,
     recoverEnergy,
     recoverHealth,
+    getUserData,
     isMining: computed(() => user.value?.isMining ?? false),
   }
 }

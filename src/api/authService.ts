@@ -1,15 +1,15 @@
 import apiClient from './axios'
 import WebApp from '@twa-dev/sdk'
-import type { ApiResponse, AuthResponse } from './types'
+import type { AuthApiResponse } from './types'
 
 export const authService = {
-  loginWithTelegram: async (): Promise<ApiResponse<AuthResponse>> => {
+  loginWithTelegram: async (): Promise<AuthApiResponse> => {
     const initData = WebApp.initData
     const ref = new URLSearchParams(window.location.search).get('ref')
 
-    if (!initData) throw new Error('Telegram WebApp initData is missing.')
+    if (!initData) throw new Error('Telegram WebApp initData is missing')
 
-    const { data } = await apiClient.post<ApiResponse<AuthResponse>>('/auth', { initData, ref })
+    const { data } = await apiClient.post<AuthApiResponse>('/auth', { initData, ref })
 
     localStorage.setItem('token', data.data.token)
     localStorage.setItem('user', JSON.stringify(data.data.user))

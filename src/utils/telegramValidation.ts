@@ -11,7 +11,7 @@ export function useTelegram() {
 
     if (!isTelegram || !user) {
       document.body.innerHTML = `
-        <div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;text-align:center;">
+        <div style="display:flex;align-items:center;justify-content:center;height:100vh;text-align:center;">
           <div>
             <h2>Access Denied 🚫</h2>
             <p>Please open this app inside <b>Telegram</b>.</p>

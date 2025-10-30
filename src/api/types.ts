@@ -1,6 +1,6 @@
 export interface User {
   id: number
-  telegramId: number
+  telegramId: string
   username?: string
   firstName?: string
   lastName?: string
@@ -11,19 +11,19 @@ export interface User {
   coins: number
   level: number
   miningRate: number
-  referredById: number
-  referredBy: User
-  referrals: User[]
-  lastMiningTick: string
+  referredById: number | null
+  referredBy?: User
+  referrals?: User[]
+  lastMiningTick: string | null
+  isMining: boolean
   tempCoins: number
   vaultCapacity: number
-  currentEnergy: number
   currentHealth: number
-  maxEnergy: number
   maxHealth: number
+  currentEnergy: number
+  maxEnergy: number
   healthPerSecond: number
   energyPerSecond: number
-  isMining: boolean
 }
 
 export interface ApiResponse<T> {
@@ -32,18 +32,29 @@ export interface ApiResponse<T> {
   message?: string
 }
 
-export interface AuthResponse {
+export type UserDataResponse = {
+  user: User
+}
+
+export type AuthResponseData = {
   token: string
   user: User
 }
+export type AuthApiResponse = ApiResponse<AuthResponseData>
 
-export interface GameMineResponse extends User {
-  mined?: number
-  vaultFull?: boolean
-  message: string
-}
+export type GameStartMiningResponseData = UserDataResponse
+export type GameStartMiningApiResponse = ApiResponse<GameStartMiningResponseData>
 
-export interface GameCollectResponse {
-  user: User
+export type GameStopMiningResponseData = UserDataResponse
+export type GameStopMiningApiResponse = ApiResponse<GameStopMiningResponseData>
+
+export type GameSyncResponseData = UserDataResponse
+export type GameSyncApiResponse = ApiResponse<GameSyncResponseData>
+
+export type GameCollectCoinsResponseData = UserDataResponse & {
   coinsCollected: number
 }
+export type GameCollectCoinsApiResponse = ApiResponse<GameCollectCoinsResponseData>
+
+export type GameRecoveryResponseData = UserDataResponse
+export type GameRecoveryApiResponse = ApiResponse<GameRecoveryResponseData>

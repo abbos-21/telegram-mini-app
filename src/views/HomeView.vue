@@ -20,7 +20,7 @@ import BottlePopup from '@/components/BottlePopup.vue'
 import SpinPopup from '@/components/SpinPopup.vue'
 import ProgressBar from '@/components/ProgressBar.vue'
 
-const { user, mine, collect, sync } = useGame()
+const { user, mine, collect, sync, getUserData } = useGame()
 const isBottlePopupOpen = ref(false)
 const isSpinPopupOpen = ref(false)
 
@@ -29,9 +29,24 @@ const closeBottlePopup = () => (isBottlePopupOpen.value = false)
 const openSpinPopup = () => (isSpinPopupOpen.value = true)
 const closeSpinPopup = () => (isSpinPopupOpen.value = false)
 
+const runChainUntilSuccess = async (functions: Array<() => Promise<unknown>>) => {
+  for (const func of functions) {
+    try {
+      await func()
+      console.log(`Successfully executed: ${func.name}. Stopping chain.`)
+      return
+    } catch (error) {
+      console.warn(`Function ${func.name} failed. Moving to next function.`, error)
+    }
+  }
+
+  console.error('FAILURE: All functions in the chain failed to execute successfully.')
+}
+
 onMounted(async () => {
-  await sync()
-  await mine()
+  const functionChain = [mine, sync, getUserData]
+
+  await runChainUntilSuccess(functionChain)
 })
 </script>
 

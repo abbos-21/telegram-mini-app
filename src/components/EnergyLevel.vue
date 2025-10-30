@@ -82,7 +82,6 @@ const segments = computed(() => {
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  font-family: 'Arial', sans-serif;
 }
 
 .energy-label {
@@ -107,7 +106,6 @@ const segments = computed(() => {
   flex-direction: column-reverse;
 }
 
-/* Sizes */
 .energy-bar-small {
   width: 12px;
   height: 60px;
@@ -117,8 +115,8 @@ const segments = computed(() => {
   height: 196px;
 }
 .energy-bar-large {
-  width: 20px;
-  height: 150px;
+  width: 25px;
+  height: 250px;
 }
 
 @media only screen and (max-height: 700px) {

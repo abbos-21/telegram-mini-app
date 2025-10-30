@@ -2,10 +2,8 @@
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { CoinIcon, CloseIcon, AdIcon, LeftArrowIcon, RightArrowIcon } from '@/assets/icons'
 import { HeartImage, FlashImage } from '@/assets/images'
-
 import { useGame } from '@/composables/useGame'
 
-// Destructuring the functions needed to perform the recovery
 const { recoverEnergy, recoverHealth } = useGame()
 
 interface Props {
@@ -27,7 +25,6 @@ const sections = ref([
     title: 'Refill health',
     content: 'Fill health tank completely to continue coin mining.',
     image: HeartImage,
-    // Add an action key to make the logic cleaner in the functions
     action: 'health',
   },
   {
@@ -35,90 +32,59 @@ const sections = ref([
     title: 'Refill energy',
     content: 'Fill energy tank completely to continue coin mining.',
     image: FlashImage,
-    // Add an action key to make the logic cleaner in the functions
     action: 'energy',
   },
 ])
 
 const currentSectionData = computed(() => {
-  const section = sections.value[currentSection.value]
-  return section || { id: 0, title: '', content: '', image: '', action: '' }
+  return (
+    sections.value[currentSection.value] || { id: 0, title: '', content: '', image: '', action: '' }
+  )
 })
 
 const nextSection = () => {
-  if (currentSection.value < sections.value.length - 1) {
-    currentSection.value++
-  } else {
-    currentSection.value = 0 // Loop back to first section
-  }
+  currentSection.value = (currentSection.value + 1) % sections.value.length
 }
 
 const prevSection = () => {
-  if (currentSection.value > 0) {
-    currentSection.value--
-  } else {
-    currentSection.value = sections.value.length - 1 // Loop to last section
-  }
+  currentSection.value = (currentSection.value - 1 + sections.value.length) % sections.value.length
 }
 
 const closePopup = () => {
   emit('close')
 }
 
-/**
- * Handles buying the current section's refill (health or energy) with coins.
- */
+const performRecovery = () => {
+  const action = currentSectionData.value.action
+  if (action === 'health') {
+    recoverHealth()
+  } else if (action === 'energy') {
+    recoverEnergy()
+  }
+  closePopup()
+}
+
 const buyWithCoins = () => {
   console.log('Buying with 25 coins for:', currentSectionData.value.title)
-
-  if (currentSectionData.value.action === 'health') {
-    // Logic for buying health
-    // You'd typically check for sufficient coins here before calling recoverHealth
-    recoverHealth()
-  } else if (currentSectionData.value.action === 'energy') {
-    // Logic for buying energy
-    // You'd typically check for sufficient coins here before calling recoverEnergy
-    recoverEnergy()
-  }
-  // Optionally close the popup after purchase
-  closePopup()
+  // You'd typically check for sufficient coins here
+  performRecovery()
 }
 
-/**
- * Handles watching an ad for the current section's free refill (health or energy).
- */
 const watchAd = () => {
   console.log('Watching ad for free refill for:', currentSectionData.value.title)
-
-  if (currentSectionData.value.action === 'health') {
-    // Logic for watching ad for health
-    // You'd typically call a function to show the ad, then call recoverHealth on success
-    recoverHealth()
-  } else if (currentSectionData.value.action === 'energy') {
-    // Logic for watching ad for energy
-    // You'd typically call a function to show the ad, then call recoverEnergy on success
-    recoverEnergy()
-  }
-  // Optionally close the popup after a successful ad view
-  closePopup()
+  // You'd typically call a function to show the ad, then call recoverFn on success
+  performRecovery()
 }
 
-// Reset to first section when popup opens
-const resetToFirstSection = () => {
-  currentSection.value = 0
-}
-
-// Watch for popup open to reset section
 watch(
   () => props.isOpen,
-  (newValue) => {
-    if (newValue) {
-      resetToFirstSection()
+  (isOpen) => {
+    if (isOpen) {
+      currentSection.value = 0
     }
   },
 )
 
-// Keyboard navigation
 const handleKeydown = (event: KeyboardEvent) => {
   if (!props.isOpen) return
 
@@ -245,15 +211,12 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-/* Your CSS styles remain the same */
-/* Blur overlay effect */
 .blur-overlay {
   background: rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
 }
 
-/* Animation for overlay appearance */
 .overlay-enter-active,
 .overlay-leave-active {
   transition: opacity 0.2s ease;
@@ -264,7 +227,6 @@ onUnmounted(() => {
   opacity: 0;
 }
 
-/* Animation for popup container */
 .popup-container {
   animation: popupSlideIn 0.3s ease-out;
 }
@@ -280,7 +242,6 @@ onUnmounted(() => {
   }
 }
 
-/* Hover effects for better interactivity */
 button:hover {
   transform: translateY(-1px);
 }
@@ -289,7 +250,6 @@ button:active {
   transform: translateY(0);
 }
 
-/* Custom scrollbar for content if needed */
 .content-scroll {
   scrollbar-width: thin;
   scrollbar-color: #d68c62 #fac487;
