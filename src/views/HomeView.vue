@@ -43,22 +43,22 @@ const runChainUntilSuccess = async (functions: Array<() => Promise<unknown>>) =>
   console.error('FAILURE: All functions in the chain failed to execute successfully.')
 }
 
-const syncLoop = async () => {
-  try {
-    await sync()
-  } catch (err) {
-    console.log('Sync error: ', err)
-  } finally {
-    setTimeout(syncLoop, 5000)
-  }
-}
+// const syncLoop = async () => {
+//   try {
+//     await sync()
+//   } catch (err) {
+//     console.log('Sync error: ', err)
+//   } finally {
+//     setTimeout(syncLoop, 5000)
+//   }
+// }
 
 onMounted(async () => {
   const functionChain = [sync, mine, getUserData]
 
   await runChainUntilSuccess(functionChain)
 
-  setTimeout(syncLoop, 5000)
+  // setTimeout(syncLoop, 5000)
 })
 </script>
 
