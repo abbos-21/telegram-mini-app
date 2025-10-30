@@ -31,7 +31,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, type CSSProperties } from 'vue'
 import { useSpinWheel } from '@/composables/useSpinWheel'
-import { useGame } from '@/composables/useGame'
 
 interface Segment {
   label: string
@@ -40,10 +39,10 @@ interface Segment {
 
 const emit = defineEmits<{
   (e: 'finish', payload: { index: number; label: string }): void
+  (e: 'spinning', spinning: boolean): void
 }>()
 
 const { canSpin, cooldownRemaining, spin, fetchStatus } = useSpinWheel()
-const { sync } = useGame()
 
 const segments = computed<Segment[]>(() => [
   { label: '5 🪙', color: '#F44336' },
@@ -64,6 +63,7 @@ const wheelRef = ref<HTMLDivElement | null>(null)
 const spinning = ref(false)
 const currentRotation = ref(0)
 const result = ref<number | null>(null)
+const resPrize = ref<number | null>(null)
 
 const degPer = computed(() => 360 / segments.value.length)
 const wheelBackground = computed(() => {
@@ -106,48 +106,46 @@ function labelStyle(index: number): CSSProperties {
   }
 }
 
-function randomJitter(): number {
-  return Math.random() * (degPer.value - 8)
-}
-
 async function handleSpin() {
   if (spinning.value || !canSpin.value) return
 
   spinning.value = true
+  emit('spinning', true)
   result.value = null
 
   const res = await spin()
   if (!res) {
     spinning.value = false
+    emit('spinning', false)
     return
   }
 
-  const prize = res.prize
-  const chosenIndex = segments.value.findIndex((s) => s.label.includes(String(prize)))
+  resPrize.value = res.prize
+  const chosenIndex = segments.value.findIndex((s) => s.label.includes(String(resPrize.value)))
   const index = chosenIndex === -1 ? 0 : chosenIndex
 
   const segmentCenter = index * degPer.value + degPer.value / 2
   const rotationNeededMod = (270 - segmentCenter + 360) % 360
   const fullRotation = spins * 360
 
-  currentRotation.value += fullRotation + rotationNeededMod + randomJitter()
+  currentRotation.value = currentRotation.value + fullRotation + rotationNeededMod
 }
 
-async function onTransitionEnd(e: TransitionEvent) {
+function onTransitionEnd(e: TransitionEvent) {
   if (e.propertyName !== 'transform') return
   spinning.value = false
+  emit('spinning', false)
 
-  const normalized = ((currentRotation.value % 360) + 360) % 360
-  const centerAngle = (270 - normalized + 360) % 360
-  const idx = Math.floor(centerAngle / degPer.value) % segments.value.length
+  const prizeSegmentIndex = segments.value.findIndex((s) =>
+    s.label.includes(String(resPrize.value)),
+  )
 
-  result.value = idx
-  emit('finish', { index: idx, label: segments.value[idx]?.label ?? '' })
-
-  try {
-    await sync()
-  } catch (err) {
-    console.error('❌ Sync after spin failed:', err)
+  if (prizeSegmentIndex !== -1 && segments.value[prizeSegmentIndex]) {
+    result.value = prizeSegmentIndex
+    emit('finish', {
+      index: prizeSegmentIndex,
+      label: segments.value[prizeSegmentIndex].label,
+    })
   }
 }
 
