@@ -37,7 +37,7 @@ export function useGame() {
   const collect = async () => {
     const res = await gameService.collect()
     user.value = res.data.user
-    startMiningSimulation()
+    if (user.value.isMining) startMiningSimulation()
   }
 
   const sync = async () => {
