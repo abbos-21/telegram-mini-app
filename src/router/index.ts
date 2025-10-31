@@ -5,7 +5,6 @@ import ShopView from '../views/ShopView.vue'
 import FriendsView from '../views/FriendsView.vue'
 import WidthdrawView from '../views/WidthdrawView.vue'
 import WidthdrawHistoryView from '@/views/WidthdrawHistoryView.vue'
-import CounterView from '@/views/CounterView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -39,11 +38,6 @@ const router = createRouter({
       path: '/widthdraw-history',
       name: 'widthdraw-history',
       component: WidthdrawHistoryView,
-    },
-    {
-      path: '/counter',
-      name: 'counter',
-      component: CounterView,
     },
   ],
 })

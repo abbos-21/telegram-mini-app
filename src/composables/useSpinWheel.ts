@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 import { gameService } from '@/api/gameService'
 
-const canSpin = ref(true)
+const canSpin = ref(false)
 const cooldownRemaining = ref<{ hours: number; minutes: number } | null>(null)
 const lastPrize = ref<number | null>(null)
 const isSpinning = ref(false)
