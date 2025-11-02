@@ -30,8 +30,11 @@ const stopMiningSimulation = () => {
 export function useGame() {
   const mine = async () => {
     const res = await gameService.mine()
-    user.value = res.data.user
-    startMiningSimulation()
+    if (res?.data?.user) {
+      user.value = res.data.user
+      startMiningSimulation()
+    }
+    return
   }
 
   const collect = async () => {
