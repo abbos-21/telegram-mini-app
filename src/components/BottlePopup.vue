@@ -3,13 +3,14 @@ import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { CoinIcon, CloseIcon, AdIcon, LeftArrowIcon, RightArrowIcon } from '@/assets/icons'
 import { HeartImage, FlashImage } from '@/assets/images'
 import { useGame } from '@/composables/useGame'
+import { useAdsgram } from '@adsgram/vue' // ✅ Correct composable
 
-const { recoverEnergy, recoverHealth } = useGame()
+const blockId = import.meta.env.VITE_BLOCK_ID
+const { recoverEnergy, recoverHealth, recoverEnergyFree, recoverHealthFree } = useGame()
 
 interface Props {
   isOpen: boolean
 }
-
 interface Emits {
   (e: 'close'): void
 }
@@ -18,6 +19,7 @@ const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 const currentSection = ref(0)
+const isLoading = ref(false)
 
 const sections = ref([
   {
@@ -45,49 +47,72 @@ const currentSectionData = computed(() => {
 const nextSection = () => {
   currentSection.value = (currentSection.value + 1) % sections.value.length
 }
-
 const prevSection = () => {
   currentSection.value = (currentSection.value - 1 + sections.value.length) % sections.value.length
 }
-
-const closePopup = () => {
-  emit('close')
-}
+const closePopup = () => emit('close')
 
 const performRecovery = () => {
   const action = currentSectionData.value.action
-  if (action === 'health') {
-    recoverHealth()
-  } else if (action === 'energy') {
-    recoverEnergy()
-  }
+  if (action === 'health') recoverHealth()
+  else if (action === 'energy') recoverEnergy()
   closePopup()
+}
+
+const performFreeRecovery = () => {
+  const action = currentSectionData.value.action
+  if (action === 'health') recoverHealthFree()
+  else if (action === 'energy') recoverEnergyFree()
 }
 
 const buyWithCoins = () => {
   console.log('Buying with 25 coins for:', currentSectionData.value.title)
-  // You'd typically check for sufficient coins here
   performRecovery()
 }
 
-const watchAd = () => {
-  console.log('Watching ad for free refill for:', currentSectionData.value.title)
-  // You'd typically call a function to show the ad, then call recoverFn on success
-  performRecovery()
+const { show, addEventListener } = useAdsgram({
+  blockId,
+  onReward: () => {
+    console.log('✅ Ad finished successfully — rewarding user')
+    performRecovery()
+  },
+  onError: () => {
+    console.warn('❌ Ad error occurred')
+  },
+})
+
+addEventListener('onBannerNotFound', () => {
+  console.log('No ad available at the moment')
+})
+addEventListener('onTooLongSession', () => {
+  console.log('User session too long — ad not available')
+})
+
+const watchAd = async () => {
+  try {
+    isLoading.value = true
+    const result = await show()
+    console.log('Ad result:', result)
+
+    if (result.done && !result.error) {
+      performFreeRecovery()
+    }
+  } catch (err) {
+    console.error('Error showing ad:', err)
+  } finally {
+    isLoading.value = false
+  }
 }
 
 watch(
   () => props.isOpen,
   (isOpen) => {
-    if (isOpen) {
-      currentSection.value = 0
-    }
+    if (isOpen) currentSection.value = 0
   },
 )
 
 const handleKeydown = (event: KeyboardEvent) => {
   if (!props.isOpen) return
-
   switch (event.key) {
     case 'ArrowLeft':
       event.preventDefault()
@@ -107,7 +132,6 @@ const handleKeydown = (event: KeyboardEvent) => {
 onMounted(() => {
   document.addEventListener('keydown', handleKeydown)
 })
-
 onUnmounted(() => {
   document.removeEventListener('keydown', handleKeydown)
 })
@@ -165,10 +189,13 @@ onUnmounted(() => {
 
             <button
               @click="watchAd"
-              class="flex-1 bg-[#4CAF50] border-2 border-black rounded-lg p-3 flex items-center justify-center gap-2 hover:bg-[#45a049] transition-colors shadow-lg"
+              :disabled="isLoading"
+              class="flex-1 bg-[#4CAF50] border-2 border-black rounded-lg p-3 flex items-center justify-center gap-2 hover:bg-[#45a049] transition-colors shadow-lg disabled:opacity-60"
             >
               <AdIcon class="w-8 h-8" />
-              <span class="font-bold text-white">Free</span>
+              <span class="font-bold text-white">
+                {{ isLoading ? 'Loading...' : 'Free' }}
+              </span>
             </button>
           </div>
 

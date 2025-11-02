@@ -30,6 +30,15 @@ export const gameService = {
     return response.data
   },
 
+  recoverHealthByAd: async (): Promise<GameRecoveryApiResponse> => {
+    const response = await apiClient.post<GameRecoveryApiResponse>('/game/recover-health-by-ad')
+    return response.data
+  },
+  recoverEnergyByAd: async (): Promise<GameRecoveryApiResponse> => {
+    const response = await apiClient.post<GameRecoveryApiResponse>('/game/recover-energy-by-ad')
+    return response.data
+  },
+
   getSpinWheelStatus: async (): Promise<GameSpinWheelStatusApiResponse> => {
     const response = await apiClient.get<GameSpinWheelStatusApiResponse>('/game/spin-wheel/status')
     return response.data

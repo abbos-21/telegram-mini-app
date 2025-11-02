@@ -77,3 +77,12 @@ export interface GameSpinWheelSpinApiResponse {
     nextSpinAt: string
   }
 }
+
+export interface AdResponse {
+  text_html: string
+  click_url: string
+  button_name: string
+  image_url: string
+  button_reward_name: string
+  reward_url: string
+}
