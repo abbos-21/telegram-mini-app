@@ -4,9 +4,12 @@ import { CoinIcon, CloseIcon, AdIcon, LeftArrowIcon, RightArrowIcon } from '@/as
 import { HeartImage, FlashImage } from '@/assets/images'
 import { useGame } from '@/composables/useGame'
 import { useAdsgram } from '@adsgram/vue'
+import { runChainUntilSuccess } from '@/utils/chainFunction'
 
-const blockId = import.meta.env.VITE_BLOCK_ID
-const { recoverEnergy, recoverHealth, recoverEnergyFree, recoverHealthFree } = useGame()
+// const blockId = import.meta.env.VITE_BLOCK_ID
+const healthRewardBlockId = import.meta.env.VITE_HEALTH_REWARD_BLOCK_ID
+const energyRewardBlockId = import.meta.env.VITE_ENERGY_REWARD_BLOCK_ID
+const { recoverEnergy, recoverHealth, mine, sync, getUserData } = useGame() // recoverEnergyFree, recoverHealthFree
 
 interface Props {
   isOpen: boolean
@@ -59,42 +62,79 @@ const performRecovery = () => {
   closePopup()
 }
 
-const performFreeRecovery = () => {
-  const action = currentSectionData.value.action
-  if (action === 'health') recoverHealthFree()
-  else if (action === 'energy') recoverEnergyFree()
-  closePopup()
-}
+// const performFreeRecovery = () => {
+//   const action = currentSectionData.value.action
+//   if (action === 'health') recoverHealthFree()
+//   else if (action === 'energy') recoverEnergyFree()
+//   closePopup()
+// }
 
 const buyWithCoins = () => {
   console.log('Buying with 25 coins for:', currentSectionData.value.title)
   performRecovery()
 }
 
-const { show, addEventListener } = useAdsgram({
-  blockId,
-})
+// const watchAd = async () => {
+//   try {
+//     isLoading.value = true
+//     const result = await show()
+//     console.log('Ad result:', result)
 
-addEventListener('onBannerNotFound', () => {
-  console.log('No ad available at the moment')
-})
-addEventListener('onTooLongSession', () => {
-  console.log('User session too long — ad not available')
-})
+//     if (result.done && !result.error) {
+//       performFreeRecovery()
+//     }
+//   } catch (err) {
+//     console.error('Error showing ad:', err)
+//   } finally {
+//     isLoading.value = false
+//   }
+// }
 
 const watchAd = async () => {
-  try {
-    isLoading.value = true
-    const result = await show()
-    console.log('Ad result:', result)
+  const action = currentSectionData.value.action
 
-    if (result.done && !result.error) {
-      performFreeRecovery()
+  if (action === 'health') {
+    const { show, addEventListener } = useAdsgram({
+      blockId: healthRewardBlockId,
+    })
+
+    addEventListener('onBannerNotFound', () => {
+      console.log('No ad available at the moment')
+    })
+    addEventListener('onTooLongSession', () => {
+      console.log('User session too long — ad not available')
+    })
+
+    try {
+      const result = await show()
+
+      if (result.done && !result.error) {
+        runChainUntilSuccess([sync, mine, getUserData])
+      }
+    } catch (err) {
+      console.log('Error showing ad: ', err)
     }
-  } catch (err) {
-    console.error('Error showing ad:', err)
-  } finally {
-    isLoading.value = false
+  } else if (action === 'energy') {
+    const { show, addEventListener } = useAdsgram({
+      blockId: energyRewardBlockId,
+    })
+
+    addEventListener('onBannerNotFound', () => {
+      console.log('No ad available at the moment')
+    })
+    addEventListener('onTooLongSession', () => {
+      console.log('User session too long — ad not available')
+    })
+
+    try {
+      const result = await show()
+
+      if (result.done && !result.error) {
+        runChainUntilSuccess([sync, mine, getUserData])
+      }
+    } catch (err) {
+      console.log('Error showing ad: ', err)
+    }
   }
 }
 

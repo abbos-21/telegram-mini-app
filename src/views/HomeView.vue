@@ -2,6 +2,7 @@
 import { onMounted, ref } from 'vue'
 import { useGame } from '@/composables/useGame'
 import { RouterLink } from 'vue-router'
+import { runChainUntilSuccess } from '@/utils/chainFunction'
 
 import { CoinIcon, WidthdrawIcon } from '@/assets/icons'
 import {
@@ -42,20 +43,6 @@ const openBottlePopup = () => (isBottlePopupOpen.value = true)
 const closeBottlePopup = () => (isBottlePopupOpen.value = false)
 const openSpinPopup = () => (isSpinPopupOpen.value = true)
 const closeSpinPopup = () => (isSpinPopupOpen.value = false)
-
-const runChainUntilSuccess = async (functions: Array<() => Promise<unknown>>) => {
-  for (const func of functions) {
-    try {
-      await func()
-      console.log(`Successfully executed: ${func.name}. Stopping chain.`)
-      return
-    } catch (error) {
-      console.warn(`Function ${func.name} failed. Moving to next function.`, error)
-    }
-  }
-
-  console.error('FAILURE: All functions in the chain failed to execute successfully.')
-}
 
 // const syncLoop = async () => {
 //   try {

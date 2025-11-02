@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import SpinWheel from './SpinWheel.vue'
 import { CloseIcon } from '@/assets/icons'
 import { useGame } from '@/composables/useGame'
+import { runChainUntilSuccess } from '@/utils/chainFunction'
 
 interface Props {
   isOpen: boolean
@@ -18,20 +19,6 @@ const { sync, mine, getUserData } = useGame()
 
 const isSpinning = ref(false)
 const hasFinished = ref(false)
-
-const runChainUntilSuccess = async (functions: Array<() => Promise<unknown>>) => {
-  for (const func of functions) {
-    try {
-      await func()
-      console.log(`Successfully executed: ${func.name}. Stopping chain.`)
-      return
-    } catch (error) {
-      console.warn(`Function ${func.name} failed. Moving to next function.`, error)
-    }
-  }
-
-  console.error('FAILURE: All functions in the chain failed to execute successfully.')
-}
 
 const closePopup = async () => {
   if (isSpinning.value) return
