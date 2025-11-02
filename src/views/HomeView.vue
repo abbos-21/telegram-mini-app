@@ -19,6 +19,20 @@ import HealthLevel from '@/components/HealthLevel.vue'
 import BottlePopup from '@/components/BottlePopup.vue'
 import SpinPopup from '@/components/SpinPopup.vue'
 import ProgressBar from '@/components/ProgressBar.vue'
+import { useAdsgram } from '@adsgram/vue'
+
+const blockId = import.meta.env.VITE_BLOCK_ID
+
+const { show, addEventListener } = useAdsgram({
+  blockId,
+})
+
+addEventListener('onBannerNotFound', () => {
+  console.log('No ad available at the moment')
+})
+addEventListener('onTooLongSession', () => {
+  console.log('User session too long — ad not available')
+})
 
 const { user, mine, collect, sync, getUserData } = useGame()
 const isBottlePopupOpen = ref(false)
@@ -139,7 +153,16 @@ onMounted(async () => {
         <img :src="BottleImage" class="w-12" />
       </button>
 
-      <button type="button" class="cursor-pointer" @click="openSpinPopup">
+      <button
+        type="button"
+        class="cursor-pointer"
+        @click="
+          async () => {
+            openSpinPopup()
+            await show()
+          }
+        "
+      >
         <img :src="SpinImage" class="w-12" />
       </button>
     </div>

@@ -5,6 +5,20 @@ import { RouterView, RouterLink } from 'vue-router'
 import { HomeImage, ShopImage, TaskImage, FriendsImage } from '@/assets/images'
 import { BgMusicAudio } from '@/assets/audios'
 import { isMusicPlaying, isMusicEnabled, setMusicPlaying, setMusicAvailable } from '@/stores/music'
+import { useAdsgram } from '@adsgram/vue'
+
+const blockId = import.meta.env.VITE_BLOCK_ID
+
+const { show, addEventListener } = useAdsgram({
+  blockId,
+})
+
+addEventListener('onBannerNotFound', () => {
+  console.log('No ad available at the moment')
+})
+addEventListener('onTooLongSession', () => {
+  console.log('User session too long — ad not available')
+})
 
 const audioRef = ref<HTMLAudioElement | null>(null)
 
@@ -63,6 +77,7 @@ const authenticate = async () => {
 
 onMounted(async () => {
   await authenticate()
+  await show()
 })
 </script>
 

@@ -73,13 +73,6 @@ const buyWithCoins = () => {
 
 const { show, addEventListener } = useAdsgram({
   blockId,
-  onReward: () => {
-    console.log('✅ Ad finished successfully — rewarding user')
-    performRecovery()
-  },
-  onError: () => {
-    console.warn('❌ Ad error occurred')
-  },
 })
 
 addEventListener('onBannerNotFound', () => {
