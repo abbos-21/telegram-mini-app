@@ -109,7 +109,9 @@ const watchAd = async () => {
       const result = await show()
 
       if (result.done && !result.error) {
-        runChainUntilSuccess([sync, mine, getUserData])
+        setTimeout(() => {
+          runChainUntilSuccess([sync, mine, getUserData])
+        }, 1000)
       }
     } catch (err) {
       console.log('Error showing ad: ', err)
@@ -130,7 +132,9 @@ const watchAd = async () => {
       const result = await show()
 
       if (result.done && !result.error) {
-        runChainUntilSuccess([sync, mine, getUserData])
+        setTimeout(() => {
+          runChainUntilSuccess([sync, mine, getUserData])
+        }, 1000)
       }
     } catch (err) {
       console.log('Error showing ad: ', err)
