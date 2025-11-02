@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import { CoinIcon } from '@/assets/icons'
 import { ref, onMounted } from 'vue'
-import WebApp from '@twa-dev/sdk'
-
-const userId = ref<number | null>(null)
+import { userService } from '@/api/userService'
 
 const referralLink = ref<string | null>(null)
 const copied = ref(false)
@@ -16,12 +14,12 @@ function copyLink(e: Event) {
   })
 }
 
-onMounted(() => {
-  userId.value = WebApp.initDataUnsafe.user?.id as number
-  if (userId.value) {
-    referralLink.value = `https://t.me/brunoearning/${userId.value}`
-  } else {
-    referralLink.value = 'No referral link available'
+onMounted(async () => {
+  try {
+    const response = await userService.getReferralLink()
+    referralLink.value = response.data.link
+  } catch (err) {
+    console.log('Error while getting referral link: ', err)
   }
 })
 </script>

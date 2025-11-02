@@ -3,7 +3,7 @@ import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { CoinIcon, CloseIcon, AdIcon, LeftArrowIcon, RightArrowIcon } from '@/assets/icons'
 import { HeartImage, FlashImage } from '@/assets/images'
 import { useGame } from '@/composables/useGame'
-import { useAdsgram } from '@adsgram/vue' // ✅ Correct composable
+import { useAdsgram } from '@adsgram/vue'
 
 const blockId = import.meta.env.VITE_BLOCK_ID
 const { recoverEnergy, recoverHealth, recoverEnergyFree, recoverHealthFree } = useGame()
@@ -63,6 +63,7 @@ const performFreeRecovery = () => {
   const action = currentSectionData.value.action
   if (action === 'health') recoverHealthFree()
   else if (action === 'energy') recoverEnergyFree()
+  closePopup()
 }
 
 const buyWithCoins = () => {

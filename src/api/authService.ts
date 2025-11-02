@@ -5,7 +5,7 @@ import type { AuthApiResponse } from './types'
 export const authService = {
   loginWithTelegram: async (): Promise<AuthApiResponse> => {
     const initData = WebApp.initData
-    const ref = new URLSearchParams(window.location.search).get('ref')
+    const ref = WebApp.initDataUnsafe.start_param
 
     if (!initData) throw new Error('Telegram WebApp initData is missing')
 

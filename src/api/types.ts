@@ -86,3 +86,7 @@ export interface AdResponse {
   button_reward_name: string
   reward_url: string
 }
+
+export interface InviteLinkResponse {
+  link: string
+}
