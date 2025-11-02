@@ -14,10 +14,24 @@ interface Emits {
 
 defineProps<Props>()
 const emit = defineEmits<Emits>()
-const { sync } = useGame()
+const { sync, mine, getUserData } = useGame()
 
 const isSpinning = ref(false)
 const hasFinished = ref(false)
+
+const runChainUntilSuccess = async (functions: Array<() => Promise<unknown>>) => {
+  for (const func of functions) {
+    try {
+      await func()
+      console.log(`Successfully executed: ${func.name}. Stopping chain.`)
+      return
+    } catch (error) {
+      console.warn(`Function ${func.name} failed. Moving to next function.`, error)
+    }
+  }
+
+  console.error('FAILURE: All functions in the chain failed to execute successfully.')
+}
 
 const closePopup = async () => {
   if (isSpinning.value) return
@@ -26,7 +40,7 @@ const closePopup = async () => {
 
   if (hasFinished.value) {
     try {
-      await sync()
+      await runChainUntilSuccess([sync, mine, getUserData])
     } catch (err) {
       console.error('❌ Sync after popup close failed:', err)
     }
@@ -38,7 +52,9 @@ const handleSpinning = (value: boolean) => {
   isSpinning.value = value
   if (!value) {
     hasFinished.value = true
-    sync().catch((err) => console.error('❌ Sync after spin failed:', err))
+    runChainUntilSuccess([sync, mine, getUserData]).catch((err) =>
+      console.error('❌ Sync after spin failed:', err),
+    )
   }
 }
 </script>

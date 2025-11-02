@@ -90,3 +90,12 @@ export interface AdResponse {
 export interface InviteLinkResponse {
   link: string
 }
+
+export interface ReferralsResponse {
+  count: number
+  referralEarnings: number
+  referralRewards: {
+    [referrals: number]: number
+  }
+  referrals?: User[]
+}

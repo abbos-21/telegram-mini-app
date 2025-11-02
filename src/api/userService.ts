@@ -1,5 +1,5 @@
 import apiClient from './axios'
-import type { ApiResponse, UserDataResponse, InviteLinkResponse } from './types'
+import type { ApiResponse, UserDataResponse, InviteLinkResponse, ReferralsResponse } from './types'
 
 export const userService = {
   getCurrentUser: async (): Promise<ApiResponse<UserDataResponse>> => {
@@ -12,8 +12,8 @@ export const userService = {
     return response.data
   },
 
-  getAllReferrals: async (): Promise<ApiResponse<unknown>> => {
-    const response = await apiClient.get<ApiResponse<unknown>>('/user/referrals')
+  getAllReferrals: async (): Promise<ApiResponse<ReferralsResponse>> => {
+    const response = await apiClient.get<ApiResponse<ReferralsResponse>>('/user/referrals')
     return response.data
   },
 }
