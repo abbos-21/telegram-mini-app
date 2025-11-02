@@ -11,4 +11,9 @@ export const userService = {
     const response = await apiClient.get<ApiResponse<InviteLinkResponse>>('/user/invite-link')
     return response.data
   },
+
+  getAllReferrals: async (): Promise<ApiResponse<unknown>> => {
+    const response = await apiClient.get<ApiResponse<unknown>>('/user/referrals')
+    return response.data
+  },
 }

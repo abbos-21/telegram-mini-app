@@ -14,12 +14,17 @@ function copyLink(e: Event) {
   })
 }
 
+const referrals = <unknown>ref(null)
+
 onMounted(async () => {
   try {
+    referrals.value = (await userService.getAllReferrals()).data
     const response = await userService.getReferralLink()
     referralLink.value = response.data.link
   } catch (err) {
     console.log('Error while getting referral link: ', err)
+  } finally {
+    console.log(referrals.value)
   }
 })
 </script>
