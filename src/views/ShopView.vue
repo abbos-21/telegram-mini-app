@@ -10,6 +10,7 @@ const { getUserData, user } = useGame()
 
 const upgradeStatus = ref<UpgradeStatusItem[] | null>(null)
 const loading = ref(false)
+const pageloading = ref(true)
 const upgradingName = ref<string | null>(null)
 
 const icons: Record<UpgradeStatusItem['name'], Component | string> = {
@@ -44,13 +45,23 @@ const handleUpgrade = async (name: UpgradeStatusItem['name']) => {
 }
 
 onMounted(async () => {
-  await getUserData()
-  await getUpgradeStatus()
+  onMounted(async () => {
+    try {
+      await getUserData()
+      await getUpgradeStatus()
+    } catch (error) {
+      console.error('Initial data loading failed:', error)
+    } finally {
+      pageloading.value = false
+    }
+  })
 })
 </script>
 
 <template>
+  <div v-if="pageloading">Loading...</div>
   <div
+    v-else
     class="h-full w-full flex flex-col relative bg-cover bg-center bg-no-repeat p-4 gap-4 pb-24"
     :style="{ backgroundImage: `url(${ShopBgImage})` }"
   >
