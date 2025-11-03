@@ -1,29 +1,46 @@
 export interface User {
   id: number
   telegramId: string
-  username?: string
-  firstName?: string
-  lastName?: string
-  languageCode?: string
+  username?: string | null
+  firstName?: string | null
+  lastName?: string | null
+  languageCode?: string | null
   isBot: boolean
   createdAt: string
   updatedAt: string
+
+  totalCoins: number
   coins: number
   level: number
   miningRate: number
+
   referredById: number | null
-  referredBy?: User
+  referredBy?: User | null
   referrals?: User[]
+
+  rewardedLevels: string
+  referralEarnings: number
+
   lastMiningTick: string | null
   isMining: boolean
   tempCoins: number
   vaultCapacity: number
+
   currentHealth: number
   maxHealth: number
+
   currentEnergy: number
   maxEnergy: number
+
   healthPerSecond: number
   energyPerSecond: number
+
+  vaultLevel: number
+  miningRateLevel: number
+  energyLevel: number
+  healthLevel: number
+
+  lastWheelSpin: string | null
 }
 
 export interface ApiResponse<T> {
@@ -99,3 +116,28 @@ export interface ReferralsResponse {
   }
   referrals?: User[]
 }
+
+export interface UpgradeStatusItem {
+  name: 'wealth' | 'work' | 'food' | 'immune'
+  level: number
+  maxLevel: number
+  cost: number | null
+  canUpgrade: boolean
+  effect: string
+  description: string
+  details: string
+}
+
+export interface UpgradeStatusData {
+  status: UpgradeStatusItem[]
+}
+
+export type UpgradeStatusApiResponse = ApiResponse<UpgradeStatusData>
+
+export interface UpgradeResponse {
+  user: User
+  spent: number
+  newValue: number
+}
+
+export type UpgradeApiResponse = ApiResponse<UpgradeResponse>

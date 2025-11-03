@@ -140,6 +140,8 @@ const watchAd = async () => {
       console.log('Error showing ad: ', err)
     }
   }
+
+  closePopup()
 }
 
 watch(
