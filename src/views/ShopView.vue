@@ -45,16 +45,14 @@ const handleUpgrade = async (name: UpgradeStatusItem['name']) => {
 }
 
 onMounted(async () => {
-  onMounted(async () => {
-    try {
-      await getUserData()
-      await getUpgradeStatus()
-    } catch (error) {
-      console.error('Initial data loading failed:', error)
-    } finally {
-      pageloading.value = false
-    }
-  })
+  try {
+    await getUserData()
+    await getUpgradeStatus()
+  } catch (error) {
+    console.error('Initial data loading failed:', error)
+  } finally {
+    pageloading.value = false
+  }
 })
 </script>
 
