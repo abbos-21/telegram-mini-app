@@ -118,11 +118,11 @@ onMounted(async () => {
 
               <span
                 class="bg-[#fff] rounded-[5px] p-px px-[6px] text-xs font-medium flex items-center gap-1"
+                v-if="upgrade.cost !== null"
               >
                 <CoinIcon class="w-[14px]" />
                 Required coins:
-                <span v-if="upgrade.cost !== null">{{ upgrade.cost }}</span>
-                <span v-else>—</span>
+                <span>{{ upgrade.cost }}</span>
               </span>
             </div>
 
