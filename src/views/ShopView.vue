@@ -102,18 +102,20 @@ onMounted(async () => {
               </div>
             </div>
 
-            <span class="bg-[#fff] rounded-[5px] p-px px-1 text-xs font-medium">
-              {{ upgrade.effect }}
-            </span>
+            <div class="flex flex-col items-start gap-1">
+              <span class="bg-[#fff] rounded-[5px] p-px px-1 text-xs font-medium">
+                {{ upgrade.effect }}
+              </span>
 
-            <span
-              class="bg-[#fff] rounded-[5px] p-px px-[6px] text-xs font-medium flex items-center gap-1 mt-1"
-            >
-              <CoinIcon class="w-[14px]" />
-              Required coins:
-              <span v-if="upgrade.cost !== null">{{ upgrade.cost }}</span>
-              <span v-else>—</span>
-            </span>
+              <span
+                class="bg-[#fff] rounded-[5px] p-px px-[6px] text-xs font-medium flex items-center gap-1"
+              >
+                <CoinIcon class="w-[14px]" />
+                Required coins:
+                <span v-if="upgrade.cost !== null">{{ upgrade.cost }}</span>
+                <span v-else>—</span>
+              </span>
+            </div>
 
             <p class="text-xs text-[#fff] mt-1 font-medium">
               {{ upgrade.details }}
