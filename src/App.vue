@@ -80,8 +80,8 @@ const authenticate = async () => {
 
 onMounted(async () => {
   await authenticate()
-  await show()
-  setTimeout(() => {
+  const result = await show()
+  if (result.done) {
     showMonetagAd({
       type: 'inApp',
       inAppSettings: {
@@ -92,7 +92,7 @@ onMounted(async () => {
         everyPage: false,
       },
     })
-  }, 20000)
+  }
 })
 </script>
 
