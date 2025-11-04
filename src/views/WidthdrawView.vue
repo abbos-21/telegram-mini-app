@@ -1,5 +1,25 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { ClockBackImage } from '@/assets/images'
+import { withdrawService } from '@/api/withdrawService'
+
+const amountCoins = ref<number>(0)
+const targetAddress = ref<string>('')
+
+const withdraw = async () => {
+  try {
+    const response = await withdrawService.withdrawCoins(+amountCoins.value, targetAddress.value)
+    if (response?.success) {
+      alert('Success!')
+    }
+  } catch (err) {
+    console.log('Error while withdrawing: ', err)
+    alert('Operation failed!')
+  } finally {
+    amountCoins.value = 0
+    targetAddress.value = ''
+  }
+}
 </script>
 
 <template>
@@ -129,28 +149,40 @@ import { ClockBackImage } from '@/assets/images'
 
       <div class="p-4 flex flex-col gap-4 bg-[#475a5a] rounded-md">
         <ul class="p-2 px-3 bg-[#d9d9d9] rounded-lg font-medium text-xs">
-          <li>Withdrawal limits at your level: <strong>0</strong></li>
-          <li>Maximum withdrawal amount (coins) - <strong>2100</strong></li>
-          <li>Maximum number of requests at your level - <strong>2</strong></li>
+          <!-- <li>Withdrawal limits at your level: <strong>0</strong></li> -->
+          <li>Minimum withdrawal amount (coins) - <strong>55000</strong></li>
+          <li>Maximum number of requests at your level - <strong>10</strong></li>
         </ul>
 
         <div class="p-2 px-3 bg-[#d9d9d9] rounded-lg font-semibold text-lg text-center">
-          Coin rate: 22000 coins = 1 TON
+          Coin rate: 220000 coins = 1 TON
         </div>
 
-        <form class="flex flex-col gap-4">
+        <form class="flex flex-col gap-4" @submit.prevent="withdraw">
           <div
             class="p-2 px-3 bg-[#d9d9d9] rounded-lg font-semibold text-xs flex items-center gap-2 justify-between"
           >
             <p>Enter the amount of coins:</p>
-            <input class="w-1/3 outline-none border-b" type="number" placeholder="0.00" required />
+            <input
+              class="w-1/3 outline-none border-b"
+              type="number"
+              placeholder="0.00"
+              required
+              v-model="amountCoins"
+            />
           </div>
 
           <div
             class="p-2 px-3 bg-[#d9d9d9] rounded-lg font-semibold text-xs flex items-center gap-2 justify-between"
           >
             <p>Enter the TON address:</p>
-            <input class="w-1/3 outline-none border-b" type="text" placeholder="UQA..." required />
+            <input
+              class="w-1/3 outline-none border-b"
+              type="text"
+              placeholder="UQA..."
+              required
+              v-model="targetAddress"
+            />
           </div>
 
           <div class="text-white flex justify-between items-center text-xs gap-2 mt-2">

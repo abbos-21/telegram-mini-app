@@ -167,3 +167,14 @@ export interface Withdrawal {
 export interface WithdrawalHistoryResponse {
   withdrawals: Withdrawal[]
 }
+
+export interface WithdrawalRequestBody {
+  amountCoins: number
+  targetAddress: string
+}
+
+export interface WithdrawalResponse {
+  withdrawal: Withdrawal
+}
+
+export type WithdrawalApiResponse = ApiResponse<WithdrawalResponse>
