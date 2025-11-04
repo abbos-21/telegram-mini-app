@@ -5,10 +5,8 @@ import { RouterView, RouterLink } from 'vue-router'
 import { HomeImage, ShopImage, TaskImage, FriendsImage } from '@/assets/images'
 import { BgMusicAudio } from '@/assets/audios'
 import { isMusicPlaying, isMusicEnabled, setMusicPlaying, setMusicAvailable } from '@/stores/music'
+import { useMonetagAdHandler } from './composables/useMonetagAdHandler'
 // import { useAdsgram } from '@adsgram/vue'
-import createAdHandler from 'monetag-tg-sdk'
-
-const showMonetagAd = createAdHandler(10139203)
 
 // const blockId = import.meta.env.VITE_BLOCK_ID
 
@@ -78,16 +76,7 @@ const authenticate = async () => {
   }
 }
 
-showMonetagAd({
-  type: 'inApp',
-  inAppSettings: {
-    frequency: 58,
-    capping: 0.5,
-    interval: 31,
-    timeout: 0,
-    everyPage: false,
-  },
-})
+useMonetagAdHandler()
 
 onMounted(async () => {
   await authenticate()
