@@ -6,6 +6,9 @@ import { HomeImage, ShopImage, TaskImage, FriendsImage } from '@/assets/images'
 import { BgMusicAudio } from '@/assets/audios'
 import { isMusicPlaying, isMusicEnabled, setMusicPlaying, setMusicAvailable } from '@/stores/music'
 import { useAdsgram } from '@adsgram/vue'
+import createAdHandler from 'monetag-tg-sdk'
+
+const showMonetagAd = createAdHandler(10139203)
 
 const blockId = import.meta.env.VITE_BLOCK_ID
 
@@ -78,6 +81,18 @@ const authenticate = async () => {
 onMounted(async () => {
   await authenticate()
   await show()
+  setTimeout(() => {
+    showMonetagAd({
+      type: 'inApp',
+      inAppSettings: {
+        frequency: 3,
+        capping: 0.5,
+        interval: 30,
+        timeout: 10,
+        everyPage: false,
+      },
+    })
+  }, 20000)
 })
 </script>
 
