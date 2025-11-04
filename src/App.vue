@@ -5,23 +5,23 @@ import { RouterView, RouterLink } from 'vue-router'
 import { HomeImage, ShopImage, TaskImage, FriendsImage } from '@/assets/images'
 import { BgMusicAudio } from '@/assets/audios'
 import { isMusicPlaying, isMusicEnabled, setMusicPlaying, setMusicAvailable } from '@/stores/music'
-import { useAdsgram } from '@adsgram/vue'
+// import { useAdsgram } from '@adsgram/vue'
 import createAdHandler from 'monetag-tg-sdk'
 
 const showMonetagAd = createAdHandler(10139203)
 
-const blockId = import.meta.env.VITE_BLOCK_ID
+// const blockId = import.meta.env.VITE_BLOCK_ID
 
-const { show, addEventListener } = useAdsgram({
-  blockId,
-})
+// const { show, addEventListener } = useAdsgram({
+//   blockId,
+// })
 
-addEventListener('onBannerNotFound', () => {
-  console.log('No ad available at the moment')
-})
-addEventListener('onTooLongSession', () => {
-  console.log('User session too long — ad not available')
-})
+// addEventListener('onBannerNotFound', () => {
+//   console.log('No ad available at the moment')
+// })
+// addEventListener('onTooLongSession', () => {
+//   console.log('User session too long — ad not available')
+// })
 
 const audioRef = ref<HTMLAudioElement | null>(null)
 
@@ -78,21 +78,20 @@ const authenticate = async () => {
   }
 }
 
+showMonetagAd({
+  type: 'inApp',
+  inAppSettings: {
+    frequency: 58,
+    capping: 0.5,
+    interval: 31,
+    timeout: 0,
+    everyPage: false,
+  },
+})
+
 onMounted(async () => {
   await authenticate()
-  const result = await show()
-  if (result.done) {
-    showMonetagAd({
-      type: 'inApp',
-      inAppSettings: {
-        frequency: 3,
-        capping: 0.5,
-        interval: 30,
-        timeout: 10,
-        everyPage: false,
-      },
-    })
-  }
+  // await show()
 })
 </script>
 
