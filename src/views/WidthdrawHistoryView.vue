@@ -9,7 +9,6 @@ const withdrawals = ref<Withdrawal[]>([])
 const loading = ref(true)
 const error = ref('')
 
-// Fetch withdrawal history
 const fetchWithdrawals = async () => {
   try {
     loading.value = true
@@ -25,7 +24,6 @@ const fetchWithdrawals = async () => {
 
 onMounted(fetchWithdrawals)
 
-// Format date nicely
 const formatDate = (dateStr: string | Date) => {
   const date = new Date(dateStr)
   return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1)
@@ -36,12 +34,10 @@ const formatDate = (dateStr: string | Date) => {
     .padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`
 }
 
-// Format TON amount with thousands separators and up to 6 decimals (trim trailing zeros)
 const formatTon = (value: number | string | undefined) => {
   if (value == null || value === '') return '0'
   const num = Number(value)
   if (Number.isNaN(num)) return '0'
-  // show up to 6 decimals but remove trailing zeros
   const formatted = num.toLocaleString('en-US', {
     maximumFractionDigits: 6,
     minimumFractionDigits: 0,
@@ -49,11 +45,10 @@ const formatTon = (value: number | string | undefined) => {
   return formatted
 }
 
-// Return classes for status badge
 const statusBadgeClass = (status: Withdrawal['status']) => {
   switch (status) {
     case 'COMPLETED':
-      return 'bg-[#FFD983] text-black' // golden chip
+      return 'bg-[#FFD983] text-black'
     case 'PENDING':
       return 'bg-gray-600 text-white'
     case 'FAILED':
@@ -81,44 +76,33 @@ const statusBadgeClass = (status: Withdrawal['status']) => {
       </div>
 
       <div class="flex flex-col gap-4">
-        <!-- Loading -->
         <p v-if="loading" class="text-white text-center">Loading...</p>
 
-        <!-- Error -->
         <p v-if="error" class="text-red-500 text-center">{{ error }}</p>
 
-        <!-- Empty state -->
         <p v-if="!loading && withdrawals.length === 0 && !error" class="text-white text-center">
           No withdrawal history yet.
         </p>
 
-        <!-- Withdrawals list -->
         <div
           v-for="withdrawal in withdrawals"
           :key="withdrawal.id"
-          class="relative bg-[#556666] rounded-2xl border p-3 flex justify-between items-center"
+          class="bg-[#556666] rounded-2xl border p-3 flex justify-between items-center"
         >
-          <!-- Status badge -->
-          <span
-            class="absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-semibold shadow-sm"
-            :class="statusBadgeClass(withdrawal.status)"
-          >
-            {{ withdrawal.status }}
-          </span>
-
           <div class="flex gap-3 items-center">
             <img :src="WalletImage" class="w-6" alt="" />
 
             <div class="text-xs text-white font-semibold flex flex-col gap-1 items-start">
-              <p class="leading-tight">
-                TON withdrawal to <br />
-                {{
-                  withdrawal.targetAddress
-                    ? withdrawal.targetAddress.slice(0, 4) +
-                      '...' +
-                      withdrawal.targetAddress.slice(-4)
-                    : 'Unknown address'
-                }}
+              <p class="leading-tight font-normal">
+                TON withdrawal to:<br /><span class="underline italic font-semibold">
+                  {{
+                    withdrawal.targetAddress
+                      ? withdrawal.targetAddress.slice(0, 4) +
+                        '...' +
+                        withdrawal.targetAddress.slice(-4)
+                      : 'Unknown address'
+                  }}
+                </span>
               </p>
 
               <p v-if="withdrawal.txHash" class="text-[#ffd983] text-xs">
@@ -130,7 +114,7 @@ const statusBadgeClass = (status: Withdrawal['status']) => {
                   Open TX
                 </a>
               </p>
-              <p v-else class="text-gray-400 text-xs">
+              <p v-else class="text-[#ffd983] text-xs">
                 {{ withdrawal.status === 'PENDING' ? 'Pending' : 'No TX available' }}
               </p>
 
@@ -138,15 +122,54 @@ const statusBadgeClass = (status: Withdrawal['status']) => {
             </div>
           </div>
 
-          <div class="flex flex-col items-end">
-            <p class="font-semibold text-sm">
-              <!-- show sign and formatted amount -->
-              <span class="text-sm text-white/80">-</span
-              ><span class="text-lg font-bold">
-                {{ formatTon(withdrawal.amountTon) }}
-              </span>
+          <div class="text-[#FFD983] text-sm flex flex-col justify-between items-end h-full">
+            <p class="font-semibold leading-tight">
+              {{ formatTon(withdrawal.amountTon) }}<br /><span
+                class="text-gray-200 uppercase text-xs"
+                >ton</span
+              >
             </p>
-            <p class="text-xs text-gray-300 mt-1">TON</p>
+
+            <span
+              class="px-3 py-1 rounded-full text-xs font-semibold shadow-sm"
+              :class="statusBadgeClass(withdrawal.status)"
+            >
+              {{ withdrawal.status }}
+            </span>
+          </div>
+        </div>
+
+        <div class="bg-[#556666] rounded-2xl border p-3 flex justify-between items-center">
+          <div class="flex gap-3 items-center">
+            <img :src="WalletImage" class="w-6" alt="" />
+
+            <div class="text-xs text-white font-semibold flex flex-col gap-1 items-start">
+              <p class="leading-tight font-normal">
+                TON withdrawal to:<br /><span class="underline italic font-semibold"
+                  >UQA9...aeuG</span
+                >
+              </p>
+
+              <p class="text-[#ffd983] text-xs">
+                <a :href="`https://tonscan.io/tx/`" target="_blank" rel="noopener noreferrer">
+                  Open TX
+                </a>
+              </p>
+
+              <p class="text-gray-200 text-xs">18/10/2025, 14:13:41</p>
+            </div>
+          </div>
+
+          <div class="text-[#FFD983] text-sm flex flex-col justify-between items-end h-full">
+            <p class="font-semibold leading-tight">
+              1.23<br /><span class="text-gray-200 uppercase text-xs">ton</span>
+            </p>
+
+            <span
+              class="px-3 py-1 rounded-full text-xs font-semibold shadow-sm bg-gray-600 text-white"
+            >
+              PENDING
+            </span>
           </div>
         </div>
 
