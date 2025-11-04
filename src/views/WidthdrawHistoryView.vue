@@ -14,7 +14,6 @@ const fetchWithdrawals = async () => {
   try {
     loading.value = true
     const response = await withdrawService.getWithdrawalHistory()
-    // ✅ Safely handle API shape: { success: true, data: { withdrawals: [] } }
     withdrawals.value = Array.isArray(response.data?.withdrawals) ? response.data.withdrawals : []
   } catch (err) {
     console.error(err)
@@ -35,6 +34,33 @@ const formatDate = (dateStr: string | Date) => {
     .getMinutes()
     .toString()
     .padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`
+}
+
+// Format TON amount with thousands separators and up to 6 decimals (trim trailing zeros)
+const formatTon = (value: number | string | undefined) => {
+  if (value == null || value === '') return '0'
+  const num = Number(value)
+  if (Number.isNaN(num)) return '0'
+  // show up to 6 decimals but remove trailing zeros
+  const formatted = num.toLocaleString('en-US', {
+    maximumFractionDigits: 6,
+    minimumFractionDigits: 0,
+  })
+  return formatted
+}
+
+// Return classes for status badge
+const statusBadgeClass = (status: Withdrawal['status']) => {
+  switch (status) {
+    case 'COMPLETED':
+      return 'bg-[#FFD983] text-black' // golden chip
+    case 'PENDING':
+      return 'bg-gray-600 text-white'
+    case 'FAILED':
+      return 'bg-red-500 text-white'
+    default:
+      return 'bg-gray-500 text-white'
+  }
 }
 </script>
 
@@ -70,13 +96,21 @@ const formatDate = (dateStr: string | Date) => {
         <div
           v-for="withdrawal in withdrawals"
           :key="withdrawal.id"
-          class="bg-[#556666] rounded-2xl border p-2 flex justify-between items-center"
+          class="relative bg-[#556666] rounded-2xl border p-3 flex justify-between items-center"
         >
-          <div class="flex gap-2 items-center">
+          <!-- Status badge -->
+          <span
+            class="absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-semibold shadow-sm"
+            :class="statusBadgeClass(withdrawal.status)"
+          >
+            {{ withdrawal.status }}
+          </span>
+
+          <div class="flex gap-3 items-center">
             <img :src="WalletImage" class="w-6" alt="" />
 
-            <div class="text-xs text-white font-semibold flex flex-col gap-px items-start">
-              <p>
+            <div class="text-xs text-white font-semibold flex flex-col gap-1 items-start">
+              <p class="leading-tight">
                 TON withdrawal to <br />
                 {{
                   withdrawal.targetAddress
@@ -87,7 +121,7 @@ const formatDate = (dateStr: string | Date) => {
                 }}
               </p>
 
-              <p v-if="withdrawal.txHash" class="text-[#ffd983]">
+              <p v-if="withdrawal.txHash" class="text-[#ffd983] text-xs">
                 <a
                   :href="`https://tonscan.io/tx/${withdrawal.txHash}`"
                   target="_blank"
@@ -96,25 +130,24 @@ const formatDate = (dateStr: string | Date) => {
                   Open TX
                 </a>
               </p>
-              <p v-else class="text-gray-400">
+              <p v-else class="text-gray-400 text-xs">
                 {{ withdrawal.status === 'PENDING' ? 'Pending' : 'No TX available' }}
               </p>
 
-              <p>{{ formatDate(withdrawal.createdAt) }}</p>
+              <p class="text-gray-200 text-xs">{{ formatDate(withdrawal.createdAt) }}</p>
             </div>
           </div>
 
-          <p
-            class="font-semibold text-sm"
-            :class="{
-              'text-[#FFD983]': withdrawal.status === 'COMPLETED',
-              'text-gray-300': withdrawal.status === 'PENDING',
-              'text-red-400': withdrawal.status === 'FAILED',
-            }"
-          >
-            -{{ withdrawal.amountTon }} <br />
-            TON
-          </p>
+          <div class="flex flex-col items-end">
+            <p class="font-semibold text-sm">
+              <!-- show sign and formatted amount -->
+              <span class="text-sm text-white/80">-</span
+              ><span class="text-lg font-bold">
+                {{ formatTon(withdrawal.amountTon) }}
+              </span>
+            </p>
+            <p class="text-xs text-gray-300 mt-1">TON</p>
+          </div>
         </div>
 
         <RouterLink to="/widthdraw" class="text-center text-white underline text-sm font-semibold">
