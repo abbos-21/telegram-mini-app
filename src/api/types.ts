@@ -163,3 +163,7 @@ export interface Withdrawal {
 
   user?: User
 }
+
+export interface WithdrawalHistoryResponse {
+  withdrawals: Withdrawal[]
+}

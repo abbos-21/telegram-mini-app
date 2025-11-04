@@ -9,11 +9,13 @@ const withdrawals = ref<Withdrawal[]>([])
 const loading = ref(true)
 const error = ref('')
 
+// Fetch withdrawal history
 const fetchWithdrawals = async () => {
   try {
     loading.value = true
     const response = await withdrawService.getWithdrawalHistory()
-    withdrawals.value = response.data || []
+    // ✅ Safely handle API shape: { success: true, data: { withdrawals: [] } }
+    withdrawals.value = Array.isArray(response.data?.withdrawals) ? response.data.withdrawals : []
   } catch (err) {
     console.error(err)
     error.value = 'Failed to fetch withdrawal history'
@@ -24,6 +26,7 @@ const fetchWithdrawals = async () => {
 
 onMounted(fetchWithdrawals)
 
+// Format date nicely
 const formatDate = (dateStr: string | Date) => {
   const date = new Date(dateStr)
   return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1)
@@ -52,12 +55,18 @@ const formatDate = (dateStr: string | Date) => {
       </div>
 
       <div class="flex flex-col gap-4">
+        <!-- Loading -->
         <p v-if="loading" class="text-white text-center">Loading...</p>
+
+        <!-- Error -->
         <p v-if="error" class="text-red-500 text-center">{{ error }}</p>
-        <p v-if="!loading && withdrawals.length === 0" class="text-white text-center">
+
+        <!-- Empty state -->
+        <p v-if="!loading && withdrawals.length === 0 && !error" class="text-white text-center">
           No withdrawal history yet.
         </p>
 
+        <!-- Withdrawals list -->
         <div
           v-for="withdrawal in withdrawals"
           :key="withdrawal.id"
@@ -69,8 +78,12 @@ const formatDate = (dateStr: string | Date) => {
             <div class="text-xs text-white font-semibold flex flex-col gap-px items-start">
               <p>
                 TON withdrawal to <br />
-                {{ withdrawal.targetAddress.slice(0, 4) }}...{{
-                  withdrawal.targetAddress.slice(-4)
+                {{
+                  withdrawal.targetAddress
+                    ? withdrawal.targetAddress.slice(0, 4) +
+                      '...' +
+                      withdrawal.targetAddress.slice(-4)
+                    : 'Unknown address'
                 }}
               </p>
 
@@ -83,13 +96,22 @@ const formatDate = (dateStr: string | Date) => {
                   Open TX
                 </a>
               </p>
-              <p v-else class="text-gray-400">Pending</p>
+              <p v-else class="text-gray-400">
+                {{ withdrawal.status === 'PENDING' ? 'Pending' : 'No TX available' }}
+              </p>
 
               <p>{{ formatDate(withdrawal.createdAt) }}</p>
             </div>
           </div>
 
-          <p class="font-semibold text-[#FFD983] text-sm">
+          <p
+            class="font-semibold text-sm"
+            :class="{
+              'text-[#FFD983]': withdrawal.status === 'COMPLETED',
+              'text-gray-300': withdrawal.status === 'PENDING',
+              'text-red-400': withdrawal.status === 'FAILED',
+            }"
+          >
             -{{ withdrawal.amountTon }} <br />
             TON
           </p>
