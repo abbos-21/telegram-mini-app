@@ -139,40 +139,6 @@ const statusBadgeClass = (status: Withdrawal['status']) => {
           </div>
         </div>
 
-        <div class="bg-[#556666] rounded-2xl border p-3 flex justify-between items-center">
-          <div class="flex gap-3 items-center">
-            <img :src="WalletImage" class="w-6" alt="" />
-
-            <div class="text-xs text-white font-semibold flex flex-col gap-1 items-start">
-              <p class="leading-tight font-normal">
-                TON withdrawal to:<br /><span class="underline italic font-semibold"
-                  >UQA9...aeuG</span
-                >
-              </p>
-
-              <p class="text-[#ffd983] text-xs">
-                <a :href="`https://tonscan.io/tx/`" target="_blank" rel="noopener noreferrer">
-                  Open TX
-                </a>
-              </p>
-
-              <p class="text-gray-200 text-xs">18/10/2025, 14:13:41</p>
-            </div>
-          </div>
-
-          <div class="text-[#FFD983] text-sm flex flex-col justify-between items-end h-full">
-            <p class="font-semibold leading-tight">
-              1.23<br /><span class="text-gray-200 uppercase text-xs">ton</span>
-            </p>
-
-            <span
-              class="px-3 py-1 rounded-full text-xs font-semibold shadow-sm bg-gray-600 text-white"
-            >
-              PENDING
-            </span>
-          </div>
-        </div>
-
         <RouterLink to="/widthdraw" class="text-center text-white underline text-sm font-semibold">
           Go Back
         </RouterLink>

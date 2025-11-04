@@ -76,7 +76,7 @@ const authenticate = async () => {
   }
 }
 
-// useMonetagAdHandler()
+useMonetagAdHandler()
 
 onMounted(async () => {
   await authenticate()
