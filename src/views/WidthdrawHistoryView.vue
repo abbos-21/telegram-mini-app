@@ -1,5 +1,38 @@
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
 import { WalletImage } from '@/assets/images'
+import { withdrawService } from '@/api/withdrawService'
+import type { Withdrawal } from '@/api/types'
+import { RouterLink } from 'vue-router'
+
+const withdrawals = ref<Withdrawal[]>([])
+const loading = ref(true)
+const error = ref('')
+
+const fetchWithdrawals = async () => {
+  try {
+    loading.value = true
+    const response = await withdrawService.getWithdrawalHistory()
+    withdrawals.value = response.data || []
+  } catch (err) {
+    console.error(err)
+    error.value = 'Failed to fetch withdrawal history'
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(fetchWithdrawals)
+
+const formatDate = (dateStr: string | Date) => {
+  const date = new Date(dateStr)
+  return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1)
+    .toString()
+    .padStart(2, '0')}/${date.getFullYear()}, ${date.getHours().toString().padStart(2, '0')}:${date
+    .getMinutes()
+    .toString()
+    .padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`
+}
 </script>
 
 <template>
@@ -19,46 +52,45 @@ import { WalletImage } from '@/assets/images'
       </div>
 
       <div class="flex flex-col gap-4">
-        <div class="bg-[#556666] rounded-2xl border p-2 flex justify-between items-center">
+        <p v-if="loading" class="text-white text-center">Loading...</p>
+        <p v-if="error" class="text-red-500 text-center">{{ error }}</p>
+        <p v-if="!loading && withdrawals.length === 0" class="text-white text-center">
+          No withdrawal history yet.
+        </p>
+
+        <div
+          v-for="withdrawal in withdrawals"
+          :key="withdrawal.id"
+          class="bg-[#556666] rounded-2xl border p-2 flex justify-between items-center"
+        >
           <div class="flex gap-2 items-center">
             <img :src="WalletImage" class="w-6" alt="" />
 
             <div class="text-xs text-white font-semibold flex flex-col gap-px items-start">
               <p>
                 TON withdrawal to <br />
-                UQA9...aeuG
+                {{ withdrawal.targetAddress.slice(0, 4) }}...{{
+                  withdrawal.targetAddress.slice(-4)
+                }}
               </p>
 
-              <p class="text-[#ffd983]">Open TX</p>
+              <p v-if="withdrawal.txHash" class="text-[#ffd983]">
+                <a
+                  :href="`https://tonscan.io/tx/${withdrawal.txHash}`"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Open TX
+                </a>
+              </p>
+              <p v-else class="text-gray-400">Pending</p>
 
-              <p>18/10/2025, 14:13:41</p>
+              <p>{{ formatDate(withdrawal.createdAt) }}</p>
             </div>
           </div>
 
           <p class="font-semibold text-[#FFD983] text-sm">
-            -0.1 <br />
-            TON
-          </p>
-        </div>
-
-        <div class="bg-[#556666] rounded-2xl border p-2 flex justify-between items-center">
-          <div class="flex gap-2 items-center">
-            <img :src="WalletImage" class="w-6" alt="" />
-
-            <div class="text-xs text-white font-semibold flex flex-col gap-px items-start">
-              <p>
-                TON withdrawal to <br />
-                UQA9...aeuG
-              </p>
-
-              <p class="text-[#ffd983]">Open TX</p>
-
-              <p>18/10/2025, 14:13:41</p>
-            </div>
-          </div>
-
-          <p class="font-semibold text-[#FFD983] text-sm">
-            -0.1 <br />
+            -{{ withdrawal.amountTon }} <br />
             TON
           </p>
         </div>

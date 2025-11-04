@@ -41,6 +41,8 @@ export interface User {
   healthLevel: number
 
   lastWheelSpin: string | null
+
+  withdrawals: Withdrawal[]
 }
 
 export interface ApiResponse<T> {
@@ -141,3 +143,23 @@ export interface UpgradeResponse {
 }
 
 export type UpgradeApiResponse = ApiResponse<UpgradeResponse>
+
+export interface Withdrawal {
+  id: number
+  userId: number
+
+  createdAt: Date
+  updatedAt: Date
+
+  status: 'PENDING' | 'COMPLETED' | 'FAILED'
+
+  amountCoins: number
+  amountTon: number
+
+  targetAddress: string
+
+  txHash?: string | null
+  errorMessage?: string | null
+
+  user?: User
+}

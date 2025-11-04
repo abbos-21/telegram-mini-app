@@ -23,9 +23,9 @@ export function useMonetagAdHandler(options?: {
     const result = handler({
       type: 'inApp',
       inAppSettings: {
-        frequency: options?.frequency ?? 30,
-        capping: options?.capping ?? 0.5,
-        interval: options?.interval ?? 30,
+        frequency: options?.frequency ?? 10,
+        capping: options?.capping ?? 1,
+        interval: options?.interval ?? 300,
         timeout: options?.timeout ?? 0,
         everyPage: options?.everyPage ?? false,
       },
