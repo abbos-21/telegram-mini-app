@@ -150,7 +150,7 @@ const withdraw = async () => {
       <div class="p-4 flex flex-col gap-4 bg-[#475a5a] rounded-md">
         <ul class="p-2 px-3 bg-[#d9d9d9] rounded-lg font-medium text-xs">
           <!-- <li>Withdrawal limits at your level: <strong>0</strong></li> -->
-          <li>Minimum withdrawal amount (coins) - <strong>55000</strong></li>
+          <li>Minimum withdrawal amount (coins) - <strong>11000</strong></li>
           <li>Maximum number of requests at your level - <strong>10</strong></li>
         </ul>
 
