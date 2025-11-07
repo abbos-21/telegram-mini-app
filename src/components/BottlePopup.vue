@@ -5,6 +5,7 @@ import { HeartImage, FlashImage } from '@/assets/images'
 import { useGame } from '@/composables/useGame'
 import { useAdsgram } from '@adsgram/vue'
 import { runChainUntilSuccess } from '@/utils/chainFunction'
+import LoaderComponent from './LoaderComponent.vue'
 
 // const blockId = import.meta.env.VITE_BLOCK_ID
 const healthRewardBlockId = import.meta.env.VITE_HEALTH_REWARD_BLOCK_ID
@@ -23,6 +24,7 @@ const emit = defineEmits<Emits>()
 
 const currentSection = ref(0)
 const isLoading = ref(false)
+const loading = ref(false)
 
 const sections = ref([
   {
@@ -109,8 +111,16 @@ const watchAd = async () => {
       const result = await show()
 
       if (result.done && !result.error) {
+        loading.value = true
         setTimeout(() => {
           runChainUntilSuccess([sync, mine, getUserData])
+            .then(() => {
+              loading.value = false
+            })
+            .catch((error) => {
+              console.error('Chain failed:', error)
+              loading.value = false
+            })
         }, 1000)
       }
     } catch (err) {
@@ -132,8 +142,16 @@ const watchAd = async () => {
       const result = await show()
 
       if (result.done && !result.error) {
+        loading.value = true
         setTimeout(() => {
           runChainUntilSuccess([sync, mine, getUserData])
+            .then(() => {
+              loading.value = false
+            })
+            .catch((error) => {
+              console.error('Chain failed:', error)
+              loading.value = false
+            })
         }, 1000)
       }
     } catch (err) {
@@ -178,6 +196,7 @@ onUnmounted(() => {
 </script>
 
 <template>
+  <LoaderComponent v-if="loading" />
   <Transition name="overlay">
     <div
       v-if="isOpen"
