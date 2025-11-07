@@ -5,6 +5,7 @@ import { ShopBgImage } from '@/assets/images'
 import { useGame } from '@/composables/useGame'
 import { upgradeService } from '@/api/upgradeService'
 import type { UpgradeStatusItem } from '@/api/types'
+import { toast } from 'vue3-toastify'
 
 const { getUserData, user } = useGame()
 
@@ -36,8 +37,8 @@ const handleUpgrade = async (name: UpgradeStatusItem['name']) => {
     await upgradeService.upgrade(name)
     await getUserData()
     await getUpgradeStatus()
-  } catch (err) {
-    console.error('Error while upgrading:', err)
+  } catch (error) {
+    toast.error(error)
   } finally {
     loading.value = false
     upgradingName.value = null

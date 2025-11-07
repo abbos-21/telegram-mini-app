@@ -26,7 +26,7 @@ export function useMonetagAdHandler(options?: {
         frequency: options?.frequency ?? 10,
         capping: options?.capping ?? 1,
         interval: options?.interval ?? 300,
-        timeout: options?.timeout ?? 0,
+        timeout: options?.timeout ?? 5,
         everyPage: options?.everyPage ?? false,
       },
     })

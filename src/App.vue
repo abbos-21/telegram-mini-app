@@ -6,6 +6,9 @@ import { HomeImage, ShopImage, TaskImage, FriendsImage } from '@/assets/images'
 import { BgMusicAudio } from '@/assets/audios'
 import { isMusicPlaying, isMusicEnabled, setMusicPlaying, setMusicAvailable } from '@/stores/music'
 import { useMonetagAdHandler } from './composables/useMonetagAdHandler'
+import { toast } from 'vue3-toastify'
+
+import LoaderComponent from './components/LoaderComponent.vue'
 // import { useAdsgram } from '@adsgram/vue'
 
 // const blockId = import.meta.env.VITE_BLOCK_ID
@@ -67,10 +70,9 @@ watch(isMusicEnabled, async (enabled) => {
 const authenticate = async () => {
   try {
     loading.value = true
-    const response = await authService.loginWithTelegram()
-    console.log('✅ Authenticated as', response.data.user)
-  } catch (err) {
-    console.error('Auth failed:', err)
+    await authService.loginWithTelegram()
+  } catch (error) {
+    toast.error(error)
   } finally {
     loading.value = false
   }
@@ -85,6 +87,7 @@ onMounted(async () => {
 </script>
 
 <template>
+  <LoaderComponent v-if="loading" />
   <audio
     ref="audioRef"
     loop
@@ -94,13 +97,12 @@ onMounted(async () => {
     autoplay
     muted
     @loadeddata="handleAudioLoaded"
-    v-if="!loading"
   >
     <source :src="BgMusicAudio" type="audio/mpeg" />
     Your browser does not support the audio element.
   </audio>
 
-  <div class="app-container" v-if="!loading">
+  <div class="app-container">
     <div class="h-screen w-screen flex justify-center items-center">
       <div class="max-w-md w-full h-full relative">
         <RouterView />
@@ -138,8 +140,6 @@ onMounted(async () => {
       </div>
     </div>
   </div>
-
-  <div v-else>Loading...</div>
 </template>
 
 <style scoped>
