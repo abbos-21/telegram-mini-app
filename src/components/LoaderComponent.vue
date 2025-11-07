@@ -20,25 +20,25 @@
 }
 
 .boxLoading {
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
   position: relative;
   &:before {
     content: '';
-    width: 50px;
-    height: 5px;
+    width: 40px;
+    height: 4px;
     background: #000;
     opacity: 0.1;
     position: absolute;
-    top: 59px;
+    top: 49px;
     left: 0;
     border-radius: 50%;
     animation: shadow 0.5s linear infinite;
   }
   &:after {
     content: '';
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     background: #1a6844;
     animation: animate 0.5s linear infinite;
     position: absolute;
@@ -53,14 +53,15 @@
     border-bottom-right-radius: 3px;
   }
   25% {
-    transform: translateY(9px) rotate(22.5deg);
+    transform: translateY(7.2px) rotate(22.5deg);
   }
   50% {
-    transform: translateY(18px) scale(1, 0.9) rotate(45deg);
-    border-bottom-right-radius: 40px;
+    transform: translateY(14.4px) scale(1, 0.9) rotate(45deg);
+
+    border-bottom-right-radius: 32px;
   }
   75% {
-    transform: translateY(9px) rotate(67.5deg);
+    transform: translateY(7.2px) rotate(67.5deg);
   }
   100% {
     transform: translateY(0) rotate(90deg);

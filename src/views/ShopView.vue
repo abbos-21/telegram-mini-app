@@ -39,6 +39,7 @@ const handleUpgrade = async (name: UpgradeStatusItem['name']) => {
     await getUpgradeStatus()
   } catch (error) {
     toast.error(error)
+    console.log(error)
   } finally {
     loading.value = false
     upgradingName.value = null

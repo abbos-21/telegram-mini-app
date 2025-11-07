@@ -5,7 +5,7 @@ import { RouterView, RouterLink } from 'vue-router'
 import { HomeImage, ShopImage, TaskImage, FriendsImage } from '@/assets/images'
 import { BgMusicAudio } from '@/assets/audios'
 import { isMusicPlaying, isMusicEnabled, setMusicPlaying, setMusicAvailable } from '@/stores/music'
-import { useMonetagAdHandler } from './composables/useMonetagAdHandler'
+// import { useMonetagAdHandler } from './composables/useMonetagAdHandler'
 import { toast } from 'vue3-toastify'
 
 import LoaderComponent from './components/LoaderComponent.vue'
