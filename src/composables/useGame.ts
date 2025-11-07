@@ -1,10 +1,12 @@
 import { ref, computed, onUnmounted } from 'vue'
 import { gameService } from '@/api/gameService'
-import type { User } from '@/api/types'
+import type { ApiError, User } from '@/api/types'
 import { userService } from '@/api/userService'
+import { toast } from 'vue3-toastify'
 
 const user = ref<User | null>(null)
 let miningInterval: ReturnType<typeof setInterval> | null = null
+const error = ref<ApiError | null>(null)
 
 const startMiningSimulation = () => {
   stopMiningSimulation()
@@ -55,17 +57,29 @@ export function useGame() {
   }
 
   const recoverEnergy = async () => {
-    const res = await gameService.recoverEnergy()
-    user.value = res.data.user
-    await mine()
-    if (user.value.isMining) startMiningSimulation()
+    try {
+      const res = await gameService.recoverEnergy()
+      user.value = res.data.user
+      await mine()
+    } catch (err) {
+      error.value = err as ApiError
+      toast.error(error.value.response.data.message)
+    } finally {
+      if (user.value?.isMining) startMiningSimulation()
+    }
   }
 
   const recoverHealth = async () => {
-    const res = await gameService.recoverHealth()
-    user.value = res.data.user
-    await mine()
-    if (user.value.isMining) startMiningSimulation()
+    try {
+      const res = await gameService.recoverHealth()
+      user.value = res.data.user
+      await mine()
+    } catch (err) {
+      error.value = err as ApiError
+      toast.error(error.value.response.data.message)
+    } finally {
+      if (user.value?.isMining) startMiningSimulation()
+    }
   }
 
   // const recoverEnergyFree = async () => {

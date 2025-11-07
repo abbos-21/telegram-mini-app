@@ -3,6 +3,7 @@ import { CoinIcon } from '@/assets/icons'
 import { ref, onMounted } from 'vue'
 import { userService } from '@/api/userService'
 import type { User } from '@/api/types'
+import LoaderComponent from '@/components/LoaderComponent.vue'
 
 type ReferralRewardsArray = [string, number][]
 
@@ -70,8 +71,8 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div v-if="loading">Loading...</div>
-  <div v-else class="w-full h-full flex flex-col p-4 gap-6 pb-24 pt-8 bg-[#364B4B]">
+  <LoaderComponent v-if="loading" />
+  <div class="w-full h-full flex flex-col p-4 gap-6 pb-24 pt-8 bg-[#364B4B]">
     <h1 class="text-center text-2xl font-bold text-white">Invite and earn!</h1>
 
     <div

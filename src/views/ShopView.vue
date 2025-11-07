@@ -4,8 +4,11 @@ import { CoinIcon, MealIcon, MoneyBagIcon, PostBuildingIcon, ImmuneIcon } from '
 import { ShopBgImage } from '@/assets/images'
 import { useGame } from '@/composables/useGame'
 import { upgradeService } from '@/api/upgradeService'
-import type { UpgradeStatusItem } from '@/api/types'
+import type { ApiError, UpgradeStatusItem } from '@/api/types'
 import { toast } from 'vue3-toastify'
+import LoaderComponent from '@/components/LoaderComponent.vue'
+
+const error = ref<ApiError | null>(null)
 
 const { getUserData, user } = useGame()
 
@@ -37,9 +40,9 @@ const handleUpgrade = async (name: UpgradeStatusItem['name']) => {
     await upgradeService.upgrade(name)
     await getUserData()
     await getUpgradeStatus()
-  } catch (error) {
-    toast.error(error)
-    console.log(error)
+  } catch (err) {
+    error.value = err as ApiError
+    toast.error(error.value.response.data.message)
   } finally {
     loading.value = false
     upgradingName.value = null
@@ -59,9 +62,8 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div v-if="pageloading">Loading...</div>
+  <LoaderComponent v-if="pageloading" />
   <div
-    v-else
     class="h-full w-full flex flex-col relative bg-cover bg-center bg-no-repeat p-4 gap-4 pb-24"
     :style="{ backgroundImage: `url(${ShopBgImage})` }"
   >
@@ -70,7 +72,7 @@ onMounted(async () => {
         class="flex items-center gap-2 bg-[#FAC487] border border-[#000] py-2 px-4 rounded-[25px]"
       >
         <CoinIcon class="w-5" />
-        <span class="font-bold">{{ user?.coins }}</span>
+        <span class="font-bold">{{ user?.coins.toFixed(2) }}</span>
       </div>
 
       <div

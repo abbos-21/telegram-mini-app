@@ -21,6 +21,7 @@ import BottlePopup from '@/components/BottlePopup.vue'
 import SpinPopup from '@/components/SpinPopup.vue'
 import ProgressBar from '@/components/ProgressBar.vue'
 import { useAdsgram } from '@adsgram/vue'
+import { toast } from 'vue3-toastify'
 
 const blockId = import.meta.env.VITE_BLOCK_ID
 
@@ -58,6 +59,10 @@ onMounted(async () => {
   const functionChain = [sync, mine, getUserData]
 
   await runChainUntilSuccess(functionChain)
+
+  if (user.value?.healthLevel === 0) {
+    toast.info('Health 0, coins burned')
+  }
 
   // setTimeout(syncLoop, 5000)
 })

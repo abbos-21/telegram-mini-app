@@ -178,3 +178,12 @@ export interface WithdrawalResponse {
 }
 
 export type WithdrawalApiResponse = ApiResponse<WithdrawalResponse>
+
+export interface ApiError {
+  response: {
+    data: {
+      message: string
+      success: boolean
+    }
+  }
+}

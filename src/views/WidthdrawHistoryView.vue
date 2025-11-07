@@ -4,6 +4,7 @@ import { WalletImage } from '@/assets/images'
 import { withdrawService } from '@/api/withdrawService'
 import type { Withdrawal } from '@/api/types'
 import { RouterLink } from 'vue-router'
+import LoaderComponent from '@/components/LoaderComponent.vue'
 
 const withdrawals = ref<Withdrawal[]>([])
 const loading = ref(true)
@@ -60,6 +61,7 @@ const statusBadgeClass = (status: Withdrawal['status']) => {
 </script>
 
 <template>
+  <LoaderComponent v-if="loading" />
   <div class="bg-[#364B4B] w-full h-full pb-24 p-4 flex flex-col gap-4">
     <h1 class="text-2xl text-white font-bold text-center">Transaction History</h1>
 

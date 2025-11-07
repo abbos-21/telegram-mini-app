@@ -2,19 +2,22 @@
 import { ref } from 'vue'
 import { ClockBackImage } from '@/assets/images'
 import { withdrawService } from '@/api/withdrawService'
+import type { ApiError } from '@/api/types'
+import { toast } from 'vue3-toastify'
 
 const amountCoins = ref<number>(0)
 const targetAddress = ref<string>('')
+const error = ref<ApiError | null>(null)
 
 const withdraw = async () => {
   try {
     const response = await withdrawService.withdrawCoins(+amountCoins.value, targetAddress.value)
     if (response?.success) {
-      alert('Success!')
+      toast.success(response.message)
     }
   } catch (err) {
-    console.log('Error while withdrawing: ', err)
-    alert('Operation failed!')
+    error.value = err as ApiError
+    toast.error(error.value.response.data.message)
   } finally {
     amountCoins.value = 0
     targetAddress.value = ''
