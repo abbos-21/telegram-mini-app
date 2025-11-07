@@ -1,16 +1,22 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { ClockBackImage } from '@/assets/images'
 import { withdrawService } from '@/api/withdrawService'
 import type { ApiError } from '@/api/types'
 import { toast } from 'vue3-toastify'
+import { useGame } from '@/composables/useGame'
+import LoaderComponent from '@/components/LoaderComponent.vue'
 
 const amountCoins = ref<number>(0)
 const targetAddress = ref<string>('')
 const error = ref<ApiError | null>(null)
+const loading = ref(true)
+
+const { user, getUserData } = useGame()
 
 const withdraw = async () => {
   try {
+    loading.value = true
     const response = await withdrawService.withdrawCoins(+amountCoins.value, targetAddress.value)
     if (response?.success) {
       toast.success(response.message)
@@ -21,11 +27,24 @@ const withdraw = async () => {
   } finally {
     amountCoins.value = 0
     targetAddress.value = ''
+    loading.value = false
   }
 }
+
+onMounted(async () => {
+  await getUserData()
+    .then(() => {
+      loading.value = false
+    })
+    .catch((error) => {
+      console.error('Error fetching user data: ', error)
+      loading.value = false
+    })
+})
 </script>
 
 <template>
+  <LoaderComponent v-if="loading" />
   <div class="bg-[#364B4B] w-full h-full pb-24 pt-8 p-4 flex flex-col gap-4">
     <h1 class="text-2xl text-white font-bold">Widthdrawal</h1>
 
@@ -146,7 +165,7 @@ const withdraw = async () => {
         </text>
 
         <text x="65%" y="70%" text-anchor="middle" font-size="48" font-weight="bold" fill="#000000">
-          0.00
+          {{ user?.coins.toFixed(2) }}
         </text>
       </svg>
 
@@ -154,7 +173,7 @@ const withdraw = async () => {
         <ul class="p-2 px-3 bg-[#d9d9d9] rounded-lg font-medium text-xs">
           <!-- <li>Withdrawal limits at your level: <strong>0</strong></li> -->
           <li>Minimum withdrawal amount (coins) - <strong>2200</strong></li>
-          <li>Maximum number of requests at your level - <strong>10</strong></li>
+          <li>Maximum withdrawal amount (coins) - <strong>22000</strong></li>
         </ul>
 
         <div class="p-2 px-3 bg-[#d9d9d9] rounded-lg font-semibold text-lg text-center">
@@ -167,7 +186,7 @@ const withdraw = async () => {
           >
             <p>Enter the amount of coins:</p>
             <input
-              class="w-1/3 outline-none border-b"
+              class="w-1/3 outline-none border-b text-sm"
               type="number"
               placeholder="0.00"
               required
@@ -176,21 +195,16 @@ const withdraw = async () => {
           </div>
 
           <div
-            class="p-2 px-3 bg-[#d9d9d9] rounded-lg font-semibold text-xs flex items-center gap-2 justify-between"
+            class="p-2 px-3 bg-[#d9d9d9] rounded-lg font-semibold text-xs flex flex-col items-start gap-1"
           >
             <p>Enter the TON address:</p>
             <input
-              class="w-1/3 outline-none border-b"
+              class="w-full outline-none border-b text-sm"
               type="text"
               placeholder="UQA..."
               required
               v-model="targetAddress"
             />
-          </div>
-
-          <div class="text-white flex justify-between items-center text-xs gap-2 mt-2">
-            <p>Blockchain fee: 0.05 TON</p>
-            <p>You will receive: 0.1 TON</p>
           </div>
 
           <button
