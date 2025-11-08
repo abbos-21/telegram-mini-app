@@ -78,7 +78,7 @@ const checkSubscription = async (channel: string) => {
         class="flex justify-between gap-4 items-center bg-[#fff] rounded-lg px-3 py-1"
       >
         <div class="flex gap-3 items-center flex-1 min-w-0">
-          <img :src="TelegramImage" alt="task" class="w-12 h-12 flex-shrink-0" />
+          <img :src="TelegramImage" alt="task" class="w-10 h-10 shrink-0" />
 
           <div class="flex flex-col justify-between items-start flex-1 min-w-0">
             <p class="font-bold truncate w-full">{{ channel }}</p>
@@ -109,7 +109,7 @@ const checkSubscription = async (channel: string) => {
         <button
           v-else
           disabled
-          class="subscribe-button bg-[#D9D9D9] border border-[#000] text-[#17212B] px-2 py-1 rounded-sm opacity-70 cursor-not-allowed"
+          class="subscribe-button bg-[#D9D9D9] border border-[#000] text-[#17212B] px-2 py-1 rounded-sm opacity-70 cursor-not-allowed flex justify-center items-center whitespace-nowrap text-sm font-medium"
         >
           Checking...
         </button>

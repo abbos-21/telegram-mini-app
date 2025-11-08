@@ -120,7 +120,7 @@ const segments = computed(() => {
 
 @media only screen and (max-height: 700px) {
   .health-bar-medium {
-    height: 148px;
+    height: 108px;
   }
 }
 

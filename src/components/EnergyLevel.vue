@@ -121,7 +121,7 @@ const segments = computed(() => {
 
 @media only screen and (max-height: 700px) {
   .energy-bar-medium {
-    height: 148px;
+    height: 108px;
   }
 }
 
