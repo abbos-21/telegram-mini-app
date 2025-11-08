@@ -11,8 +11,23 @@ const amountCoins = ref<number>(0)
 const targetAddress = ref<string>('')
 const error = ref<ApiError | null>(null)
 const loading = ref(true)
+const withdrawRate = ref<number | null>()
+const maxWithdraw = ref<number | null>()
+const minWithdraw = ref<number | null>()
 
 const { user, getUserData } = useGame()
+
+const getWithdrawData = async () => {
+  try {
+    const response = await withdrawService.getWithdrawalData()
+    withdrawRate.value = response.data.rate
+    minWithdraw.value = response.data.min
+    maxWithdraw.value = response.data.max
+  } catch (err) {
+    error.value = err as ApiError
+    toast.error(error.value.response.data.message)
+  }
+}
 
 const withdraw = async () => {
   try {
@@ -31,13 +46,18 @@ const withdraw = async () => {
   }
 }
 
-onMounted(async () => {
+const fetchData = async () => {
   await getUserData()
+  await getWithdrawData()
+}
+
+onMounted(async () => {
+  await fetchData()
     .then(() => {
       loading.value = false
     })
     .catch((error) => {
-      console.error('Error fetching user data: ', error)
+      console.error('Error fetching data: ', error)
       loading.value = false
     })
 })
@@ -171,13 +191,16 @@ onMounted(async () => {
 
       <div class="p-4 flex flex-col gap-4 bg-[#475a5a] rounded-md">
         <ul class="p-2 px-3 bg-[#d9d9d9] rounded-lg font-medium text-xs">
-          <!-- <li>Withdrawal limits at your level: <strong>0</strong></li> -->
-          <li>Minimum withdrawal amount (coins) - <strong>2200</strong></li>
-          <li>Maximum withdrawal amount (coins) - <strong>22000</strong></li>
+          <li>
+            Minimum withdrawal amount (coins) - <strong>{{ minWithdraw }}</strong>
+          </li>
+          <li>
+            Maximum withdrawal amount (coins) - <strong>{{ maxWithdraw }}</strong>
+          </li>
         </ul>
 
         <div class="p-2 px-3 bg-[#d9d9d9] rounded-lg font-semibold text-lg text-center">
-          Coin rate: 220000 coins = 1 TON
+          Coin rate: {{ withdrawRate }} coins = 1 TON
         </div>
 
         <form class="flex flex-col gap-4" @submit.prevent="withdraw">

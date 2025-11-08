@@ -1,7 +1,17 @@
 import apiClient from './axios'
-import type { ApiResponse, WithdrawalApiResponse, WithdrawalHistoryResponse } from './types'
+import type {
+  ApiResponse,
+  WithdrawalApiResponse,
+  WithdrawalHistoryResponse,
+  WithdrawalDataApiResponse,
+} from './types'
 
 export const withdrawService = {
+  getWithdrawalData: async (): Promise<WithdrawalDataApiResponse> => {
+    const response = await apiClient.get<WithdrawalDataApiResponse>('/withdrawals/data')
+    return response.data
+  },
+
   getWithdrawalHistory: async (): Promise<ApiResponse<WithdrawalHistoryResponse>> => {
     const response =
       await apiClient.get<ApiResponse<WithdrawalHistoryResponse>>('/withdrawals/history')

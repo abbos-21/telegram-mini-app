@@ -168,6 +168,14 @@ export interface WithdrawalHistoryResponse {
   withdrawals: Withdrawal[]
 }
 
+export interface WithdrawalDataResponse {
+  rate: number
+  min: number
+  max: number
+}
+
+export type WithdrawalDataApiResponse = ApiResponse<WithdrawalDataResponse>
+
 export interface WithdrawalRequestBody {
   amountCoins: number
   targetAddress: string
@@ -178,6 +186,12 @@ export interface WithdrawalResponse {
 }
 
 export type WithdrawalApiResponse = ApiResponse<WithdrawalResponse>
+
+export interface TasksResponse {
+  tasks: string[]
+}
+
+export type TasksApiResponse = ApiResponse<TasksResponse>
 
 export interface ApiError {
   response: {
