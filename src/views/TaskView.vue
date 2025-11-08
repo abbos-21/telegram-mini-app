@@ -10,7 +10,16 @@ import LoaderComponent from '@/components/LoaderComponent.vue'
 const error = ref<ApiError | null>(null)
 const loading = ref<boolean>(false)
 const tasks = ref<string[] | null>(null)
-const buttonClicked = ref<boolean>(false)
+const subscribedChannels = ref<Set<string>>(new Set())
+const processingChannel = ref<string | null>(null)
+
+const tg = window.Telegram?.WebApp
+
+onMounted(() => {
+  tg?.ready()
+  tg?.expand()
+  fetchTasks()
+})
 
 const fetchTasks = async () => {
   try {
@@ -19,28 +28,38 @@ const fetchTasks = async () => {
     tasks.value = response.data.tasks
   } catch (err) {
     error.value = err as ApiError
-    toast.error(error.value.response.data.message)
+    toast.error((err as ApiError).response?.data?.message || 'Failed to load tasks')
   } finally {
     loading.value = false
   }
 }
 
-const checkSubscription = async (channel: string | null) => {
+const openChannel = (channel: string) => {
+  const username = channel.slice(1)
+  const url = `https://t.me/${username}`
+
+  if (tg?.openTelegramLink) {
+    tg.openTelegramLink(url)
+  } else {
+    tg?.openLink(url)
+  }
+
+  subscribedChannels.value = new Set(subscribedChannels.value).add(channel)
+}
+
+const checkSubscription = async (channel: string) => {
+  processingChannel.value = channel
   try {
     const response = await taskService.checkSubscription(channel)
-    toast.success(response?.message)
+    toast.success(response?.message || 'Verified!')
   } catch (err) {
     error.value = err as ApiError
-    toast.error(error.value.response.data.message)
+    toast.error((err as ApiError).response?.data?.message || 'Check failed')
   } finally {
-    buttonClicked.value = false
+    processingChannel.value = null
     await fetchTasks()
   }
 }
-
-onMounted(async () => {
-  await fetchTasks()
-})
 </script>
 
 <template>
@@ -71,27 +90,33 @@ onMounted(async () => {
           </div>
         </div>
 
-        <a
-          v-if="!buttonClicked"
-          @click="buttonClicked = true"
-          :href="`https://t.me/${channel.slice(1)}`"
-          class="bg-[#D9D9D9] border border-[#000] text-[#17212B] px-2 py-1 rounded-sm cursor-pointer flex justify-center items-center whitespace-nowrap text-sm font-medium"
+        <button
+          v-if="!subscribedChannels.has(channel)"
+          @click="openChannel(channel)"
+          class="subscribe-button bg-[#D9D9D9] border border-[#000] text-[#17212B] px-2 py-1 rounded-sm cursor-pointer flex justify-center items-center whitespace-nowrap text-sm font-medium transition-all hover:bg-[#c0c0c0]"
         >
           Subscribe
-        </a>
+        </button>
 
         <button
-          v-if="buttonClicked"
-          type="button"
+          v-else-if="processingChannel !== channel"
           @click="checkSubscription(channel)"
-          class="bg-[#D9D9D9] border border-[#000] text-[#17212B] px-2 py-1 rounded-sm cursor-pointer flex justify-center items-center whitespace-nowrap text-sm font-medium"
+          class="subscribe-button bg-[#D9D9D9] border border-[#000] text-[#17212B] px-2 py-1 rounded-sm cursor-pointer flex justify-center items-center whitespace-nowrap text-sm font-medium transition-all hover:bg-[#c0c0c0]"
         >
           Check
+        </button>
+
+        <button
+          v-else
+          disabled
+          class="subscribe-button bg-[#D9D9D9] border border-[#000] text-[#17212B] px-2 py-1 rounded-sm opacity-70 cursor-not-allowed"
+        >
+          Checking...
         </button>
       </div>
     </div>
 
-    <div v-else class="text-center">No tasks available</div>
+    <div v-else class="text-center text-white">No tasks available</div>
   </div>
 </template>
 
