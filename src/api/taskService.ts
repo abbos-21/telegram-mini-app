@@ -7,8 +7,12 @@ export const taskService = {
     return response.data
   },
 
-  checkSubscription: async (): Promise<ApiResponse<null>> => {
-    const response = await apiClient.post<ApiResponse<null>>('/task/check-subscription')
-    return response.data
+  checkSubscription: async (channelUsername: string | null) => {
+    if (channelUsername) {
+      const response = await apiClient.post<ApiResponse<null>>('/task/check-subscription', {
+        channelUsername,
+      })
+      return response.data
+    }
   },
 }

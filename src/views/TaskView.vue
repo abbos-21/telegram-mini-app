@@ -10,6 +10,7 @@ import LoaderComponent from '@/components/LoaderComponent.vue'
 const error = ref<ApiError | null>(null)
 const loading = ref<boolean>(false)
 const tasks = ref<string[] | null>(null)
+const buttonClicked = ref<boolean>(false)
 
 const fetchTasks = async () => {
   try {
@@ -21,6 +22,19 @@ const fetchTasks = async () => {
     toast.error(error.value.response.data.message)
   } finally {
     loading.value = false
+  }
+}
+
+const checkSubscription = async (channel: string | null) => {
+  try {
+    const response = await taskService.checkSubscription(channel)
+    toast.success(response?.message)
+  } catch (err) {
+    error.value = err as ApiError
+    toast.error(error.value.response.data.message)
+  } finally {
+    buttonClicked.value = false
+    await fetchTasks()
   }
 }
 
@@ -37,17 +51,18 @@ onMounted(async () => {
     <div
       class="flex flex-col gap-4 overflow-y-scroll scrollbar-hide"
       style="scrollbar-width: none; -ms-overflow-style: none"
+      v-if="tasks"
     >
       <div
         v-for="(channel, index) in tasks"
         :key="index"
-        class="flex justify-between items-center bg-[#fff] rounded-lg px-3 py-1"
+        class="flex justify-between gap-4 items-center bg-[#fff] rounded-lg px-3 py-1"
       >
         <div class="flex gap-3 items-center">
           <img :src="TelegramImage" alt="task" class="w-12 h-12" />
 
           <div class="flex flex-col justify-between items-start">
-            <p class="font-bold">{{ channel }}</p>
+            <p class="font-bold truncate">{{ channel }}</p>
 
             <div class="flex gap-1 items-center">
               <CoinIcon class="w-4 h-4" />
@@ -57,14 +72,27 @@ onMounted(async () => {
         </div>
 
         <a
+          v-if="!buttonClicked"
+          @click="buttonClicked = true"
           :href="`https://t.me/${channel.slice(1)}`"
           target="_blank"
           class="subscribe-button bg-[#D9D9D9] border border-[#000] text-[#17212B] px-2 py-1 rounded-sm cursor-pointer flex justify-center items-center"
         >
           Subscribe
         </a>
+
+        <button
+          v-if="buttonClicked"
+          type="button"
+          @click="checkSubscription(channel)"
+          class="subscribe-button bg-[#D9D9D9] border border-[#000] text-[#17212B] px-2 py-1 rounded-sm cursor-pointer flex justify-center items-center"
+        >
+          Check
+        </button>
       </div>
     </div>
+
+    <div v-else class="text-center">No tasks available</div>
   </div>
 </template>
 
