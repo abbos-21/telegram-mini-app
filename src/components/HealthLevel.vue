@@ -118,6 +118,12 @@ const segments = computed(() => {
   height: 250px;
 }
 
+@media only screen and (max-height: 700px) {
+  .health-bar-medium {
+    height: 128px;
+  }
+}
+
 @media only screen and (max-height: 640px) {
   .health-bar-medium {
     height: 108px;
