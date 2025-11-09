@@ -85,7 +85,7 @@ const checkSubscription = async (channel: string) => {
 
             <div class="flex gap-1 items-center">
               <CoinIcon class="w-4 h-4 flex-shrink-0" />
-              <p class="text-sm font-bold">100</p>
+              <p class="text-sm font-bold">20</p>
             </div>
           </div>
         </div>
