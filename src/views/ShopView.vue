@@ -102,7 +102,6 @@ onMounted(async () => {
             <div class="flex justify-between items-start">
               <p class="text-[#fff]">
                 <span class="uppercase font-bold text-lg">{{ upgrade.name }}</span>
-                - {{ upgrade.description }}
               </p>
 
               <div

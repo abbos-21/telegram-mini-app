@@ -9,20 +9,30 @@ import { isMusicPlaying, isMusicEnabled, setMusicPlaying, setMusicAvailable } fr
 import { toast } from 'vue3-toastify'
 
 import LoaderComponent from './components/LoaderComponent.vue'
-// import { useAdsgram } from '@adsgram/vue'
+import { useAdsgram } from '@adsgram/vue'
 
-// const blockId = import.meta.env.VITE_BLOCK_ID
+const blockId = import.meta.env.VITE_BLOCK_ID
 
-// const { show, addEventListener } = useAdsgram({
-//   blockId,
-// })
+const { show, addEventListener } = useAdsgram({
+  blockId,
+})
 
-// addEventListener('onBannerNotFound', () => {
-//   console.log('No ad available at the moment')
-// })
-// addEventListener('onTooLongSession', () => {
-//   console.log('User session too long — ad not available')
-// })
+const startAdLoop = async () => {
+  try {
+    await show()
+  } catch (err) {
+    console.log('Error in ad loop: ', err)
+  } finally {
+    setTimeout(startAdLoop, 180000) // every 3 minutes
+  }
+}
+
+addEventListener('onBannerNotFound', () => {
+  console.log('No ad available at the moment')
+})
+addEventListener('onTooLongSession', () => {
+  console.log('User session too long — ad not available')
+})
 
 const audioRef = ref<HTMLAudioElement | null>(null)
 
@@ -82,7 +92,7 @@ const authenticate = async () => {
 
 onMounted(async () => {
   await authenticate()
-  // await show()
+  await startAdLoop()
 })
 </script>
 

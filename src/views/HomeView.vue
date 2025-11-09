@@ -76,7 +76,7 @@ onMounted(async () => {
     <div class="flex justify-between items-start">
       <RouterLink
         to="/widthdraw"
-        class="flex items-center p-2 bg-[#FAC487] gap-2 border border-[#000]"
+        class="flex items-center p-2 px-3 bg-[#FAC487] gap-2 border border-[#000] rounded-full"
       >
         <CoinIcon class="w-6" />
         <p class="font-bold">{{ user?.coins.toFixed(2) ?? 0 }}</p>
@@ -84,11 +84,15 @@ onMounted(async () => {
       </RouterLink>
 
       <div class="flex flex-col gap-2 items-end">
-        <div class="flex items-center justify-center p-2 bg-[#FAC487] border border-[#000]">
+        <div
+          class="flex items-center justify-center p-2 px-3 bg-[#FAC487] border border-[#000] rounded-full"
+        >
           <p class="font-bold">Your level: {{ user?.level ?? 0 }}</p>
         </div>
 
-        <button class="flex items-center justify-center bg-[#FAC487] border border-[#000] pe-2">
+        <button
+          class="flex items-center justify-center bg-[#FAC487] border border-[#000] pe-2 ps-px rounded-full cursor-pointer"
+        >
           <img :src="UkFlagImage" class="w-10 h-10" alt="" />
           <span class="font-bold">EN</span>
         </button>
