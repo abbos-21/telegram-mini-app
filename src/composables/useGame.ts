@@ -2,7 +2,6 @@ import { ref, computed, onUnmounted } from 'vue'
 import { gameService } from '@/api/gameService'
 import type { ApiError, User } from '@/api/types'
 import { userService } from '@/api/userService'
-import { toast } from 'vue3-toastify'
 
 const user = ref<User | null>(null)
 let miningInterval: ReturnType<typeof setInterval> | null = null
@@ -63,7 +62,6 @@ export function useGame() {
       await mine()
     } catch (err) {
       error.value = err as ApiError
-      toast.error(error.value.response.data.message)
     } finally {
       if (user.value?.isMining) startMiningSimulation()
     }
@@ -76,7 +74,6 @@ export function useGame() {
       await mine()
     } catch (err) {
       error.value = err as ApiError
-      toast.error(error.value.response.data.message)
     } finally {
       if (user.value?.isMining) startMiningSimulation()
     }
