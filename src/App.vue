@@ -1,10 +1,16 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { authService } from './api/authService'
 import { RouterView, RouterLink } from 'vue-router'
 import { HomeImage, ShopImage, TaskImage, FriendsImage } from '@/assets/images'
 import { BgMusicAudio } from '@/assets/audios'
-import { isMusicEnabled, setMusicPlaying, setMusicAvailable } from '@/stores/music'
+import {
+  setAudioElement,
+  isMusicEnabled,
+  isMusicAvailable,
+  setMusicPlaying,
+  setMusicAvailable,
+} from '@/stores/music'
 import { toast } from 'vue3-toastify'
 
 import LoaderComponent from './components/LoaderComponent.vue'
@@ -12,6 +18,10 @@ import LoaderComponent from './components/LoaderComponent.vue'
 const loading = ref<boolean>(true)
 const authFailed = ref<boolean>(false)
 const audioRef = ref<HTMLAudioElement | null>(null)
+
+watch(audioRef, (newEl) => {
+  setAudioElement(newEl)
+})
 
 const authenticate = async () => {
   try {
@@ -34,27 +44,46 @@ const handleRetry = async () => {
 
 onMounted(async () => {
   await authenticate()
+  // document.addEventListener('touchstart', resumeOnInteraction)
+  // document.addEventListener('click', resumeOnInteraction)
 })
 
-const handleAudioEnded = () => setMusicPlaying(false)
-const handleAudioError = () => {
-  console.log('Audio could not be loaded')
-  setMusicPlaying(false)
-}
+// const resumeOnInteraction = () => {
+//   if (!isMusicAvailable.value && isMusicEnabled.value && audioRef.value) {
+//     audioRef.value
+//       .play()
+//       .then(() => {
+//         setMusicAvailable(true)
+//         setMusicPlaying(true)
+//       })
+//       .catch(() => {})
+//     document.removeEventListener('touchstart', resumeOnInteraction)
+//     document.removeEventListener('click', resumeOnInteraction)
+//   }
+// }
 
 const handleAudioLoaded = async () => {
-  if (audioRef.value && isMusicEnabled.value) {
+  if (audioRef.value && isMusicEnabled.value && isMusicAvailable.value) {
     try {
       audioRef.value.muted = false
       await audioRef.value.play()
       setMusicPlaying(true)
-      setMusicAvailable(true)
     } catch {
       console.log('Autoplay prevented by browser.')
       setMusicPlaying(false)
       setMusicAvailable(false)
     }
   }
+}
+
+const handleAudioEnded = () => {
+  setMusicPlaying(false)
+}
+
+const handleAudioError = () => {
+  console.log('Audio could not be loaded')
+  setMusicPlaying(false)
+  setMusicAvailable(false)
 }
 </script>
 
@@ -98,11 +127,11 @@ const handleAudioLoaded = async () => {
     <audio
       ref="audioRef"
       loop
+      preload="auto"
+      :muted="!isMusicEnabled || !isMusicAvailable"
+      @loadeddata="handleAudioLoaded"
       @ended="handleAudioEnded"
       @error="handleAudioError"
-      preload="auto"
-      muted
-      @loadeddata="handleAudioLoaded"
     >
       <source :src="BgMusicAudio" type="audio/mpeg" />
       Your browser does not support the audio element.
