@@ -32,12 +32,10 @@ const handleRetry = async () => {
   await authenticate()
 }
 
-// Auto authenticate on mount
 onMounted(async () => {
   await authenticate()
 })
 
-// Music handlers
 const handleAudioEnded = () => setMusicPlaying(false)
 const handleAudioError = () => {
   console.log('Audio could not be loaded')
@@ -61,10 +59,8 @@ const handleAudioLoaded = async () => {
 </script>
 
 <template>
-  <!-- Loading Screen -->
   <LoaderComponent v-if="loading" />
 
-  <!-- Auth Failed - Retry Screen -->
   <div
     v-else-if="authFailed"
     class="fixed inset-0 bg-gradient-to-br from-black/90 via-[#1a1a2e]/90 to-[#16213e]/90 flex items-center justify-center z-50 px-4"
@@ -98,7 +94,6 @@ const handleAudioLoaded = async () => {
     </div>
   </div>
 
-  <!-- Main App -->
   <div v-else class="app-container">
     <audio
       ref="audioRef"
@@ -117,26 +112,34 @@ const handleAudioLoaded = async () => {
       <div class="max-w-md w-full h-full relative">
         <RouterView />
 
-        <!-- Bottom Navigation -->
         <div class="grid grid-cols-4 gap-2 absolute bottom-2 inset-x-0 px-2 max-w-md">
-          <RouterLink to="/" class="nav-item nav-home">
-            <img :src="HomeImage" alt="Home" class="w-8 h-8 object-contain" />
-            <p class="font-bold text-sm mt-1">Home</p>
+          <RouterLink
+            to="/"
+            class="cursor-pointer flex flex-col items-center justify-center bg-[#D68C62] rounded-[10px] w-full h-16 border border-[#FBEFE7]"
+          >
+            <img :src="HomeImage" alt="" class="w-8 h-8 object-contain" />
+            <p class="font-bold">Home</p>
           </RouterLink>
-
-          <RouterLink to="/shop" class="nav-item nav-shop">
-            <img :src="ShopImage" alt="Shop" class="w-8 h-8 object-contain" />
-            <p class="font-bold text-sm mt-1">Shop</p>
+          <RouterLink
+            to="/shop"
+            class="cursor-pointer flex flex-col items-center justify-center bg-[#DAC7C0] rounded-[10px] w-full h-16 border border-[#FBEFE7]"
+          >
+            <img :src="ShopImage" alt="" class="w-8 h-8 object-contain" />
+            <p class="font-bold">Shop</p>
           </RouterLink>
-
-          <RouterLink to="/task" class="nav-item nav-task">
-            <img :src="TaskImage" alt="Task" class="w-8 h-8 object-contain" />
-            <p class="font-bold text-sm mt-1">Task</p>
+          <RouterLink
+            to="/task"
+            class="cursor-pointer flex flex-col items-center justify-center bg-[#D68C62] rounded-[10px] w-full h-16 border border-[#FBEFE7]"
+          >
+            <img :src="TaskImage" alt="" class="w-8 h-8 object-contain" />
+            <p class="font-bold">Task</p>
           </RouterLink>
-
-          <RouterLink to="/friends" class="nav-item nav-friends">
-            <img :src="FriendsImage" alt="Friends" class="w-8 h-8 object-contain" />
-            <p class="font-bold text-sm mt-1">Friends</p>
+          <RouterLink
+            to="/friends"
+            class="cursor-pointer flex flex-col items-center justify-center bg-[#DAC7C0] rounded-[10px] w-full h-16 border border-[#FBEFE7]"
+          >
+            <img :src="FriendsImage" alt="" class="w-8 h-8 object-contain" />
+            <p class="font-bold">Friends</p>
           </RouterLink>
         </div>
       </div>
@@ -149,30 +152,5 @@ const handleAudioLoaded = async () => {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
-}
-
-.nav-item {
-  @apply cursor-pointer flex flex-col items-center justify-center rounded-[10px] w-full h-16 border transition-all duration-300 hover:scale-105 active:scale-95;
-}
-
-.nav-home,
-.nav-task {
-  @apply bg-[#D68C62]/20 border-[#D68C62]/30 backdrop-blur-sm;
-}
-
-.nav-shop,
-.nav-friends {
-  @apply bg-[#DAC7C0]/20 border-[#DAC7C0]/30 backdrop-blur-sm;
-}
-
-.nav-home:hover,
-.nav-task:hover {
-  @apply bg-[#D68C62]/30 border-[#D68C62]/50;
-}
-
-.nav-shop:hover,
-.nav-friends:hover {
-  @apply bg-[#DAC7C0]/30 border-[#DAC7C0]/50;
 }
 </style>
