@@ -44,23 +44,23 @@ const handleRetry = async () => {
 
 onMounted(async () => {
   await authenticate()
-  // document.addEventListener('touchstart', resumeOnInteraction)
-  // document.addEventListener('click', resumeOnInteraction)
+  document.addEventListener('touchstart', resumeOnInteraction)
+  document.addEventListener('click', resumeOnInteraction)
 })
 
-// const resumeOnInteraction = () => {
-//   if (!isMusicAvailable.value && isMusicEnabled.value && audioRef.value) {
-//     audioRef.value
-//       .play()
-//       .then(() => {
-//         setMusicAvailable(true)
-//         setMusicPlaying(true)
-//       })
-//       .catch(() => {})
-//     document.removeEventListener('touchstart', resumeOnInteraction)
-//     document.removeEventListener('click', resumeOnInteraction)
-//   }
-// }
+const resumeOnInteraction = () => {
+  if (!isMusicAvailable.value && isMusicEnabled.value && audioRef.value) {
+    audioRef.value
+      .play()
+      .then(() => {
+        setMusicAvailable(true)
+        setMusicPlaying(true)
+      })
+      .catch(() => {})
+    document.removeEventListener('touchstart', resumeOnInteraction)
+    document.removeEventListener('click', resumeOnInteraction)
+  }
+}
 
 const handleAudioLoaded = async () => {
   if (audioRef.value && isMusicEnabled.value && isMusicAvailable.value) {
