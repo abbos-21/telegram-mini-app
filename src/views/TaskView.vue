@@ -78,7 +78,7 @@ const checkSubscription = async (channel: string) => {
     toast.error((err as ApiError).response?.data?.message || 'Check failed')
   } finally {
     processingChannel.value = null
-    await fetchTasks()
+    await mountFetch()
   }
 }
 </script>
@@ -155,8 +155,9 @@ const checkSubscription = async (channel: string) => {
         </div>
 
         <button
+          disabled
           type="button"
-          class="subscribe-button bg-[#D9D9D9] border border-[#000] text-[#17212B] px-2 py-1 rounded-sm cursor-pointer flex justify-center items-center whitespace-nowrap text-sm font-medium transition-all hover:bg-[#c0c0c0]"
+          class="subscribe-button bg-[#D9D9D9] border border-[#000] text-[#17212B] px-2 py-1 rounded-sm cursor-pointer flex justify-center items-center whitespace-nowrap text-sm font-medium"
         >
           Subscribed
         </button>
