@@ -91,7 +91,7 @@ const checkSubscription = async (channel: string) => {
     <div
       class="flex flex-col gap-4 overflow-y-scroll scrollbar-hide"
       style="scrollbar-width: none; -ms-overflow-style: none"
-      v-if="tasks?.length && allTasks?.length"
+      v-if="tasks?.length || allTasks?.length"
     >
       <div
         v-for="(channel, index) in tasks"
