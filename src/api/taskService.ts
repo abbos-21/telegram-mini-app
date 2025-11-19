@@ -6,6 +6,10 @@ export const taskService = {
     const response = await apiClient.get<TasksApiResponse>('/task')
     return response.data
   },
+  getAllTasks: async (): Promise<TasksApiResponse> => {
+    const response = await apiClient.get<TasksApiResponse>('/task/all')
+    return response.data
+  },
 
   checkSubscription: async (channelUsername: string | null) => {
     if (channelUsername) {
