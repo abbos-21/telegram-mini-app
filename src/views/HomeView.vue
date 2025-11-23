@@ -26,7 +26,13 @@ import { useNavigate } from '@/composables/useNavigate'
 import { useOrchestrator, type OrchestratorTask } from '@/composables/useOrchestrator'
 import WebApp from '@twa-dev/sdk'
 
+const biggies = [5035538171, 1031081189, 352641904, 1701438929]
 const currentUserTelegramId = WebApp.initDataUnsafe.user?.id
+
+function runIfUserIsNotBiggie(callback: () => void) {
+  if (biggies.includes(currentUserTelegramId as number)) return
+  callback()
+}
 
 const blockId = import.meta.env.VITE_BLOCK_ID
 const spinBlockId = import.meta.env.VITE_SPIN_BLOCK_ID
@@ -85,7 +91,7 @@ const { goTo } = useNavigate()
 
 onMounted(async () => {
   if (currentUserTelegramId === 1031081189) {
-    alert('Hey, you should be the admin!')
+    alert('Hey, you must be the admin!')
   }
 
   const functionChain = [sync, mine, getUserData]
@@ -111,7 +117,7 @@ onMounted(async () => {
         class="flex items-center p-2 px-3 bg-[#FAC487] gap-2 border border-[#000] rounded-full cursor-pointer"
         @click="
           () => {
-            withdrawalAds.show()
+            runIfUserIsNotBiggie(() => withdrawalAds.show())
             goTo('/widthdraw')
           }
         "
@@ -189,7 +195,7 @@ onMounted(async () => {
         @click="
           () => {
             openBottlePopup()
-            bottleAds.show()
+            runIfUserIsNotBiggie(() => bottleAds.show())
           }
         "
       >
@@ -216,7 +222,7 @@ onMounted(async () => {
         @click="
           () => {
             collect()
-            collectAds.show()
+            runIfUserIsNotBiggie(() => collectAds.show())
           }
         "
         :disabled="!user || user.tempCoins < user.vaultCapacity * 0.1"
