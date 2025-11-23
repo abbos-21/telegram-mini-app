@@ -94,36 +94,18 @@ const checkSubscription = async (channel: string) => {
       style="scrollbar-width: none; -ms-overflow-style: none"
       v-if="tasks?.length || allTasks?.length"
     >
-      <AdsgramTask block-id="task-18086" class="adsgram-task" data-debug="true">
-        <!-- LEFT SIDE: icon + text -->
-        <template #left>
-          <div class="flex gap-3 items-center flex-1 min-w-0">
-            <img :src="TelegramImage" alt="task" class="w-10 h-10 shrink-0" />
-
-            <div class="flex flex-col justify-between items-start flex-1 min-w-0">
-              <p class="font-bold truncate w-full">Adsgram Task</p>
-
-              <div class="flex gap-1 items-center">
-                <CoinIcon class="w-4 h-4 flex-shrink-0" />
-                <p class="text-sm font-bold">100</p>
-              </div>
-            </div>
-          </div>
+      <AdsgramTask data-debug="true" block-id="task-18086" class="task">
+        <template v-slot:reward>
+          <p class="task__reward">🪙 100</p>
         </template>
-
-        <!-- ACTION BUTTON (show ad / go) -->
-        <template #button="{ show }">
-          <button @click="show" class="task-button">Go</button>
+        <template v-slot:button>
+          <div class="task__button">go</div>
         </template>
-
-        <!-- CLAIM BUTTON -->
-        <template #claim="{ claim }">
-          <button @click="claim" class="task-button_claim">Claim</button>
+        <template v-slot:claim>
+          <div class="task__button task__button_claim">claim</div>
         </template>
-
-        <!-- DONE BUTTON -->
-        <template #done>
-          <button disabled class="task-button_done">Done</button>
+        <template v-slot:done>
+          <div class="task__button task__button_done">done</div>
         </template>
       </AdsgramTask>
 
@@ -203,41 +185,42 @@ const checkSubscription = async (channel: string) => {
 </template>
 
 <style scoped>
-.adsgram-task {
-  background: #fff;
-  padding: 8px 12px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  border: 1px solid #000;
+.task {
+  --adsgram-task-font-size: 16px; /* min 14px */
+  --adsgram-task-icon-size: 50px; /* min 30px */
+  --adsgram-task-icon-title-gap: 15px; /* min 5px max 40px */
+  --adsgram-task-button-width: 60px; /* min 40px */
+  --adsgram-task-icon-border-radius: 8px;
+
+  display: block;
+  width: 328px;
+  padding: 8px 16px 8px 8px;
+  border-radius: 16px;
+  background-color: #1d2733;
+  font-family: Roboto;
+  color: white;
 }
 
-/* main buttons */
-.task-button,
-.task-button_claim,
-.task-button_done {
-  font-family: 'Lalezar', sans-serif;
-  background: #d9d9d9;
-  border: 1px solid #000;
-  color: #17212b;
-  padding: 4px 8px;
-  border-radius: 4px;
+.task__reward {
+  margin: 5px 0 0 0;
   font-size: 14px;
-  white-space: nowrap;
-  cursor: pointer;
-  transition: 0.15s;
 }
 
-.task-button:hover,
-.task-button_claim:hover {
-  background: #c0c0c0;
+.task__button {
+  margin-left: 10px;
+  background-color: #50a8eb;
+  border-radius: 5px;
+  padding: 6px 12px;
 }
 
-/* done state */
-.task-button_done {
-  opacity: 0.6;
-  cursor: not-allowed;
+.task__button_claim {
+  margin-left: 0;
+  background-color: #ee941c;
+}
+
+.task__button_done {
+  margin-left: 0;
+  background-color: #007539;
 }
 
 .subscribe-button {
