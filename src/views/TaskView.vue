@@ -94,41 +94,20 @@ const checkSubscription = async (channel: string) => {
       style="scrollbar-width: none; -ms-overflow-style: none"
       v-if="tasks?.length || allTasks?.length"
     >
-      <AdsgramTask data-debug="true" block-id="task-18086" class="task">
-        <template v-slot:reward>
-          <p class="task__reward" style="margin: 5px 0 0 0; font-size: 14px">🪙 100</p>
+      <AdsgramTask
+        blockId="task-18086"
+        reward-class="task__reward"
+        button-class="task__button"
+        claim-class="task__button_claim"
+        done-class="task__button_done"
+      >
+        <template #reward>
+          <span>1000 coins</span>
         </template>
-        <template v-slot:button>
-          <div
-            class="task__button"
-            style="
-              margin-left: 10px;
-              background-color: #50a8eb;
-              border-radius: 5px;
-              padding: 6px 12px;
-            "
-          >
-            Go
-          </div>
-        </template>
-        <template v-slot:claim>
-          <div
-            class="task__button task__button_claim"
-            style="margin-left: 0; background-color: #ee941c"
-          >
-            Claim
-          </div>
-        </template>
-        <template v-slot:done>
-          <div
-            class="task__button task__button_done"
-            style="margin-left: 0; background-color: #007539"
-          >
-            Done
-          </div>
-        </template>
+        <template #button><div>Go</div></template>
+        <template #claim><div>Claim</div></template>
+        <template #done><div>Done</div></template>
       </AdsgramTask>
-
       <div
         v-for="(channel, index) in tasks"
         :key="index"
@@ -205,20 +184,30 @@ const checkSubscription = async (channel: string) => {
 </template>
 
 <style scoped>
-.task {
-  --adsgram-task-font-size: 16px;
-  --adsgram-task-icon-size: 50px;
-  --adsgram-task-icon-title-gap: 15px;
-  --adsgram-task-button-width: 60px;
-  --adsgram-task-icon-border-radius: 8px;
-
-  display: block;
-  width: 328px;
-  padding: 8px 16px 8px 8px;
-  border-radius: 16px;
-  background-color: #1d2733;
-  color: white;
+.task__reward {
+  color: #ffd43b;
+  font-weight: 700;
+  font-size: 18px;
 }
+.task__button {
+  background: #4caf50;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 12px;
+}
+.task__button_claim {
+  background: #2196f3;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 12px;
+}
+.task__button_done {
+  background: #666;
+  color: #ccc;
+  padding: 12px 24px;
+  border-radius: 12px;
+}
+
 .subscribe-button {
   font-family: 'Lalezar', sans-serif;
 }
