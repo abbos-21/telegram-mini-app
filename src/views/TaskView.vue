@@ -94,7 +94,20 @@ const checkSubscription = async (channel: string) => {
       style="scrollbar-width: none; -ms-overflow-style: none"
       v-if="tasks?.length || allTasks?.length"
     >
-      <AdsgramTask data-debug="true" block-id="task-18086" class="task"></AdsgramTask>
+      <AdsgramTask data-debug="true" block-id="task-18086" class="task">
+        <template v-slot:reward>
+          <span className="task__reward">100 coins</span>
+        </template>
+        <template v-slot:button>
+          <div className="task__button">go</div>
+        </template>
+        <template v-slot:claim>
+          <div className="task__button_claim">claim</div>
+        </template>
+        <template v-slot:done>
+          <div className="task__button_done">done</div>
+        </template>
+      </AdsgramTask>
 
       <div
         v-for="(channel, index) in tasks"
