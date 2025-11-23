@@ -23,16 +23,34 @@ import ProgressBar from '@/components/ProgressBar.vue'
 import { useAdsgram } from '@adsgram/vue'
 import { toast } from 'vue3-toastify'
 import { useNavigate } from '@/composables/useNavigate'
+import { useOrchestrator, type OrchestratorTask } from '@/composables/useOrchestrator'
 
 const blockId = import.meta.env.VITE_BLOCK_ID
+const spinBlockId = import.meta.env.VITE_SPIN_BLOCK_ID
 const collectBlockId = import.meta.env.VITE_COLLECT_BLOCK_ID
 const withdrawalBlockId = import.meta.env.VITE_WITHDRAWAL_BLOCK_ID
 const bottleBlockId = import.meta.env.VITE_BOTTLE_BLOCK_ID
 
 const interstitialAds = useAdsgram({ blockId })
+const spinAds = useAdsgram({ blockId: spinBlockId })
 const collectAds = useAdsgram({ blockId: collectBlockId })
 const withdrawalAds = useAdsgram({ blockId: withdrawalBlockId })
 const bottleAds = useAdsgram({ blockId: bottleBlockId })
+
+const tasks: OrchestratorTask[] = [
+  {
+    name: 'Interstitial',
+    probability: 25,
+    fn: () => interstitialAds.show(),
+  },
+  {
+    name: 'Spin',
+    probability: 75,
+    fn: () => spinAds.show(),
+  },
+]
+
+const { run } = useOrchestrator(tasks)
 
 // addEventListener('onBannerNotFound', () => {
 //   console.log('No ad available at the moment')
@@ -177,7 +195,7 @@ onMounted(async () => {
         @click="
           () => {
             openSpinPopup()
-            interstitialAds.show()
+            run()
           }
         "
       >

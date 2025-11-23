@@ -6,6 +6,7 @@ import { taskService } from '@/api/taskService'
 import type { ApiError } from '@/api/types'
 import { toast } from 'vue3-toastify'
 import LoaderComponent from '@/components/LoaderComponent.vue'
+import { AdsgramTask } from '@adsgram/vue'
 
 const error = ref<ApiError | null>(null)
 const loading = ref<boolean>(false)
@@ -93,6 +94,8 @@ const checkSubscription = async (channel: string) => {
       style="scrollbar-width: none; -ms-overflow-style: none"
       v-if="tasks?.length || allTasks?.length"
     >
+      <AdsgramTask data-debug="true" block-id="task-18086" class="task"></AdsgramTask>
+
       <div
         v-for="(channel, index) in tasks"
         :key="index"
