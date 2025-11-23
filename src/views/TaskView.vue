@@ -96,16 +96,36 @@ const checkSubscription = async (channel: string) => {
     >
       <AdsgramTask data-debug="true" block-id="task-18086" class="task">
         <template v-slot:reward>
-          <p class="task__reward">🪙 100</p>
+          <p class="task__reward" style="margin: 5px 0 0 0; font-size: 14px">🪙 100</p>
         </template>
         <template v-slot:button>
-          <div class="task__button">go</div>
+          <div
+            class="task__button"
+            style="
+              margin-left: 10px;
+              background-color: #50a8eb;
+              border-radius: 5px;
+              padding: 6px 12px;
+            "
+          >
+            Go
+          </div>
         </template>
         <template v-slot:claim>
-          <div class="task__button task__button_claim">claim</div>
+          <div
+            class="task__button task__button_claim"
+            style="margin-left: 0; background-color: #ee941c"
+          >
+            Claim
+          </div>
         </template>
         <template v-slot:done>
-          <div class="task__button task__button_done">done</div>
+          <div
+            class="task__button task__button_done"
+            style="margin-left: 0; background-color: #007539"
+          >
+            Done
+          </div>
         </template>
       </AdsgramTask>
 
@@ -186,10 +206,10 @@ const checkSubscription = async (channel: string) => {
 
 <style scoped>
 .task {
-  --adsgram-task-font-size: 16px; /* min 14px */
-  --adsgram-task-icon-size: 50px; /* min 30px */
-  --adsgram-task-icon-title-gap: 15px; /* min 5px max 40px */
-  --adsgram-task-button-width: 60px; /* min 40px */
+  --adsgram-task-font-size: 16px;
+  --adsgram-task-icon-size: 50px;
+  --adsgram-task-icon-title-gap: 15px;
+  --adsgram-task-button-width: 60px;
   --adsgram-task-icon-border-radius: 8px;
 
   display: block;
@@ -197,32 +217,8 @@ const checkSubscription = async (channel: string) => {
   padding: 8px 16px 8px 8px;
   border-radius: 16px;
   background-color: #1d2733;
-  font-family: Roboto;
   color: white;
 }
-
-.task__reward {
-  margin: 5px 0 0 0;
-  font-size: 14px;
-}
-
-.task__button {
-  margin-left: 10px;
-  background-color: #50a8eb;
-  border-radius: 5px;
-  padding: 6px 12px;
-}
-
-.task__button_claim {
-  margin-left: 0;
-  background-color: #ee941c;
-}
-
-.task__button_done {
-  margin-left: 0;
-  background-color: #007539;
-}
-
 .subscribe-button {
   font-family: 'Lalezar', sans-serif;
 }
