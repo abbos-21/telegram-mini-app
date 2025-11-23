@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useGame } from '@/composables/useGame'
-import { RouterLink } from 'vue-router'
+
 import { runChainUntilSuccess } from '@/utils/chainFunction'
 
 import { CoinIcon, WidthdrawIcon } from '@/assets/icons'
@@ -22,19 +22,24 @@ import SpinPopup from '@/components/SpinPopup.vue'
 import ProgressBar from '@/components/ProgressBar.vue'
 import { useAdsgram } from '@adsgram/vue'
 import { toast } from 'vue3-toastify'
+import { useNavigate } from '@/composables/useNavigate'
 
 const blockId = import.meta.env.VITE_BLOCK_ID
+const collectBlockId = import.meta.env.VITE_COLLECT_BLOCK_ID
+const withdrawalBlockId = import.meta.env.VITE_WITHDRAWAL_BLOCK_ID
+const bottleBlockId = import.meta.env.VITE_BOTTLE_BLOCK_ID
 
-const { show, addEventListener } = useAdsgram({
-  blockId,
-})
+const interstitialAds = useAdsgram({ blockId })
+const collectAds = useAdsgram({ blockId: collectBlockId })
+const withdrawalAds = useAdsgram({ blockId: withdrawalBlockId })
+const bottleAds = useAdsgram({ blockId: bottleBlockId })
 
-addEventListener('onBannerNotFound', () => {
-  console.log('No ad available at the moment')
-})
-addEventListener('onTooLongSession', () => {
-  console.log('User session too long — ad not available')
-})
+// addEventListener('onBannerNotFound', () => {
+//   console.log('No ad available at the moment')
+// })
+// addEventListener('onTooLongSession', () => {
+//   console.log('User session too long — ad not available')
+// })
 
 const { user, mine, collect, sync, getUserData } = useGame()
 const isBottlePopupOpen = ref(false)
@@ -55,6 +60,8 @@ const closeSpinPopup = () => (isSpinPopupOpen.value = false)
 //   }
 // }
 
+const { goTo } = useNavigate()
+
 onMounted(async () => {
   const functionChain = [sync, mine, getUserData]
 
@@ -74,14 +81,20 @@ onMounted(async () => {
     :style="{ backgroundImage: `url(${HomeBgImage})` }"
   >
     <div class="flex justify-between items-start">
-      <RouterLink
-        to="/widthdraw"
-        class="flex items-center p-2 px-3 bg-[#FAC487] gap-2 border border-[#000] rounded-full"
+      <button
+        type="button"
+        class="flex items-center p-2 px-3 bg-[#FAC487] gap-2 border border-[#000] rounded-full cursor-pointer"
+        @click="
+          () => {
+            withdrawalAds.show()
+            goTo('/widthdraw')
+          }
+        "
       >
         <CoinIcon class="w-6" />
         <p class="font-bold">{{ user?.coins.toFixed(2) ?? 0 }}</p>
         <WidthdrawIcon class="ms-1 mt-1 w-7" />
-      </RouterLink>
+      </button>
 
       <div class="flex flex-col gap-2 items-end">
         <div
@@ -145,7 +158,16 @@ onMounted(async () => {
     </div>
 
     <div class="flex justify-between items-center">
-      <button type="button" class="cursor-pointer" @click="openBottlePopup">
+      <button
+        type="button"
+        class="cursor-pointer"
+        @click="
+          () => {
+            openBottlePopup()
+            bottleAds.show()
+          }
+        "
+      >
         <img :src="BottleImage" class="w-12" />
       </button>
 
@@ -153,9 +175,9 @@ onMounted(async () => {
         type="button"
         class="cursor-pointer"
         @click="
-          async () => {
+          () => {
             openSpinPopup()
-            await show()
+            interstitialAds.show()
           }
         "
       >
@@ -166,7 +188,12 @@ onMounted(async () => {
     <div class="flex justify-center items-center">
       <button
         type="button"
-        @click="collect"
+        @click="
+          () => {
+            collect()
+            collectAds.show()
+          }
+        "
         :disabled="!user || user.tempCoins < user.vaultCapacity * 0.1"
         class="bg-cover bg-center bg-no-repeat pb-1 font-semibold text-2xl w-[223px] h-[65px]"
         :class="{
