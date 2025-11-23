@@ -94,18 +94,36 @@ const checkSubscription = async (channel: string) => {
       style="scrollbar-width: none; -ms-overflow-style: none"
       v-if="tasks?.length || allTasks?.length"
     >
-      <AdsgramTask data-debug="true" block-id="task-18086" class="task">
-        <template v-slot:reward>
-          <span className="task__reward">100 coins</span>
+      <AdsgramTask block-id="task-18086" class="adsgram-task" data-debug="true">
+        <!-- LEFT SIDE: icon + text -->
+        <template #left>
+          <div class="flex gap-3 items-center flex-1 min-w-0">
+            <img :src="TelegramImage" alt="task" class="w-10 h-10 shrink-0" />
+
+            <div class="flex flex-col justify-between items-start flex-1 min-w-0">
+              <p class="font-bold truncate w-full">Adsgram Task</p>
+
+              <div class="flex gap-1 items-center">
+                <CoinIcon class="w-4 h-4 flex-shrink-0" />
+                <p class="text-sm font-bold">100</p>
+              </div>
+            </div>
+          </div>
         </template>
-        <template v-slot:button>
-          <div className="task__button">go</div>
+
+        <!-- ACTION BUTTON (show ad / go) -->
+        <template #button="{ show }">
+          <button @click="show" class="task-button">Go</button>
         </template>
-        <template v-slot:claim>
-          <div className="task__button_claim">claim</div>
+
+        <!-- CLAIM BUTTON -->
+        <template #claim="{ claim }">
+          <button @click="claim" class="task-button_claim">Claim</button>
         </template>
-        <template v-slot:done>
-          <div className="task__button_done">done</div>
+
+        <!-- DONE BUTTON -->
+        <template #done>
+          <button disabled class="task-button_done">Done</button>
         </template>
       </AdsgramTask>
 
@@ -185,6 +203,43 @@ const checkSubscription = async (channel: string) => {
 </template>
 
 <style scoped>
+.adsgram-task {
+  background: #fff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid #000;
+}
+
+/* main buttons */
+.task-button,
+.task-button_claim,
+.task-button_done {
+  font-family: 'Lalezar', sans-serif;
+  background: #d9d9d9;
+  border: 1px solid #000;
+  color: #17212b;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 14px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: 0.15s;
+}
+
+.task-button:hover,
+.task-button_claim:hover {
+  background: #c0c0c0;
+}
+
+/* done state */
+.task-button_done {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .subscribe-button {
   font-family: 'Lalezar', sans-serif;
 }
