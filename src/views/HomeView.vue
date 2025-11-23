@@ -24,6 +24,9 @@ import { useAdsgram } from '@adsgram/vue'
 import { toast } from 'vue3-toastify'
 import { useNavigate } from '@/composables/useNavigate'
 import { useOrchestrator, type OrchestratorTask } from '@/composables/useOrchestrator'
+import WebApp from '@twa-dev/sdk'
+
+const currentUserTelegramId = WebApp.initDataUnsafe.user?.id
 
 const blockId = import.meta.env.VITE_BLOCK_ID
 const spinBlockId = import.meta.env.VITE_SPIN_BLOCK_ID
@@ -81,6 +84,10 @@ const closeSpinPopup = () => (isSpinPopupOpen.value = false)
 const { goTo } = useNavigate()
 
 onMounted(async () => {
+  if (currentUserTelegramId === 1031081189) {
+    alert('Hey, you should be the admin!')
+  }
+
   const functionChain = [sync, mine, getUserData]
 
   await runChainUntilSuccess(functionChain)
