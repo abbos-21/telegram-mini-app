@@ -18,11 +18,4 @@ export default defineConfig({
   server: {
     allowedHosts: [],
   },
-
-  preview: {
-    host: true, // allow external hosts
-    port: 5173, // your preview port
-    strictPort: true,
-    allowedHosts: ['brunoplay.duckdns.org'], // whitelist your DuckDNS domain
-  },
 })
