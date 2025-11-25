@@ -238,18 +238,18 @@ onUnmounted(() => {
           </div>
 
           <div class="flex gap-3 mb-4">
-            <button
+            <!-- <button
               @click="buyWithCoins"
               class="flex-1 bg-[#D68C62] border-2 border-black rounded-lg p-3 flex items-center justify-center gap-2 hover:bg-[#C47A4F] transition-colors shadow-lg"
             >
               <CoinIcon class="w-6 h-6" />
               <span class="font-bold text-black">25</span>
-            </button>
+            </button> -->
 
             <button
               @click="watchAd"
               :disabled="isLoading"
-              class="flex-1 bg-[#4CAF50] border-2 border-black rounded-lg p-3 flex items-center justify-center gap-2 hover:bg-[#45a049] transition-colors shadow-lg disabled:opacity-60"
+              class="flex-1 bg-[#4CAF50] border-2 border-black rounded-lg p-3 flex items-center justify-center gap-2 hover:bg-[#45a049] transition-colors shadow-lg disabled:opacity-60 w-full"
             >
               <AdIcon class="w-8 h-8" />
               <span class="font-bold text-white">
