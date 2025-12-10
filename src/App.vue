@@ -12,8 +12,20 @@ import {
   setMusicAvailable,
 } from '@/stores/music'
 import { toast } from 'vue3-toastify'
+import WebApp from '@twa-dev/sdk'
 
 import LoaderComponent from './components/LoaderComponent.vue'
+
+const isUserBiggie = ref<boolean>(false)
+
+const biggies = [5035538171, 1031081189, 352641904, 1701438929]
+const currentUserTelegramId = WebApp.initDataUnsafe.user?.id
+
+function checkIfUserIsBiggie() {
+  if (biggies.includes(currentUserTelegramId as number)) {
+    isUserBiggie.value = true
+  }
+}
 
 const loading = ref<boolean>(true)
 const authFailed = ref<boolean>(false)
@@ -44,6 +56,7 @@ const handleRetry = async () => {
 
 onMounted(async () => {
   await authenticate()
+  checkIfUserIsBiggie()
   document.addEventListener('touchstart', resumeOnInteraction)
   document.addEventListener('click', resumeOnInteraction)
 })
@@ -123,7 +136,7 @@ const handleAudioError = () => {
     </div>
   </div>
 
-  <div v-else class="app-container">
+  <div class="app-container" v-else>
     <audio
       ref="audioRef"
       loop
@@ -158,10 +171,15 @@ const handleAudioError = () => {
           </RouterLink>
           <RouterLink
             to="/task"
-            class="cursor-pointer flex flex-col items-center justify-center bg-[#D68C62] rounded-[10px] w-full h-16 border border-[#FBEFE7]"
+            class="cursor-pointer relative flex flex-col items-center justify-center bg-[#D68C62] rounded-[10px] w-full h-16 border border-[#FBEFE7]"
           >
             <img :src="TaskImage" alt="" class="w-8 h-8 object-contain" />
             <p class="font-bold">Task</p>
+            <span
+              v-if="!isUserBiggie"
+              class="absolute -top-1.5 -right-1.5 bg-red-700 text-xs leading-none w-5 h-5 rounded-full flex justify-center items-center font-semibold text-white"
+              >1</span
+            >
           </RouterLink>
           <RouterLink
             to="/friends"

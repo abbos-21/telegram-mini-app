@@ -19,4 +19,13 @@ export const taskService = {
       return response.data
     }
   },
+
+  subscribe: async (channelUsername: string | null) => {
+    if (channelUsername) {
+      const response = await apiClient.post<ApiResponse<null>>('/task/subscribe', {
+        channelUsername,
+      })
+      return response.data
+    }
+  },
 }

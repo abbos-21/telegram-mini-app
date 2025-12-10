@@ -19,6 +19,7 @@
     "@adsgram/vue": "^1.0.2",
     "@tailwindcss/vite": "^4.1.14",
     "@twa-dev/sdk": "^8.0.2",
+    "animate.css": "^4.1.1",
     "axios": "^1.12.2",
     "monetag-tg-sdk": "^1.0.1",
     "pinia": "^3.0.3",

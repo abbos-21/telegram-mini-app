@@ -1,5 +1,6 @@
 import '@/assets/styles/main.css'
 import 'vue3-toastify/dist/index.css'
+import "animate.css"
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
