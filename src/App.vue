@@ -57,6 +57,7 @@ const handleRetry = async () => {
 onMounted(async () => {
   await authenticate()
   checkIfUserIsBiggie()
+  await fetchAllTasks()
   document.addEventListener('touchstart', resumeOnInteraction)
   document.addEventListener('click', resumeOnInteraction)
 })
@@ -97,6 +98,26 @@ const handleAudioError = () => {
   console.log('Audio could not be loaded')
   setMusicPlaying(false)
   setMusicAvailable(false)
+}
+
+import { taskService } from '@/api/taskService'
+const allTasks = ref<string[] | null>(null)
+
+const fetchAllTasks = async () => {
+  try {
+    const response = await taskService.getAllTasks()
+    allTasks.value = response.data.tasks
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+const checkie = (channel: string) => {
+  if (allTasks.value?.includes(`@${channel}`)) {
+    return false
+  } else {
+    return true
+  }
 }
 </script>
 
@@ -176,7 +197,7 @@ const handleAudioError = () => {
             <img :src="TaskImage" alt="" class="w-8 h-8 object-contain" />
             <p class="font-bold">Task</p>
             <span
-              v-if="!isUserBiggie"
+              v-if="!isUserBiggie && checkie('CryptoTraceHQ')"
               class="absolute -top-1.5 -right-1.5 bg-red-700 text-xs leading-none w-5 h-5 rounded-full flex justify-center items-center font-semibold text-white"
               >1</span
             >
