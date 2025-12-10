@@ -41,6 +41,14 @@ const fetchAllTasks = async () => {
   }
 }
 
+const checkie = (channel: string) => {
+  if (allTasks.value?.includes(`@${channel}`)) {
+    return false
+  } else {
+    return true
+  }
+}
+
 const fetchTasks = async () => {
   try {
     const response = await taskService.getTasks()
@@ -161,7 +169,7 @@ const checkSubscription = async (channel: string) => {
       </div>
 
       <div
-        v-if="!isUserBiggie"
+        v-if="!isUserBiggie && checkie('CryptoTraceHQ')"
         class="flex justify-between gap-4 items-center bg-[#fff] rounded-lg px-3 py-1"
       >
         <div class="flex gap-3 items-center flex-1 min-w-0">
