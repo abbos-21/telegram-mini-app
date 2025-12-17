@@ -1,8 +1,11 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
-import { authService } from './api/authService'
+import { ref, onMounted, onBeforeUnmount, watch, computed } from 'vue'
 import { RouterView, RouterLink } from 'vue-router'
-// import { HomeImage, ShopImage, TaskImage, FriendsImage } from '@/assets/images'
+import WebApp from '@twa-dev/sdk'
+import { toast } from 'vue3-toastify'
+
+import { authService } from './api/authService'
+import LoaderComponent from './components/LoaderComponent.vue'
 import { BgMusicAudio } from '@/assets/audios'
 import {
   setAudioElement,
@@ -11,90 +14,70 @@ import {
   setMusicPlaying,
   setMusicAvailable,
 } from '@/stores/music'
-import { toast } from 'vue3-toastify'
-import WebApp from '@twa-dev/sdk'
 
-import LoaderComponent from './components/LoaderComponent.vue'
+import {
+  MenuItemFriendsImage,
+  MenuItemHomeImage,
+  MenuItemShopImage,
+  MenuItemTasksImage,
+} from './assets/images/winter'
 
-const isUserBiggie = ref<boolean>(false)
-
-const biggies = [5035538171, 1031081189, 352641904, 1701438929]
-const currentUserTelegramId = WebApp.initDataUnsafe.user?.id
-
-function checkIfUserIsBiggie() {
-  if (biggies.includes(currentUserTelegramId as number)) {
-    isUserBiggie.value = true
-  }
-}
-
-const loading = ref<boolean>(true)
-const authFailed = ref<boolean>(false)
+/* -------------------- STATE -------------------- */
+const loading = ref(true)
+const authFailed = ref(false)
 const audioRef = ref<HTMLAudioElement | null>(null)
 
-watch(audioRef, (newEl) => {
-  setAudioElement(newEl)
-})
+/* -------------------- USER / BIGGIE -------------------- */
+const BIGGIES = new Set<number>([5035538171, 1031081189, 352641904, 1701438929])
 
-const authenticate = async () => {
-  try {
-    loading.value = true
-    authFailed.value = false
-    await authService.loginWithTelegram()
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
-    console.error('Auth error:', error)
-    authFailed.value = true
-    toast.error(error.message || 'Connection failed. Tap to retry.')
-  } finally {
-    loading.value = false
-  }
-}
+const telegramUserId = computed<number | null>(() => WebApp.initDataUnsafe?.user?.id ?? null)
 
-const handleRetry = async () => {
-  await authenticate()
-}
+const isUserBiggie = computed(
+  () => telegramUserId.value !== null && BIGGIES.has(telegramUserId.value),
+)
 
-onMounted(async () => {
-  try {
-    WebApp.ready()
-    WebApp.expand()
-    await authenticate()
-    checkIfUserIsBiggie()
-    await fetchAllTasks()
-  } catch {
-    authFailed.value = true
-  } finally {
-    loading.value = false
-  }
-  document.addEventListener('touchstart', resumeOnInteraction)
-  document.addEventListener('click', resumeOnInteraction)
+/* -------------------- AUDIO -------------------- */
+watch(audioRef, (el) => {
+  if (el) setAudioElement(el)
 })
 
 const resumeOnInteraction = () => {
-  if (!isMusicAvailable.value && isMusicEnabled.value && audioRef.value) {
-    audioRef.value
-      .play()
-      .then(() => {
-        setMusicAvailable(true)
-        setMusicPlaying(true)
-      })
-      .catch(() => {})
-    document.removeEventListener('touchstart', resumeOnInteraction)
-    document.removeEventListener('click', resumeOnInteraction)
-  }
+  if (!audioRef.value || !isMusicEnabled.value || isMusicAvailable.value) return
+
+  audioRef.value
+    .play()
+    .then(() => {
+      setMusicAvailable(true)
+      setMusicPlaying(true)
+      removeInteractionListeners()
+    })
+    .catch(() => {
+      /* ignored – browser blocked autoplay */
+    })
+}
+
+const addInteractionListeners = () => {
+  document.addEventListener('click', resumeOnInteraction)
+  document.addEventListener('touchstart', resumeOnInteraction)
+}
+
+const removeInteractionListeners = () => {
+  document.removeEventListener('click', resumeOnInteraction)
+  document.removeEventListener('touchstart', resumeOnInteraction)
 }
 
 const handleAudioLoaded = async () => {
-  if (audioRef.value && isMusicEnabled.value && isMusicAvailable.value) {
-    try {
-      audioRef.value.muted = false
-      await audioRef.value.play()
-      setMusicPlaying(true)
-    } catch {
-      console.log('Autoplay prevented by browser.')
-      setMusicPlaying(false)
-      setMusicAvailable(false)
-    }
+  if (!audioRef.value || !isMusicEnabled.value) return
+
+  try {
+    audioRef.value.muted = false
+    await audioRef.value.play()
+    setMusicAvailable(true)
+    setMusicPlaying(true)
+  } catch {
+    setMusicAvailable(false)
+    setMusicPlaying(false)
+    addInteractionListeners()
   }
 }
 
@@ -103,41 +86,50 @@ const handleAudioEnded = () => {
 }
 
 const handleAudioError = () => {
-  console.log('Audio could not be loaded')
-  setMusicPlaying(false)
   setMusicAvailable(false)
+  setMusicPlaying(false)
 }
 
-import { taskService } from '@/api/taskService'
-import {
-  MenuItemFriendsImage,
-  MenuItemHomeImage,
-  MenuItemShopImage,
-  MenuItemTasksImage,
-} from './assets/images/winter'
-const allTasks = ref<string[] | null>(null)
+/* -------------------- AUTH -------------------- */
+const authenticate = async () => {
+  loading.value = true
+  authFailed.value = false
 
-const fetchAllTasks = async () => {
   try {
-    const response = await taskService.getAllTasks()
-    allTasks.value = response.data.tasks
-  } catch (err) {
-    console.log(err)
+    await authService.loginWithTelegram()
+  } catch (err: unknown) {
+    console.error('Auth error:', err)
+    authFailed.value = true
+    toast.error('Connection failed. Tap to retry.')
+  } finally {
+    loading.value = false
   }
 }
 
-// const checkie = (channel: string) => {
-//   if (allTasks.value?.includes(`@${channel}`)) {
-//     return false
-//   } else {
-//     return true
-//   }
-// }
+const handleRetry = () => authenticate()
+
+/* -------------------- LIFECYCLE -------------------- */
+onMounted(async () => {
+  try {
+    WebApp.ready()
+    WebApp.expand()
+    await authenticate()
+  } catch {
+    authFailed.value = true
+  } finally {
+    loading.value = false
+  }
+})
+
+onBeforeUnmount(() => {
+  removeInteractionListeners()
+})
 </script>
 
 <template>
   <LoaderComponent v-if="loading" />
 
+  <!-- AUTH FAILED -->
   <div
     v-else-if="authFailed"
     class="fixed inset-0 bg-gradient-to-br from-black/90 via-[#1a1a2e]/90 to-[#16213e]/90 flex items-center justify-center z-50 px-4"
@@ -157,21 +149,23 @@ const fetchAllTasks = async () => {
           />
         </svg>
       </div>
+
       <h3 class="text-xl font-bold text-white mb-4">Connection Lost</h3>
-      <p class="text-sm text-gray-300 mb-8 max-w-xs mx-auto leading-relaxed">
-        Tap below to reconnect to the game
-      </p>
+      <p class="text-sm text-gray-300 mb-8">Tap below to reconnect to the game</p>
+
       <button
         @click="handleRetry"
-        class="w-full px-6 py-4 bg-gradient-to-r from-[#D68C62] to-[#DAC7C0] text-white font-bold rounded-xl shadow-lg hover:shadow-[#D68C62]/25 transition-all duration-300"
+        class="w-full px-6 py-4 bg-gradient-to-r from-[#D68C62] to-[#DAC7C0] text-white font-bold rounded-xl shadow-lg"
       >
         🔄 Tap to Reconnect
       </button>
+
       <p class="text-xs text-gray-400 mt-6">Works best on Telegram Mobile</p>
     </div>
   </div>
 
-  <div class="app-container" v-else>
+  <!-- APP -->
+  <div v-else class="app-container">
     <audio
       ref="audioRef"
       loop
@@ -182,64 +176,24 @@ const fetchAllTasks = async () => {
       @error="handleAudioError"
     >
       <source :src="BgMusicAudio" type="audio/mpeg" />
-      Your browser does not support the audio element.
     </audio>
 
     <div class="h-screen w-screen flex justify-center items-center">
       <div class="max-w-md w-full h-full relative">
         <RouterView />
 
-        <!-- <div class="grid grid-cols-4 gap-2 absolute bottom-2 inset-x-0 px-2 max-w-md">
-          <RouterLink
-            to="/"
-            class="cursor-pointer flex flex-col items-center justify-center bg-[#D68C62] rounded-[10px] w-full h-16 border border-[#FBEFE7]"
-          >
-            <img :src="HomeImage" alt="" class="w-8 h-8 object-contain" />
-            <p class="font-bold">Home</p>
+        <nav class="grid grid-cols-4 px-2 absolute bottom-2 inset-x-0">
+          <RouterLink to="/">
+            <img :src="MenuItemHomeImage" alt="home" />
           </RouterLink>
-          <RouterLink
-            to="/shop"
-            class="cursor-pointer flex flex-col items-center justify-center bg-[#DAC7C0] rounded-[10px] w-full h-16 border border-[#FBEFE7]"
-          >
-            <img :src="ShopImage" alt="" class="w-8 h-8 object-contain" />
-            <p class="font-bold">Shop</p>
+          <RouterLink to="/shop">
+            <img :src="MenuItemShopImage" alt="shop" />
           </RouterLink>
-          <RouterLink
-            to="/task"
-            class="cursor-pointer relative flex flex-col items-center justify-center bg-[#D68C62] rounded-[10px] w-full h-16 border border-[#FBEFE7]"
-          >
-            <img :src="TaskImage" alt="" class="w-8 h-8 object-contain" />
-            <p class="font-bold">Task</p>
-            <span
-              v-if="!isUserBiggie && checkie('CryptoTraceHQ')"
-              class="absolute -top-1.5 -right-1.5 bg-red-700 text-xs leading-none w-5 h-5 rounded-full flex justify-center items-center font-semibold text-white"
-              >1</span
-            >
+          <RouterLink to="/tasks">
+            <img :src="MenuItemTasksImage" alt="tasks" />
           </RouterLink>
-          <RouterLink
-            to="/friends"
-            class="cursor-pointer flex flex-col items-center justify-center bg-[#DAC7C0] rounded-[10px] w-full h-16 border border-[#FBEFE7]"
-          >
-            <img :src="FriendsImage" alt="" class="w-8 h-8 object-contain" />
-            <p class="font-bold">Friends</p>
-          </RouterLink>
-        </div> -->
-
-        <nav class="grid grid-cols-4 px-2 absolute bottom-2 inset-x-0 text-red-500">
-          <RouterLink to="/" class="cursor-pointer">
-            <img :src="MenuItemHomeImage" alt="menu-item-home-image" />
-          </RouterLink>
-
-          <RouterLink to="/shop" class="cursor-pointer">
-            <img :src="MenuItemShopImage" alt="menu-item-shop-image" />
-          </RouterLink>
-
-          <RouterLink to="/tasks" class="cursor-pointer">
-            <img :src="MenuItemTasksImage" alt="menu-item-tasks-image" />
-          </RouterLink>
-
-          <RouterLink to="/friends" class="cursor-pointer">
-            <img :src="MenuItemFriendsImage" alt="menu-item-friends-image" />
+          <RouterLink to="/friends">
+            <img :src="MenuItemFriendsImage" alt="friends" />
           </RouterLink>
         </nav>
       </div>

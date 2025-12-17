@@ -14,21 +14,20 @@ const tasks = ref<string[] | null>(null)
 const allTasks = ref<string[] | null>(null)
 const subscribedChannels = ref<Set<string>>(new Set())
 const processingChannel = ref<string | null>(null)
-const isUserBiggie = ref<boolean>(false)
+// const isUserBiggie = ref<boolean>(false)
 
-const biggies = [5035538171, 1031081189, 352641904, 1701438929]
-const currentUserTelegramId = WebApp.initDataUnsafe.user?.id
+// const biggies = [5035538171, 1031081189, 352641904, 1701438929]
+// const currentUserTelegramId = WebApp.initDataUnsafe.user?.id
 
-function checkIfUserIsBiggie() {
-  if (biggies.includes(currentUserTelegramId as number)) {
-    isUserBiggie.value = true
-  }
-}
+// function checkIfUserIsBiggie() {
+//   if (biggies.includes(currentUserTelegramId as number)) {
+//     isUserBiggie.value = true
+//   }
+// }
 
 onMounted(() => {
   WebApp.ready()
   WebApp.expand()
-  checkIfUserIsBiggie()
   mountFetch()
 })
 
@@ -38,14 +37,6 @@ const fetchAllTasks = async () => {
     allTasks.value = response.data.tasks
   } catch (err) {
     console.log(err)
-  }
-}
-
-const checkie = (channel: string) => {
-  if (allTasks.value?.includes(`@${channel}`)) {
-    return false
-  } else {
-    return true
   }
 }
 
@@ -84,21 +75,6 @@ const openChannel = (channel: string) => {
   }
 
   subscribedChannels.value = new Set(subscribedChannels.value).add(channel)
-}
-
-const subscribe = async (channel: string) => {
-  const response = await taskService.subscribe(channel)
-  const url = `https://t.me/${channel}`
-
-  if (response?.success) {
-    if (WebApp.openTelegramLink) {
-      WebApp.openTelegramLink(url)
-    } else {
-      WebApp.openLink(url)
-    }
-
-    await mountFetch()
-  }
 }
 
 const checkSubscription = async (channel: string) => {
@@ -165,31 +141,6 @@ const checkSubscription = async (channel: string) => {
           class="subscribe-button bg-[#D9D9D9] border border-[#000] text-[#17212B] px-2 py-1 rounded-sm opacity-70 cursor-not-allowed flex justify-center items-center whitespace-nowrap text-sm font-medium"
         >
           Checking...
-        </button>
-      </div>
-
-      <div
-        v-if="!isUserBiggie && checkie('CryptoTraceHQ')"
-        class="flex justify-between gap-4 items-center bg-[#fff] rounded-lg px-3 py-1"
-      >
-        <div class="flex gap-3 items-center flex-1 min-w-0">
-          <img :src="TelegramImage" alt="task" class="w-10 h-10 shrink-0" />
-
-          <div class="flex flex-col justify-between items-start flex-1 min-w-0">
-            <p class="font-bold truncate w-full">CryptoTrace Insights</p>
-
-            <div class="flex gap-1 items-center">
-              <CoinIcon class="w-4 h-4 flex-shrink-0" />
-              <p class="text-sm font-bold">20</p>
-            </div>
-          </div>
-        </div>
-
-        <button
-          @click="subscribe('CryptoTraceHQ')"
-          class="subscribe-button bg-[#D9D9D9] border border-[#000] text-[#17212B] px-2 py-1 rounded-sm cursor-pointer flex justify-center items-center whitespace-nowrap text-sm font-medium transition-all hover:bg-[#c0c0c0]"
-        >
-          Subscribe
         </button>
       </div>
 
