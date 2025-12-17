@@ -55,14 +55,17 @@ const handleRetry = async () => {
 }
 
 onMounted(async () => {
-  const token = localStorage.getItem('token')
-
-  if (!token) {
+  try {
+    WebApp.ready()
+    WebApp.expand()
     await authenticate()
+    checkIfUserIsBiggie()
+    await fetchAllTasks()
+  } catch {
+    authFailed.value = true
+  } finally {
+    loading.value = false
   }
-
-  checkIfUserIsBiggie()
-  await fetchAllTasks()
   document.addEventListener('touchstart', resumeOnInteraction)
   document.addEventListener('click', resumeOnInteraction)
 })
