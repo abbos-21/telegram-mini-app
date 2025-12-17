@@ -1,33 +1,6 @@
-<template>
-  <div class="energy-container-vertical">
-    <div class="energy-label">
-      <span class="energy-text">{{ Math.round(currentValue / 60) }} {{ unit }}</span>
-    </div>
-
-    <div class="energy-bar" :class="energyBarClass">
-      <div class="energy-fill" :style="{ height: `${percentage}%` }" :class="energyFillClass">
-        <div class="energy-glow" v-if="showGlow"></div>
-      </div>
-
-      <div class="energy-segments-vertical">
-        <div
-          v-for="segment in segments"
-          :key="segment"
-          class="energy-segment"
-          :class="{ active: segment <= percentage / 10 }"
-        ></div>
-      </div>
-    </div>
-
-    <div class="energy-icon">
-      <img :src="FlashImage" class="w-8" alt="Energy" />
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { computed } from 'vue'
-import { FlashImage } from '@/assets/images'
+import { FlashImage } from '@/assets/images/winter'
 
 interface Props {
   currentValue?: number
@@ -35,9 +8,7 @@ interface Props {
   minValue?: number
   unit?: string
   color?: 'blue' | 'green' | 'red' | 'yellow' | 'purple'
-  size?: 'small' | 'medium' | 'large'
   showGlow?: boolean
-  showStats?: boolean
   animated?: boolean
 }
 
@@ -47,34 +18,52 @@ const props = withDefaults(defineProps<Props>(), {
   minValue: 0,
   unit: 'min',
   color: 'blue',
-  size: 'medium',
   showGlow: true,
-  showStats: false,
   animated: true,
 })
 
 const percentage = computed(() => {
   const range = props.maxValue - props.minValue
-  const current = props.currentValue - props.minValue
-  return Math.min(100, Math.max(0, (current / range) * 100))
+  if (range <= 0) return 0
+  return Math.min(100, Math.max(0, ((props.currentValue - props.minValue) / range) * 100))
 })
 
-const energyBarClass = computed(() => [
-  `energy-bar-${props.size}`,
-  `energy-bar-${props.color}`,
-  { animated: props.animated },
-])
+const energyBarClass = computed(() => [`energy-bar-${props.color}`, { animated: props.animated }])
 
 const energyFillClass = computed(() => [
   `energy-fill-${props.color}`,
   { pulse: props.animated && percentage.value > 80 },
 ])
 
-const segments = computed(() => {
-  const segmentCount = props.size === 'small' ? 5 : props.size === 'large' ? 15 : 10
-  return Array.from({ length: segmentCount }, (_, i) => i + 1)
-})
+const segments = Array.from({ length: 10 }, (_, i) => i + 1)
 </script>
+
+<template>
+  <div class="energy-container-vertical">
+    <div class="energy-label">
+      <span class="energy-text"> {{ Math.round(currentValue / 60) }} {{ unit }} </span>
+    </div>
+
+    <div class="energy-bar" :class="energyBarClass">
+      <div class="energy-fill" :class="energyFillClass" :style="{ height: `${percentage}%` }">
+        <div v-if="showGlow" class="energy-glow" />
+      </div>
+
+      <div class="energy-segments-vertical">
+        <div
+          v-for="segment in segments"
+          :key="segment"
+          class="energy-segment"
+          :class="{ active: segment <= percentage / 10 }"
+        />
+      </div>
+    </div>
+
+    <div class="energy-icon">
+      <img :src="FlashImage" class="w-8" alt="Energy" />
+    </div>
+  </div>
+</template>
 
 <style scoped>
 .energy-container-vertical {
@@ -97,6 +86,8 @@ const segments = computed(() => {
 
 .energy-bar {
   position: relative;
+  width: 14px;
+  height: 140px;
   border-radius: 8px;
   overflow: hidden;
   border: 2px solid #333;
@@ -106,34 +97,8 @@ const segments = computed(() => {
   flex-direction: column-reverse;
 }
 
-.energy-bar-small {
-  width: 12px;
-  height: 60px;
-}
-.energy-bar-medium {
-  width: 14px;
-  height: 196px;
-}
-.energy-bar-large {
-  width: 25px;
-  height: 250px;
-}
-
-@media only screen and (max-height: 700px) {
-  .energy-bar-medium {
-    height: 128px;
-  }
-}
-
-@media only screen and (max-height: 640px) {
-  .energy-bar-medium {
-    height: 108px;
-  }
-}
-
-/* Border Colors */
 .energy-bar-blue {
-  border-color: #2563eb;
+  border-color: #74d4ff;
 }
 .energy-bar-green {
   border-color: #16a34a;
@@ -150,39 +115,33 @@ const segments = computed(() => {
 
 .energy-fill {
   width: 100%;
-  transition: height 0.5s ease-in-out;
+  transition: height 0.4s ease;
+  position: relative;
 }
 
-/* Fill Gradients */
 .energy-fill-blue {
-  background: linear-gradient(180deg, #3b82f6 0%, #1e40af 100%);
+  background: linear-gradient(180deg, #00bcff, #00a6f4);
 }
 .energy-fill-green {
-  background: linear-gradient(180deg, #22c55e 0%, #15803d 100%);
+  background: linear-gradient(180deg, #22c55e, #15803d);
 }
 .energy-fill-red {
-  background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%);
+  background: linear-gradient(180deg, #ef4444, #b91c1c);
 }
 .energy-fill-yellow {
-  background: linear-gradient(180deg, #facc15 0%, #a16207 100%);
+  background: linear-gradient(180deg, #facc15, #a16207);
 }
 .energy-fill-purple {
-  background: linear-gradient(180deg, #a855f7 0%, #7c3aed 100%);
+  background: linear-gradient(180deg, #a855f7, #7c3aed);
 }
 
 .energy-glow {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    180deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.3) 50%,
-    transparent 100%
-  );
+  background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.3), transparent);
   animation: shimmer 2s infinite;
 }
 
-/* Segments */
 .energy-segments-vertical {
   position: absolute;
   inset: 0;
@@ -196,23 +155,21 @@ const segments = computed(() => {
   flex: 1;
   background: rgba(0, 0, 0, 0.25);
   border-radius: 2px;
-  transition: background 0.3s ease;
 }
 
 .energy-segment.active {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.12);
 }
 
 .energy-icon img {
-  display: block;
   filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.5));
 }
 
 @keyframes shimmer {
-  0% {
+  from {
     transform: translateY(100%);
   }
-  100% {
+  to {
     transform: translateY(-100%);
   }
 }

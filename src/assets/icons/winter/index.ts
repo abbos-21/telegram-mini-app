@@ -1,0 +1,7 @@
+export { default as CoinIcon } from './coin.svg'
+export { default as ChevronIcon } from './chevron.svg'
+export { default as ArrowBackIcon } from './arrow-back.svg'
+export { default as SwitchIcon } from './switch.svg'
+export { default as InfoIcon } from './info.svg'
+export { default as CupIcon } from './cup.svg'
+export { default as HistoryIcon } from './history.svg'

@@ -5,3 +5,7 @@
   letter-spacing: 0%;
   user-select: none;
 }
+
+button {
+  cursor: pointer;
+}

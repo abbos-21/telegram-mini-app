@@ -21,7 +21,7 @@ const progressPercentage = computed(() => {
 <template>
   <div class="container">
     <div class="progress relative">
-      <span class="absolute inset-0 flex items-center justify-center">{{
+      <span class="absolute inset-x-0 top-1/2 -translate-y-1/2 text-center">{{
         currentValue.toFixed(2)
       }}</span>
       <div class="progress-bar" :style="{ width: `${progressPercentage}%` }"></div>
@@ -32,30 +32,33 @@ const progressPercentage = computed(() => {
 <style scoped lang="scss">
 .container {
   font-weight: bold;
-  color: #fff9e3;
+  color: white;
+  font-size: 15px;
 }
 
 .progress {
-  padding: 6px;
+  padding: 4px;
   background: rgba(0, 0, 0, calc(0.25 + 0.25 / 4));
-  border-radius: 8px;
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+  border-radius: 5px;
   box-shadow:
     inset 0 1px 2px rgba(0, 0, 0, 0.25),
     0 1px rgba(255, 255, 255, 0.08);
 }
 
 .progress-bar {
-  height: 20px;
-  background-color: #fcbc51;
-  border-radius: 6px;
+  height: 25px;
+  background-color: #74d4ff;
+  border-radius: 4px;
   transition: width 0.4s linear;
   background-image: linear-gradient(
     45deg,
-    rgb(252, 163, 17) 25%,
+    #00bcff 25%,
     transparent 25%,
     transparent 50%,
-    rgb(252, 163, 17) 50%,
-    rgb(252, 163, 17) 75%,
+    #00bcff 50%,
+    #00bcff 75%,
     transparent 75%,
     transparent
   );

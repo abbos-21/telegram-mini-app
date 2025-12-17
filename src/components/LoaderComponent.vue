@@ -11,7 +11,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(204, 204, 204, 0.9);
+  background: rgba(255, 255, 255, 0.75);
   backdrop-filter: blur(5px);
   display: flex;
   align-items: center;
@@ -39,7 +39,7 @@
     content: '';
     width: 40px;
     height: 40px;
-    background: #1a6844;
+    background: #00bcff;
     animation: animate 0.5s linear infinite;
     position: absolute;
     top: 0;

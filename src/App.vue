@@ -101,6 +101,12 @@ const handleAudioError = () => {
 }
 
 import { taskService } from '@/api/taskService'
+import {
+  MenuItemFriendsImage,
+  MenuItemHomeImage,
+  MenuItemShopImage,
+  MenuItemTasksImage,
+} from './assets/images/winter'
 const allTasks = ref<string[] | null>(null)
 
 const fetchAllTasks = async () => {
@@ -122,9 +128,9 @@ const checkie = (channel: string) => {
 </script>
 
 <template>
-  <LoaderComponent v-if="loading" />
+  <!-- <LoaderComponent v-if="loading" /> -->
 
-  <div
+  <!-- <div
     v-else-if="authFailed"
     class="fixed inset-0 bg-gradient-to-br from-black/90 via-[#1a1a2e]/90 to-[#16213e]/90 flex items-center justify-center z-50 px-4"
   >
@@ -155,9 +161,9 @@ const checkie = (channel: string) => {
       </button>
       <p class="text-xs text-gray-400 mt-6">Works best on Telegram Mobile</p>
     </div>
-  </div>
+  </div> -->
 
-  <div class="app-container" v-else>
+  <div class="app-container">
     <audio
       ref="audioRef"
       loop
@@ -175,7 +181,7 @@ const checkie = (channel: string) => {
       <div class="max-w-md w-full h-full relative">
         <RouterView />
 
-        <div class="grid grid-cols-4 gap-2 absolute bottom-2 inset-x-0 px-2 max-w-md">
+        <!-- <div class="grid grid-cols-4 gap-2 absolute bottom-2 inset-x-0 px-2 max-w-md">
           <RouterLink
             to="/"
             class="cursor-pointer flex flex-col items-center justify-center bg-[#D68C62] rounded-[10px] w-full h-16 border border-[#FBEFE7]"
@@ -209,7 +215,25 @@ const checkie = (channel: string) => {
             <img :src="FriendsImage" alt="" class="w-8 h-8 object-contain" />
             <p class="font-bold">Friends</p>
           </RouterLink>
-        </div>
+        </div> -->
+
+        <nav class="grid grid-cols-4 px-2 absolute bottom-2 inset-x-0 text-red-500">
+          <RouterLink to="/" class="cursor-pointer">
+            <img :src="MenuItemHomeImage" alt="menu-item-home-image" />
+          </RouterLink>
+
+          <RouterLink to="/shop" class="cursor-pointer">
+            <img :src="MenuItemShopImage" alt="menu-item-shop-image" />
+          </RouterLink>
+
+          <RouterLink to="/tasks" class="cursor-pointer">
+            <img :src="MenuItemTasksImage" alt="menu-item-tasks-image" />
+          </RouterLink>
+
+          <RouterLink to="/friends" class="cursor-pointer">
+            <img :src="MenuItemFriendsImage" alt="menu-item-friends-image" />
+          </RouterLink>
+        </nav>
       </div>
     </div>
   </div>

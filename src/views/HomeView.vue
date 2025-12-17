@@ -4,16 +4,6 @@ import { useGame } from '@/composables/useGame'
 
 import { runChainUntilSuccess } from '@/utils/chainFunction'
 
-import { CoinIcon, WidthdrawIcon } from '@/assets/icons'
-import {
-  UkFlagImage,
-  MusicImage,
-  CollectBgImage,
-  BottleImage,
-  SpinImage,
-  HomeBgImage,
-} from '@/assets/images'
-
 import { isMusicEnabled, isMusicAvailable, toggleMusic } from '@/stores/music'
 import EnergyLevel from '@/components/EnergyLevel.vue'
 import HealthLevel from '@/components/HealthLevel.vue'
@@ -25,6 +15,17 @@ import { toast } from 'vue3-toastify'
 import { useNavigate } from '@/composables/useNavigate'
 import { useOrchestrator, type OrchestratorTask } from '@/composables/useOrchestrator'
 import WebApp from '@twa-dev/sdk'
+import { LevelOneBackgroundImage } from '@/assets/backgrounds/winter'
+import {
+  CoinImage,
+  CollectButtonImage,
+  PodiumImage,
+  UnitedKingdomFlagImage,
+  WithdrawImage,
+  MusicImage,
+  IceImage,
+  SpinImage,
+} from '@/assets/images/winter'
 
 const biggies = [5035538171, 1031081189, 352641904, 1701438929]
 const currentUserTelegramId = WebApp.initDataUnsafe.user?.id
@@ -109,9 +110,9 @@ onMounted(async () => {
 <template>
   <div
     class="h-full w-full flex flex-col relative bg-cover bg-center bg-no-repeat p-2 gap-4 justify-between pb-24"
-    :style="{ backgroundImage: `url(${HomeBgImage})` }"
+    :style="{ backgroundImage: `url(${LevelOneBackgroundImage})` }"
   >
-    <div class="flex justify-between items-start">
+    <!-- <div class="flex justify-between items-start">
       <button
         type="button"
         class="flex items-center p-2 px-3 bg-[#FAC487] gap-2 border border-[#000] rounded-full cursor-pointer"
@@ -155,13 +156,70 @@ onMounted(async () => {
           </div>
         </button>
       </div>
+    </div> -->
+
+    <div class="flex justify-between items-start">
+      <div class="flex flex-col gap-2 items-start">
+        <button
+          @click="
+            () => {
+              runIfUserIsNotBiggie(() => withdrawalAds.show())
+              goTo('/widthdraw')
+            }
+          "
+          class="flex gap-2 items-center rounded-full bg-sky-400 px-2 py-1 border-4 border-sky-200"
+        >
+          <img :src="CoinImage" class="w-5 h-5" alt="coin-image" />
+          <div class="text-center">
+            <p class="font-bold text-sm">{{ user?.coins.toFixed(2) ?? 0 }}</p>
+            <p class="text-[10px] font-bold text-gray-500">= 0.4 TON</p>
+          </div>
+          <img :src="WithdrawImage" class="w-5 h-5" alt="withdraw-image" />
+        </button>
+
+        <RouterLink to="/leaderboard" class="flex flex-col items-center gap-1">
+          <img :src="PodiumImage" class="w-8" alt="podium-image" />
+
+          <span class="bg-[#00C5A6] text-white text-[10px] font-bold px-1 py-px rounded-md"
+            >29d 10h 54m 53s</span
+          >
+        </RouterLink>
+      </div>
+
+      <div class="flex flex-col gap-2 items-end">
+        <div class="text-center rounded-full bg-sky-400 px-2 py-1 border-4 border-sky-200">
+          <p class="text-sm font-bold">Your level: {{ user?.level ?? 0 }}</p>
+        </div>
+
+        <div
+          class="w-10 h-10 flex justify-center items-center rounded-full bg-sky-400 border-4 border-sky-200"
+        >
+          <img :src="UnitedKingdomFlagImage" class="w-5 h-5" alt="united-kingdom-flag-image" />
+        </div>
+
+        <button
+          type="button"
+          class="w-8 h-8 mx-1 relative music-button"
+          :class="{ 'music-disabled': !isMusicEnabled || !isMusicAvailable }"
+          @click="toggleMusic"
+        >
+          <img :src="MusicImage" class="w-full h-full" alt="united-kingdom-flag-image" />
+
+          <div
+            class="absolute inset-0 flex items-center justify-center"
+            v-if="!isMusicEnabled || !isMusicAvailable"
+          >
+            <div class="diagonal-line"></div>
+          </div>
+        </button>
+      </div>
     </div>
 
     <div>
       <div class="flex justify-center items-center">
-        <div class="w-[200px]">
+        <div class="w-40">
           <ProgressBar
-            :current-value="user?.tempCoins ?? 0"
+            :current-value="user?.tempCoins ?? 87"
             :max-value="user?.vaultCapacity ?? 100"
             :min-value="0"
           />
@@ -170,16 +228,16 @@ onMounted(async () => {
 
       <div class="flex justify-between mt-2">
         <HealthLevel
-          :current-value="user?.currentHealth"
-          :max-value="user?.maxHealth"
+          :current-value="user?.currentHealth ?? 0"
+          :max-value="user?.maxHealth ?? 0"
           color="green"
           size="medium"
           :show-glow="true"
           :animated="true"
         />
         <EnergyLevel
-          :current-value="user?.currentEnergy"
-          :max-value="user?.maxEnergy"
+          :current-value="user?.currentEnergy ?? 0"
+          :max-value="user?.maxEnergy ?? 0"
           color="blue"
           size="medium"
           :show-glow="true"
@@ -199,7 +257,7 @@ onMounted(async () => {
           }
         "
       >
-        <img :src="BottleImage" class="w-12" />
+        <img :src="IceImage" class="w-9" alt="ice-image" />
       </button>
 
       <button
@@ -212,13 +270,14 @@ onMounted(async () => {
           }
         "
       >
-        <img :src="SpinImage" class="w-12" />
+        <img :src="SpinImage" class="w-9" alt="spin-image" />
       </button>
     </div>
 
     <div class="flex justify-center items-center">
       <button
         type="button"
+        class="collect-button"
         @click="
           () => {
             collect()
@@ -226,14 +285,12 @@ onMounted(async () => {
           }
         "
         :disabled="!user || user.tempCoins < user.vaultCapacity * 0.1"
-        class="bg-cover bg-center bg-no-repeat pb-1 font-semibold text-2xl w-[223px] h-[65px]"
         :class="{
           'cursor-not-allowed opacity-50': user && user.tempCoins < user.vaultCapacity * 0.1,
           'cursor-pointer': user && user.tempCoins >= user.vaultCapacity * 0.1,
         }"
-        :style="{ backgroundImage: `url(${CollectBgImage})` }"
       >
-        Collect
+        <img :src="CollectButtonImage" class="w-full" alt="collect-button-image" />
       </button>
     </div>
   </div>
@@ -250,9 +307,30 @@ onMounted(async () => {
   opacity: 0.7;
 }
 .diagonal-line {
-  width: 40px;
-  height: 2px;
+  width: 45px;
+  height: 1.5px;
   background-color: #ff0000;
   transform: rotate(45deg);
+}
+.collect-button {
+  width: 160px;
+}
+
+@media screen and (max-width: 425px) {
+  .collect-button {
+    width: 160px;
+  }
+}
+
+@media screen and (max-width: 375px) {
+  .collect-button {
+    width: 144px;
+  }
+}
+
+@media screen and (max-width: 320px) {
+  .collect-button {
+    width: 128px;
+  }
 }
 </style>
