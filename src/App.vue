@@ -2,7 +2,7 @@
 import { ref, onMounted, watch } from 'vue'
 import { authService } from './api/authService'
 import { RouterView, RouterLink } from 'vue-router'
-import { HomeImage, ShopImage, TaskImage, FriendsImage } from '@/assets/images'
+// import { HomeImage, ShopImage, TaskImage, FriendsImage } from '@/assets/images'
 import { BgMusicAudio } from '@/assets/audios'
 import {
   setAudioElement,
@@ -55,7 +55,12 @@ const handleRetry = async () => {
 }
 
 onMounted(async () => {
-  await authenticate()
+  const token = localStorage.getItem('token')
+
+  if (!token) {
+    await authenticate()
+  }
+
   checkIfUserIsBiggie()
   await fetchAllTasks()
   document.addEventListener('touchstart', resumeOnInteraction)
@@ -118,19 +123,19 @@ const fetchAllTasks = async () => {
   }
 }
 
-const checkie = (channel: string) => {
-  if (allTasks.value?.includes(`@${channel}`)) {
-    return false
-  } else {
-    return true
-  }
-}
+// const checkie = (channel: string) => {
+//   if (allTasks.value?.includes(`@${channel}`)) {
+//     return false
+//   } else {
+//     return true
+//   }
+// }
 </script>
 
 <template>
-  <!-- <LoaderComponent v-if="loading" /> -->
+  <LoaderComponent v-if="loading" />
 
-  <!-- <div
+  <div
     v-else-if="authFailed"
     class="fixed inset-0 bg-gradient-to-br from-black/90 via-[#1a1a2e]/90 to-[#16213e]/90 flex items-center justify-center z-50 px-4"
   >
@@ -161,9 +166,9 @@ const checkie = (channel: string) => {
       </button>
       <p class="text-xs text-gray-400 mt-6">Works best on Telegram Mobile</p>
     </div>
-  </div> -->
+  </div>
 
-  <div class="app-container">
+  <div class="app-container" v-else>
     <audio
       ref="audioRef"
       loop

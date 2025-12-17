@@ -1,3 +1,4 @@
+import WebApp from '@twa-dev/sdk'
 import axios, { type AxiosInstance } from 'axios'
 
 const apiClient: AxiosInstance = axios.create({
@@ -20,6 +21,7 @@ apiClient.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('token')
+      WebApp.close()
     }
     console.error('API Error:', error.response?.data || error.message)
     return Promise.reject(error)
