@@ -32,6 +32,7 @@ const BIGGIES = new Set<number>([5035538171, 1031081189, 352641904, 1701438929])
 
 const telegramUserId = computed<number | null>(() => WebApp.initDataUnsafe?.user?.id ?? null)
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const isUserBiggie = computed(
   () => telegramUserId.value !== null && BIGGIES.has(telegramUserId.value),
 )
@@ -127,10 +128,9 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <LoaderComponent v-if="loading" />
+  <!-- <LoaderComponent v-if="loading" /> -->
 
-  <!-- AUTH FAILED -->
-  <div
+  <!-- <div
     v-else-if="authFailed"
     class="fixed inset-0 bg-gradient-to-br from-black/90 via-[#1a1a2e]/90 to-[#16213e]/90 flex items-center justify-center z-50 px-4"
   >
@@ -162,10 +162,10 @@ onBeforeUnmount(() => {
 
       <p class="text-xs text-gray-400 mt-6">Works best on Telegram Mobile</p>
     </div>
-  </div>
+  </div> -->
 
   <!-- APP -->
-  <div v-else class="app-container">
+  <div class="app-container">
     <audio
       ref="audioRef"
       loop

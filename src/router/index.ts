@@ -16,9 +16,24 @@ const router = createRouter({
       component: HomeView,
     },
     {
-      path: '/task',
-      name: 'task',
+      path: '/tasks',
       component: TaskView,
+      children: [
+        {
+          path: '',
+          redirect: '/tasks/main',
+        },
+        {
+          path: 'main',
+          name: 'main-tasks',
+          component: () => import('@/views/task/TaskMainView.vue'),
+        },
+        {
+          path: 'partner',
+          name: 'partner-tasks',
+          component: () => import('@/views/task/TaskPartnerView.vue'),
+        },
+      ],
     },
     {
       path: '/shop',

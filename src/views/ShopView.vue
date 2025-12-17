@@ -1,152 +1,155 @@
 <script setup lang="ts">
-import { onMounted, ref, type Component } from 'vue'
-import { CoinIcon, MealIcon, MoneyBagIcon, PostBuildingIcon, ImmuneIcon } from '@/assets/icons'
-import { ShopBgImage } from '@/assets/images'
+import { onMounted, ref } from 'vue'
+import { toast } from 'vue3-toastify'
+
 import { useGame } from '@/composables/useGame'
 import { upgradeService } from '@/api/upgradeService'
 import type { ApiError, UpgradeStatusItem } from '@/api/types'
-import { toast } from 'vue3-toastify'
+
 import LoaderComponent from '@/components/LoaderComponent.vue'
 
-const error = ref<ApiError | null>(null)
+import {
+  CoinImage,
+  WithdrawImage,
+  WealthImage,
+  WorkImage,
+  FoodImage,
+  ImmuneImage,
+} from '@/assets/images/winter'
+import { TealSnowBackgroundImage } from '@/assets/backgrounds/winter'
 
+/* -------------------- state -------------------- */
+const error = ref<ApiError | null>(null)
+const loading = ref(false)
+const pageLoading = ref(true)
+const upgradingName = ref<UpgradeStatusItem['name'] | null>(null)
+
+const upgradeStatus = ref<UpgradeStatusItem[]>([])
+
+/* -------------------- game -------------------- */
 const { getUserData, user } = useGame()
 
-const upgradeStatus = ref<UpgradeStatusItem[] | null>(null)
-const loading = ref(false)
-const pageloading = ref(true)
-const upgradingName = ref<string | null>(null)
-
-const icons: Record<UpgradeStatusItem['name'], Component | string> = {
-  wealth: MoneyBagIcon,
-  work: PostBuildingIcon,
-  food: MealIcon,
-  immune: ImmuneIcon,
+/* -------------------- icons mapping -------------------- */
+const icons: Record<UpgradeStatusItem['name'], string> = {
+  wealth: WealthImage,
+  work: WorkImage,
+  food: FoodImage,
+  immune: ImmuneImage,
 }
 
+/* -------------------- api -------------------- */
 const getUpgradeStatus = async () => {
-  try {
-    const response = await upgradeService.status()
-    upgradeStatus.value = response.data.status
-  } catch (err) {
-    console.error('Error while getting upgrade status: ', err)
-  }
+  const res = await upgradeService.status()
+  upgradeStatus.value = res.data.status
 }
 
 const handleUpgrade = async (name: UpgradeStatusItem['name']) => {
   try {
     loading.value = true
     upgradingName.value = name
+
     await upgradeService.upgrade(name)
-    await getUserData()
-    await getUpgradeStatus()
+    await Promise.all([getUserData(), getUpgradeStatus()])
   } catch (err) {
     error.value = err as ApiError
-    toast.error(error.value.response.data.message)
+    toast.error(error.value.response?.data?.message || 'Upgrade failed')
   } finally {
     loading.value = false
     upgradingName.value = null
   }
 }
 
+/* -------------------- lifecycle -------------------- */
 onMounted(async () => {
   try {
-    await getUserData()
-    await getUpgradeStatus()
-  } catch (error) {
-    console.error('Initial data loading failed:', error)
+    await Promise.all([getUserData(), getUpgradeStatus()])
+  } catch (err) {
+    console.error('Initial shop loading failed:', err)
   } finally {
-    pageloading.value = false
+    pageLoading.value = false
   }
 })
 </script>
 
 <template>
-  <LoaderComponent v-if="pageloading" />
-  <div
-    class="h-full w-full flex flex-col relative bg-cover bg-center bg-no-repeat p-4 gap-4 pb-24"
-    :style="{ backgroundImage: `url(${ShopBgImage})` }"
-  >
-    <div class="flex justify-between items-center">
-      <div
-        class="flex items-center gap-2 bg-[#FAC487] border border-[#000] py-2 px-4 rounded-[25px]"
-      >
-        <CoinIcon class="w-5" />
-        <span class="font-bold">{{ user?.coins.toFixed(2) }}</span>
-      </div>
+  <LoaderComponent v-if="pageLoading" />
 
-      <div
-        class="flex items-center gap-2 bg-[#FAC487] border border-[#000] py-2 px-4 rounded-[25px]"
+  <div
+    class="w-full h-full bg-cover bg-center bg-no-repeat p-2 relative flex flex-col"
+    :style="{ backgroundImage: `url(${TealSnowBackgroundImage})` }"
+  >
+    <!-- HEADER -->
+    <div class="flex justify-between items-start">
+      <RouterLink
+        to="/withdrawal"
+        class="flex gap-2 items-center rounded-full bg-sky-400 px-2 py-1 border-4 border-sky-200"
       >
-        <span class="font-bold">Your level: {{ user?.level }}</span>
+        <img :src="CoinImage" class="w-5 h-5" />
+        <div class="text-center">
+          <p class="font-bold text-sm">
+            {{ user?.coins.toFixed(2) ?? 0 }}
+          </p>
+          <p class="text-[10px] font-bold text-gray-500">= 0.4 TON</p>
+        </div>
+        <img :src="WithdrawImage" class="w-5 h-5" />
+      </RouterLink>
+
+      <div class="text-center rounded-full bg-sky-400 px-2 py-1 border-4 border-sky-200">
+        <p class="text-sm font-bold">Your level: {{ user?.level ?? 1 }}</p>
       </div>
     </div>
 
-    <div
-      class="flex flex-col gap-4 overflow-y-scroll scrollbar-hide"
-      style="scrollbar-width: none; -ms-overflow-style: none"
-    >
+    <!-- UPGRADES -->
+    <div class="my-4 flex flex-col gap-4 overflow-y-scroll scrollbar-hide">
       <div
-        v-for="upgrade in upgradeStatus ?? []"
+        v-for="upgrade in upgradeStatus"
         :key="upgrade.name"
-        class="p-4 bg-[rgba(35,44,57,0.9)] rounded-[5px] border-2 border-[#17212B]"
+        class="rounded-xl bg-[rgba(161,213,209,0.5)] p-4 flex flex-col gap-2 items-center"
       >
-        <div class="flex gap-2 items-start">
-          <div
-            class="bg-[#fff] border border-[#CBCBCB] rounded-[10px] w-14 h-14 flex justify-center items-center"
-          >
-            <component :is="icons[upgrade.name]" class="w-8" />
+        <div class="flex gap-2 items-start w-full">
+          <div class="w-12 shrink-0">
+            <img :src="icons[upgrade.name]" class="w-full" />
           </div>
 
-          <div class="flex-1">
-            <div class="flex justify-between items-start">
-              <p class="text-[#fff]">
-                <span class="uppercase font-bold text-lg">{{ upgrade.name }}</span>
-              </p>
+          <div class="flex flex-col gap-1 items-start flex-1">
+            <div class="flex justify-between items-center w-full">
+              <h1 class="uppercase text-white font-bold">
+                {{ upgrade.name }}
+              </h1>
 
-              <div
-                class="shrink-0 bg-[#fff] border border-[#CBCBCB] rounded-[5px] flex items-center justify-center px-1"
-              >
-                <p class="font-bold text-sm">
-                  Lvl. <span class="text-[#3C863C]">{{ upgrade.level }}</span> /
-                  <span class="text-[#F79423]">{{ upgrade.maxLevel }}</span>
-                </p>
+              <div class="bg-white font-bold text-sm rounded-md px-1 py-px">
+                Lvl.
+                <span class="text-green-500">{{ upgrade.level }}</span>
+                /
+                <span class="text-orange-500">{{ upgrade.maxLevel }}</span>
               </div>
             </div>
 
-            <div class="flex flex-col items-start gap-1">
-              <span class="bg-[#fff] rounded-[5px] p-px px-1 text-xs font-medium">
-                {{ upgrade.effect }}
-              </span>
-
-              <span
-                class="bg-[#fff] rounded-[5px] p-px px-[6px] text-xs font-medium flex items-center gap-1"
-                v-if="upgrade.cost !== null"
-              >
-                <CoinIcon class="w-[14px]" />
-                Required coins:
-                <span>{{ upgrade.cost }}</span>
-              </span>
+            <div class="bg-white font-medium text-[10px] rounded-md px-1 py-px">
+              {{ upgrade.effect }}
             </div>
 
-            <p class="text-xs text-[#fff] mt-1 font-medium">
+            <p class="text-white font-medium text-xs">
               {{ upgrade.details }}
             </p>
           </div>
         </div>
 
-        <div class="flex justify-center items-center mt-4">
-          <button
-            type="button"
-            class="bg-[#FAC487] uppercase cursor-pointer font-semibold py-1 px-12 rounded-full disabled:opacity-50"
-            :disabled="loading || !upgrade.canUpgrade"
-            @click="handleUpgrade(upgrade.name)"
-          >
-            <template v-if="loading && upgradingName === upgrade.name"> upgrading... </template>
-            <template v-else-if="!upgrade.canUpgrade"> max level </template>
-            <template v-else> upgrade level </template>
-          </button>
-        </div>
+        <button
+          type="button"
+          class="flex gap-1 items-center rounded-full bg-[#FFAC33] px-4 py-1 font-bold disabled:opacity-50"
+          :disabled="loading || !upgrade.canUpgrade"
+          @click="handleUpgrade(upgrade.name)"
+        >
+          <template v-if="loading && upgradingName === upgrade.name"> upgrading... </template>
+
+          <template v-else-if="!upgrade.canUpgrade"> max level </template>
+
+          <template v-else>
+            <img :src="CoinImage" class="w-6" />
+            <span>{{ upgrade.cost }}</span>
+          </template>
+        </button>
       </div>
     </div>
   </div>

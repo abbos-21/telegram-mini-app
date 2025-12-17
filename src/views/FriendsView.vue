@@ -1,142 +1,145 @@
 <script setup lang="ts">
-import { CoinIcon } from '@/assets/icons'
 import { ref, onMounted } from 'vue'
-import { userService } from '@/api/userService'
-import type { User } from '@/api/types'
+import { CoinImage } from '@/assets/images/winter'
 import LoaderComponent from '@/components/LoaderComponent.vue'
 
+import { userService } from '@/api/userService'
+import type { User } from '@/api/types'
+import { TealSnowBackgroundImage } from '@/assets/backgrounds/winter'
+
+/* -------------------- state -------------------- */
 type ReferralRewardsArray = [string, number][]
 
-const referralLink = ref<string | null>(null)
-const referrals = ref<User[] | null>(null)
-const totalReferralsCount = ref<number | null>(null)
+const referralLink = ref<string>('')
+const referrals = ref<User[]>([])
+const totalReferralsCount = ref<number>(0)
 const referralCounts = ref<Record<number, number>>({})
-const referralEarnings = ref<number | null>(null)
-const referralRewards = ref<null | ReferralRewardsArray>(null)
+const referralEarnings = ref<number>(0)
+const referralRewards = ref<ReferralRewardsArray>([])
 const loading = ref<boolean>(false)
-const copied = ref(false)
+const copied = ref<boolean>(false)
 
-function copyLink(e: Event) {
+/* -------------------- actions -------------------- */
+const copyLink = async (e: Event) => {
   e.preventDefault()
-  navigator.clipboard.writeText(referralLink.value as string).then(() => {
-    copied.value = true
-    setTimeout(() => (copied.value = false), 1500)
-  })
+  await navigator.clipboard.writeText(referralLink.value)
+  copied.value = true
+  setTimeout(() => (copied.value = false), 1500)
 }
 
+/* -------------------- api -------------------- */
 const getReferralLink = async () => {
-  try {
-    const response = await userService.getReferralLink()
-    referralLink.value = response.data.link
-  } catch (err) {
-    console.log('Error while getting referral link: ', err)
-  }
+  const res = await userService.getReferralLink()
+  referralLink.value = res.data.link
 }
 
 const getReferrals = async () => {
-  try {
-    const response = await userService.getAllReferrals()
-    referrals.value = response.data.referrals as User[]
-    totalReferralsCount.value = response.data.count
-    referralEarnings.value = response.data.referralEarnings
-    referralRewards.value = Object.entries(response.data.referralRewards)
+  const res = await userService.getAllReferrals()
 
-    referralCounts.value = referrals.value.reduce(
-      (acc, curr) => {
-        acc[curr.level] = (acc[curr.level] || 0) + 1
-        return acc
-      },
-      {} as Record<number, number>,
-    )
-  } catch (err) {
-    console.log('Error while getting referrals: ', err)
-  }
+  referrals.value = res.data.referrals as User[]
+  totalReferralsCount.value = res.data.count
+  referralEarnings.value = res.data.referralEarnings
+  referralRewards.value = Object.entries(res.data.referralRewards)
+
+  referralCounts.value = referrals.value.reduce(
+    (acc, user) => {
+      acc[user.level] = (acc[user.level] || 0) + 1
+      return acc
+    },
+    {} as Record<number, number>,
+  )
 }
 
-const getReferralData = async () => {
+const loadReferralData = async () => {
   try {
     loading.value = true
-    await getReferralLink()
-    await getReferrals()
+    await Promise.all([getReferralLink(), getReferrals()])
   } catch (err) {
-    console.log('Error while getting referral data: ', err)
+    console.error('Failed to load referral data:', err)
   } finally {
     loading.value = false
   }
 }
 
-onMounted(async () => {
-  await getReferralData()
-})
+/* -------------------- lifecycle -------------------- */
+onMounted(loadReferralData)
 </script>
 
 <template>
   <LoaderComponent v-if="loading" />
-  <div class="w-full h-full flex flex-col p-4 gap-6 pb-24 pt-8 bg-[#364B4B]">
-    <h1 class="text-center text-2xl font-bold text-white">Invite and earn!</h1>
 
-    <div
-      class="flex flex-col gap-2 overflow-y-scroll scrollbar-hide"
-      style="scrollbar-width: none; -ms-overflow-style: none"
-    >
-      <div class="flex flex-col gap-1">
-        <h1 class="text-xs text-white font-extrabold">Your referral link</h1>
-        <form class="w-full flex gap-2" @submit="copyLink">
+  <div
+    class="w-full h-full bg-cover bg-center bg-no-repeat p-2 relative flex flex-col"
+    :style="{ backgroundImage: `url${TealSnowBackgroundImage}` }"
+  >
+    <div class="flex flex-col gap-4 text-white overflow-y-scroll scrollbar-hide">
+      <h1 class="uppercase text-center text-lg font-bold">invite and earn!</h1>
+
+      <!-- REFERRAL LINK -->
+      <div class="flex flex-col gap-1 items-start font-semibold">
+        <h2 class="text-xs">Your referral link:</h2>
+
+        <form class="w-full flex gap-2" @submit.prevent="copyLink">
           <input
             type="text"
             disabled
             :value="referralLink"
-            class="bg-[#FAC487] border border-[#000] px-2 flex-1 text-xs font-extrabold"
+            class="bg-transparent border border-white px-2 py-1 flex-1 text-xs rounded-md"
           />
+
           <button
             type="submit"
-            class="bg-[#DAC7C0] text-[#000] font-extrabold px-4 py-2 cursor-pointer border border-[#000] flex items-center justify-center min-w-[75px]"
+            class="bg-transparent text-sm px-4 py-2 border border-white rounded-md"
           >
             <span v-if="!copied">Copy</span>
-            <span v-else>&check;</span>
+            <span v-else>✓</span>
           </button>
         </form>
       </div>
 
-      <h1 class="text-center text-white font-semibold">
-        Earnings from referrals: {{ referralEarnings }} coins
-      </h1>
+      <!-- STATS -->
+      <div class="border border-white rounded-md flex flex-col gap-2 p-2">
+        <h1 class="text-center font-bold text-sm">
+          Earnings from referrals: {{ referralEarnings }} coins
+        </h1>
 
-      <div class="p-4 flex gap-4 bg-[#FAC487] border justify-between">
-        <div class="flex flex-col gap-1">
-          <h1 class="font-semibold text-black">Your referrals’ upgrades</h1>
-          <ul class="text-sm font-semibold text-[#17212B]">
-            <li
+        <div class="h-px w-full bg-white"></div>
+
+        <div class="flex items-start justify-between gap-2 font-semibold text-xs">
+          <div class="flex flex-col gap-1">
+            <h2 class="text-sm">Your referrals’ upgrades</h2>
+
+            <p
               v-for="level in Object.keys(referralCounts)
                 .map(Number)
                 .sort((a, b) => a - b)"
               :key="level"
+              class="ps-1"
             >
               Level {{ level }} referrals: {{ referralCounts[level] }}
-            </li>
-          </ul>
-        </div>
+            </p>
+          </div>
 
-        <h1 class="font-semibold text-black">
-          Total referrals: <span class="underline">{{ totalReferralsCount }}</span>
-        </h1>
+          <div>
+            <h2 class="text-sm">Total referrals: {{ totalReferralsCount }}</h2>
+          </div>
+        </div>
       </div>
 
-      <div class="p-4 bg-[#FAC487] border mt-2">
-        <h1 class="font-semibold text-black">Referrals level rewards</h1>
+      <!-- REWARDS -->
+      <div class="border border-white rounded-md flex flex-col gap-2 p-2">
+        <h1 class="text-sm font-bold">Referral-level rewards</h1>
 
-        <div class="flex flex-col gap-2 mt-2">
-          <div
-            v-for="[level, reward] in referralRewards"
-            :key="level"
-            class="flex justify-between items-center text-sm font-semibold text-[#17212B]"
-          >
-            <p>Level {{ level }}</p>
+        <div
+          v-for="[level, reward] in referralRewards"
+          :key="level"
+          class="flex justify-between items-center text-xs font-semibold px-1"
+        >
+          <h2>Level {{ level }}</h2>
 
-            <div class="flex items-center gap-1">
-              <p class="text-black font-bold">{{ reward }}</p>
-              <CoinIcon class="w-5 h-5" />
-            </div>
+          <div class="flex gap-1 items-center">
+            <p>{{ reward }}</p>
+            <img :src="CoinImage" class="w-4" />
           </div>
         </div>
       </div>
