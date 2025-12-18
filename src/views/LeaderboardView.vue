@@ -8,7 +8,7 @@ import type { Season, LeaderboardResponse } from '@/api/types'
 import { LeaderboardBackgroundImage } from '@/assets/backgrounds/winter'
 import { ArrowBackIcon, CupIcon, InfoIcon, SwitchIcon } from '@/assets/icons/winter'
 import { CoinImage, UserImage } from '@/assets/images/winter'
-import type LoaderComponentVue from '@/components/LoaderComponent.vue'
+import LoaderComponent from '@/components/LoaderComponent.vue'
 
 /* -------------------- state -------------------- */
 const season = ref<Season | null>(null)
@@ -91,7 +91,13 @@ onBeforeUnmount(() => {
 })
 
 const withdrawRate: number | undefined = inject('withdrawRate')
-const numberFixed = (val: number, decimals = 2) => val.toFixed(decimals)
+
+const getRankCoins = (index: number) => {
+  if (index < 10) {
+    return 50000 - index * 1000
+  }
+  return 25000
+}
 </script>
 
 <template>
@@ -164,28 +170,16 @@ const numberFixed = (val: number, decimals = 2) => val.toFixed(decimals)
         </div>
 
         <!-- RANK -->
-        <!-- <div class="flex flex-col items-center gap-1 font-bold leading-none">
-          <CupIcon v-if="index === 0" class="w-6 text-orange-400" />
-          <CupIcon v-else-if="index === 1" class="w-6 text-slate-400" />
-          <CupIcon v-else-if="index === 2" class="w-6 text-[#C67747]" />
-          <h1 v-else>#{{ index + 1 }}</h1>
-
-          <p class="text-xs">50000 coins</p>
-          <p class="text-[10px] opacity-60">= {{ (50000 / withdrawRate).toFixed(2) }} TON</p>
-        </div> -->
-
         <div class="flex flex-col items-center gap-1 font-bold leading-none">
           <CupIcon v-if="index === 0" class="w-6 text-orange-400" />
           <CupIcon v-else-if="index === 1" class="w-6 text-slate-400" />
           <CupIcon v-else-if="index === 2" class="w-6 text-[#C67747]" />
           <h1 v-else>#{{ index + 1 }}</h1>
 
-          <p class="text-xs">{{ index === 0 ? 500000 : index === 9 ? 50000 : 10000 }} coins</p>
+          <p class="text-xs">{{ getRankCoins(index).toLocaleString() }} coins</p>
 
           <p class="text-[10px] opacity-60">
-            =
-            {{ numberFixed(index === 0 ? 500000 : index === 9 ? 50000 : 10000 / 135000, 2) }}
-            TON
+            = {{ (getRankCoins(index) / (withdrawRate ?? Infinity)).toFixed(2) }} TON
           </p>
         </div>
       </div>
