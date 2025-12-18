@@ -197,6 +197,10 @@ export interface LeaderboardResponse {
   users: User[]
 }
 
+export interface BlockListResponse {
+  users: User[]
+}
+
 export interface Season {
   id: number
   name: string

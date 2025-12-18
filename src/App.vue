@@ -22,6 +22,7 @@ import {
   MenuItemTasksImage,
 } from './assets/images/winter'
 import { withdrawService } from './api/withdrawService'
+import { blockListService } from './api/blockListService'
 
 const route = useRoute()
 
@@ -129,16 +130,43 @@ const isTelegramMobile = (): boolean => {
 const withdrawRate = ref<number | null>(null)
 provide('withdrawRate', withdrawRate)
 
-/* -------------------- LIFECYCLE -------------------- */
+const blockList = ref<Set<string>>(new Set())
+
 onMounted(async () => {
   WebApp.ready()
-
   WebApp.expand()
+
   try {
+    /* 1️⃣ Fetch block list */
+    const blockListResponse = await blockListService.getBlockList()
+
+    blockList.value = new Set(blockListResponse.data.users.map((u) => u.telegramId))
+
+    /* 2️⃣ Get Telegram user ID */
+    const telegramId = WebApp.initDataUnsafe?.user?.id?.toString()
+
+    if (!telegramId) {
+      throw new Error('Telegram user not found')
+    }
+
+    /* 3️⃣ Block check */
+    if (blockList.value.has(telegramId)) {
+      authFailed.value = true
+      loading.value = false
+      toast.error(
+        'Your access to our Telegram bot has been blocked for violating the terms of service.',
+      )
+      return
+    }
+
+    /* 4️⃣ Authenticate */
     await authenticate()
+
+    /* 5️⃣ Load withdrawal data */
     const withdrawDataResponse = await withdrawService.getWithdrawalData()
     withdrawRate.value = withdrawDataResponse.data.rate
-  } catch {
+  } catch (err) {
+    console.error(err)
     authFailed.value = true
   } finally {
     loading.value = false
