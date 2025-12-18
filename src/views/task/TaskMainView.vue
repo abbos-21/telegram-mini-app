@@ -132,29 +132,21 @@ const checkSubscription = async (channel: string) => {
             Subscribe to <span class="text-black">{{ channel }}</span> channel
           </p>
 
-          <div class="mt-3 flex justify-end gap-2">
+          <div class="mt-3 flex justify-between gap-2">
             <button
-              v-if="!subscribedChannels.has(channel)"
               @click="openChannel(channel)"
-              class="w-1/2 rounded-full bg-sky-500 py-1 text-white font-bold"
+              :disabled="subscribedChannels.has(channel)"
+              class="w-1/2 rounded-full bg-sky-500 py-1 text-white font-bold disabled:opacity-50 disabled:cursor-not-allowed!"
             >
-              Subscribe
+              Complete
             </button>
 
             <button
-              v-else-if="processingChannel !== channel"
               @click="checkSubscription(channel)"
-              class="w-1/2 rounded-full bg-white py-1 text-black font-bold"
+              :disabled="processingChannel === channel"
+              class="w-1/2 rounded-full bg-white py-1 text-black font-bold disabled:opacity-50 disabled:cursor-not-allowed!"
             >
-              Check
-            </button>
-
-            <button
-              v-else
-              disabled
-              class="w-1/2 rounded-full bg-gray-300 py-1 text-black font-bold"
-            >
-              Checking...
+              {{ processingChannel === channel ? 'Checking...' : 'Check' }}
             </button>
           </div>
         </div>

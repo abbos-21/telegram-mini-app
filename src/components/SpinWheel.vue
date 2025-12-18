@@ -17,7 +17,7 @@ const emit = defineEmits<{
 const { canSpin, cooldownRemaining, spin, fetchStatus } = useSpinWheel()
 
 const segments = computed<Segment[]>(() => [
-  { label: '-5', color: '#FFE07D' },
+  { label: '+5', color: '#FFE07D' },
   { label: '10', color: '#b3e59f' },
   { label: '15', color: '#7ca1bc' },
   { label: '20', color: '#FFC251' },
@@ -150,7 +150,11 @@ onMounted(fetchStatus)
       {{ spinning ? 'Spinning…' : canSpin ? 'Spin' : 'Come Back Later' }}
     </button> -->
 
-    <button :disabled="spinning || !canSpin" @click="handleSpin" class="w-40 mt-4">
+    <button
+      :disabled="spinning || !canSpin"
+      @click="handleSpin"
+      class="w-40 mt-4 disabled:opacity-50 disabled:cursor-not-allowed!"
+    >
       <img :src="SpinButtonImage" alt="spin" />
     </button>
 

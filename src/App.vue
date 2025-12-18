@@ -232,7 +232,7 @@ onBeforeUnmount(() => {
   </div>
 
   <!-- APP -->
-  <div class="app-container" v-else>
+  <div class="app-container">
     <audio
       ref="audioRef"
       loop
