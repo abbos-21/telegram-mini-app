@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, inject } from 'vue'
 import { CoinImage } from '@/assets/images/winter'
 import LoaderComponent from '@/components/LoaderComponent.vue'
 
@@ -67,14 +67,15 @@ const loadReferralData = async () => {
 
 /* -------------------- lifecycle -------------------- */
 onMounted(loadReferralData)
+const navHeight = inject('navHeight')
 </script>
 
 <template>
   <LoaderComponent v-if="loading" />
 
   <div
-    class="w-full h-full bg-cover bg-center bg-no-repeat p-2 relative flex flex-col"
-    :style="{ backgroundImage: `url(${TealSnowBackgroundImage})` }"
+    class="w-full h-full bg-cover bg-center bg-no-repeat p-2 relative flex flex-col mb-4"
+    :style="{ backgroundImage: `url(${TealSnowBackgroundImage})`, paddingBottom: `${navHeight}px` }"
   >
     <div class="flex flex-col gap-4 text-white overflow-y-scroll scrollbar-hide">
       <h1 class="uppercase text-center text-lg font-bold">invite and earn!</h1>

@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { inject, onMounted } from 'vue'
 import WebApp from '@twa-dev/sdk'
 import { TealSnowBackgroundImage } from '@/assets/backgrounds/winter'
+
+const navHeight = inject('navHeight')
 
 onMounted(() => {
   WebApp.ready()
@@ -12,7 +14,7 @@ onMounted(() => {
 <template>
   <div
     class="w-full h-full bg-cover bg-center bg-no-repeat p-2 relative flex flex-col"
-    :style="{ backgroundImage: `url(${TealSnowBackgroundImage})` }"
+    :style="{ backgroundImage: `url(${TealSnowBackgroundImage})`, paddingBottom: `${navHeight}px` }"
   >
     <div class="flex flex-col gap-2 items-center">
       <h1 class="uppercase text-center text-white text-lg font-bold">task list</h1>

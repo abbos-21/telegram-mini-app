@@ -164,7 +164,7 @@ onMounted(fetchStatus)
     </div>
 
     <div v-if="cooldownRemaining" class="text-xs font-bold mt-2">
-      Next spin in: {{ cooldownRemaining.hours }}h {{ cooldownRemaining.minutes }}m :
+      Next spin in: {{ cooldownRemaining.hours }}h {{ cooldownRemaining.minutes }}m
     </div>
   </div>
 </template>

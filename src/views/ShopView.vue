@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { inject, onMounted, ref } from 'vue'
 import { toast } from 'vue3-toastify'
 
 import { useGame } from '@/composables/useGame'
@@ -69,6 +69,8 @@ onMounted(async () => {
     pageLoading.value = false
   }
 })
+
+const navHeight = inject('navHeight')
 </script>
 
 <template>
@@ -76,7 +78,7 @@ onMounted(async () => {
 
   <div
     class="w-full h-full bg-cover bg-center bg-no-repeat p-2 relative flex flex-col"
-    :style="{ backgroundImage: `url(${TealSnowBackgroundImage})` }"
+    :style="{ backgroundImage: `url(${TealSnowBackgroundImage})`, paddingBottom: `${navHeight}px` }"
   >
     <!-- HEADER -->
     <div class="flex justify-between items-start">
