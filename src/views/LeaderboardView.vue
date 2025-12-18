@@ -8,6 +8,7 @@ import type { Season, LeaderboardResponse } from '@/api/types'
 import { LeaderboardBackgroundImage } from '@/assets/backgrounds/winter'
 import { ArrowBackIcon, CupIcon, InfoIcon, SwitchIcon } from '@/assets/icons/winter'
 import { CoinImage, UserImage } from '@/assets/images/winter'
+import type LoaderComponentVue from '@/components/LoaderComponent.vue'
 
 /* -------------------- state -------------------- */
 const season = ref<Season | null>(null)
@@ -94,6 +95,7 @@ const numberFixed = (val: number, decimals = 2) => val.toFixed(decimals)
 </script>
 
 <template>
+  <LoaderComponent v-if="loading" />
   <div
     class="w-full h-full bg-cover bg-center bg-no-repeat p-2 relative flex flex-col justify-between text-white"
     :style="{ backgroundImage: `url(${LeaderboardBackgroundImage})` }"
@@ -182,7 +184,7 @@ const numberFixed = (val: number, decimals = 2) => val.toFixed(decimals)
 
           <p class="text-[10px] opacity-60">
             =
-            {{ numberFixed(index === 0 ? 500000 : index === 9 ? 50000 : 10000 / withdrawRate, 2) }}
+            {{ numberFixed(index === 0 ? 500000 : index === 9 ? 50000 : 10000 / 135000, 2) }}
             TON
           </p>
         </div>
