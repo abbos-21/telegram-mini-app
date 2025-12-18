@@ -17,7 +17,21 @@ import BottlePopup from '@/components/BottlePopup.vue'
 import SpinPopup from '@/components/SpinPopup.vue'
 import ProgressBar from '@/components/ProgressBar.vue'
 
-import { LevelOneBackgroundImage } from '@/assets/backgrounds/winter'
+import {
+  Level1BackgroundImage,
+  Level2BackgroundImage,
+  Level3BackgroundImage,
+  Level4BackgroundImage,
+  Level5BackgroundImage,
+  Level6BackgroundImage,
+  Level7BackgroundImage,
+  Level8BackgroundImage,
+  Level9BackgroundImage,
+  Level10BackgroundImage,
+  Level11BackgroundImage,
+  Level12BackgroundImage,
+  Level13BackgroundImage,
+} from '@/assets/backgrounds/winter'
 import {
   CoinImage,
   CollectButtonImage,
@@ -107,12 +121,40 @@ onMounted(async () => {
     toast.info('Health 0, coins burned')
   }
 })
+
+const levelBackgrounds = [
+  Level1BackgroundImage,
+  Level2BackgroundImage,
+  Level3BackgroundImage,
+  Level4BackgroundImage,
+  Level5BackgroundImage,
+  Level6BackgroundImage,
+  Level7BackgroundImage,
+  Level8BackgroundImage,
+  Level9BackgroundImage,
+  Level10BackgroundImage,
+  Level11BackgroundImage,
+  Level12BackgroundImage,
+  Level13BackgroundImage,
+]
+
+const backgroundImage = computed(() => {
+  const level = user.value?.level ?? 1
+
+  // Clamp level to available backgrounds
+  const index = Math.min(Math.max(level - 1, 0), levelBackgrounds.length - 1)
+
+  return `url(${levelBackgrounds[index]})`
+})
 </script>
 
 <template>
   <div
     class="h-full w-full flex flex-col relative bg-cover bg-center bg-no-repeat p-2 gap-4 justify-between"
-    :style="{ backgroundImage: `url(${LevelOneBackgroundImage})`, paddingBottom: `${navHeight}px` }"
+    :style="{
+      backgroundImage,
+      paddingBottom: `${navHeight}px`,
+    }"
   >
     <!-- TOP BAR -->
     <div class="flex justify-between items-start">

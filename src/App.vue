@@ -97,6 +97,14 @@ const handleAudioError = () => {
 
 /* -------------------- AUTH -------------------- */
 const authenticate = async () => {
+  // 🚫 HARD GUARD
+  if (!isTelegramMobile()) {
+    authFailed.value = true
+    loading.value = false
+    toast.error('This game works only in Telegram Mobile')
+    return
+  }
+
   loading.value = true
   authFailed.value = false
 
@@ -115,7 +123,7 @@ const handleRetry = () => authenticate()
 
 const isTelegramMobile = (): boolean => {
   const platform = WebApp.platform
-  return platform === 'android' || platform === 'ios'
+  return platform === 'android' || platform === 'ios' || platform === 'android_x'
 }
 
 const withdrawRate = ref<number | null>(null)
@@ -124,14 +132,6 @@ provide('withdrawRate', withdrawRate)
 /* -------------------- LIFECYCLE -------------------- */
 onMounted(async () => {
   WebApp.ready()
-
-  if (!isTelegramMobile()) {
-    authFailed.value = true
-    loading.value = false
-
-    toast.error('This game works only in Telegram Mobile')
-    return
-  }
 
   WebApp.expand()
   try {
@@ -196,43 +196,8 @@ onBeforeUnmount(() => {
 
 <template>
   <!-- APP -->
-  <LoaderComponent v-if="loading" />
 
-  <div
-    v-else-if="authFailed"
-    class="fixed inset-0 bg-gradient-to-br from-black/90 via-[#1a1a2e]/90 to-[#16213e]/90 flex items-center justify-center z-50 px-4"
-  >
-    <div
-      class="text-center p-8 bg-white/10 backdrop-blur-lg rounded-2xl max-w-sm w-full border border-white/20"
-    >
-      <div
-        class="w-20 h-20 mx-auto mb-6 bg-gradient-to-r from-[#D68C62] to-[#DAC7C0] rounded-full flex items-center justify-center"
-      >
-        <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="1.5"
-            d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
-      </div>
-
-      <h3 class="text-xl font-bold text-white mb-4">Connection Lost</h3>
-      <p class="text-sm text-gray-300 mb-8">Tap below to reconnect to the game</p>
-
-      <button
-        @click="handleRetry"
-        class="w-full px-6 py-4 bg-gradient-to-r from-[#D68C62] to-[#DAC7C0] text-white font-bold rounded-xl shadow-lg"
-      >
-        🔄 Tap to Reconnect
-      </button>
-
-      <p class="text-xs text-gray-400 mt-6">Works best on Telegram Mobile</p>
-    </div>
-  </div>
-
-  <div class="app-container" v-else>
+  <div class="app-container">
     <audio
       ref="audioRef"
       loop

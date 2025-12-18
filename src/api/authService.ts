@@ -32,6 +32,13 @@ const waitForInitData = async (): Promise<string> => {
 export const authService = {
   loginWithTelegram: async (): Promise<AuthApiResponse> => {
     try {
+      const platform = WebApp.platform
+      const isMobile = platform === 'android' || platform === 'android_x' || platform === 'ios'
+
+      if (!isMobile) {
+        throw new Error('Desktop Telegram is not supported')
+      }
+
       WebApp.ready()
       WebApp.expand()
 
