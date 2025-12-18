@@ -132,7 +132,7 @@ const checkSubscription = async (channel: string) => {
             Subscribe to <span class="text-black">{{ channel }}</span> channel
           </p>
 
-          <div class="mt-3 flex justify-between gap-2">
+          <div class="mt-3 flex justify-end gap-2">
             <button
               v-if="!subscribedChannels.has(channel)"
               @click="openChannel(channel)"
