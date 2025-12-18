@@ -195,6 +195,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
+  <!-- APP -->
   <LoaderComponent v-if="loading" />
 
   <div
@@ -231,8 +232,7 @@ onBeforeUnmount(() => {
     </div>
   </div>
 
-  <!-- APP -->
-  <div class="app-container">
+  <div class="app-container" v-else>
     <audio
       ref="audioRef"
       loop

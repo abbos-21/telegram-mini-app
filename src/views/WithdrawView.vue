@@ -15,6 +15,7 @@ import { CyanSnowBackgroundImage } from '@/assets/backgrounds/winter'
 /* -------------------- layout -------------------- */
 
 /* -------------------- state -------------------- */
+const WITHDRAW_FEE = 0.005
 const amountCoins = ref<number | null>(null)
 const targetAddress = ref<string>('')
 
@@ -31,7 +32,11 @@ const { user, getUserData } = useGame()
 /* -------------------- computed -------------------- */
 const tonAmount = computed(() => {
   if (!withdrawRate.value || !amountCoins.value) return 0
-  return amountCoins.value / withdrawRate.value
+
+  const grossTon = amountCoins.value / withdrawRate.value
+  const netTon = grossTon - WITHDRAW_FEE
+
+  return netTon > 0 ? netTon : 0
 })
 
 /* -------------------- api -------------------- */

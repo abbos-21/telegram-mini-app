@@ -5,6 +5,8 @@ import { withdrawService } from '@/api/withdrawService'
 import type { Withdrawal } from '@/api/types'
 import { RouterLink } from 'vue-router'
 import LoaderComponent from '@/components/LoaderComponent.vue'
+import { CyanSnowBackgroundImage } from '@/assets/backgrounds/winter'
+import { ArrowBackIcon } from '@/assets/icons/winter'
 
 const withdrawals = ref<Withdrawal[]>([])
 const loading = ref(true)
@@ -62,14 +64,32 @@ const statusBadgeClass = (status: Withdrawal['status']) => {
 
 <template>
   <LoaderComponent v-if="loading" />
-  <div class="bg-[#364B4B] w-full h-full pb-24 p-4 flex flex-col gap-4">
-    <h1 class="text-2xl text-white font-bold text-center">Transaction History</h1>
+  <div
+    class="w-full h-full p-4 flex flex-col gap-4 bg-cover bg-center bg-no-repeat"
+    :style="{ backgroundImage: `url(${CyanSnowBackgroundImage})` }"
+  >
+    <div class="text-xl text-white font-bold text-center flex justify-between items-center">
+      <RouterLink
+        to="/"
+        class="w-8 h-8 bg-[rgba(60,143,151,0.5)] rounded-full border border-white flex justify-center items-center"
+      >
+        <ArrowBackIcon class="w-6" />
+      </RouterLink>
+      <h1>Transaction History</h1>
+      <button
+        class="opacity-0 w-8 h-8 bg-[rgba(60,143,151,0.5)] rounded-full border border-white flex justify-center items-center"
+      >
+        <ArrowBackIcon class="w-6" />
+      </button>
+    </div>
 
     <div
-      class="p-4 flex flex-col gap-4 bg-[#475a5a] rounded-md flex-1 overflow-y-scroll scrollbar-hide"
+      class="flex flex-col gap-4 rounded-md flex-1 overflow-y-scroll scrollbar-hide"
       style="scrollbar-width: none; -ms-overflow-style: none"
     >
-      <div class="p-2 px-3 bg-[#d9d9d9] rounded-lg font-semibold text-xs">
+      <div
+        class="p-2 px-3 text-white border border-white rounded-md font-medium text-xs bg-[rgba(0,123,113,0.5)]"
+      >
         <p>
           The withdrawal processing time is up to 48 hours.
           <br /><br />
@@ -78,25 +98,24 @@ const statusBadgeClass = (status: Withdrawal['status']) => {
       </div>
 
       <div class="flex flex-col gap-4">
-        <p v-if="loading" class="text-white text-center">Loading...</p>
-
-        <p v-if="error" class="text-red-500 text-center">{{ error }}</p>
-
-        <p v-if="!loading && withdrawals.length === 0 && !error" class="text-white text-center">
+        <p
+          v-if="!loading && withdrawals.length === 0 && !error"
+          class="text-white text-sm text-center font-bold"
+        >
           No withdrawal history yet.
         </p>
 
         <div
           v-for="withdrawal in withdrawals"
           :key="withdrawal.id"
-          class="bg-[#556666] rounded-2xl border p-3 flex justify-between items-center"
+          class="bg-[rgba(0,123,113,0.5)] rounded-md border border-white p-3 flex justify-between items-center"
         >
           <div class="flex gap-3 items-center">
             <img :src="WalletImage" class="w-6" alt="" />
 
             <div class="text-xs text-white font-semibold flex flex-col gap-1 items-start">
               <p class="leading-tight font-normal">
-                TON withdrawal to:<br /><span class="underline italic font-semibold">
+                TON withdrawal to:<br /><span class="font-bold">
                   {{
                     withdrawal.targetAddress
                       ? withdrawal.targetAddress.slice(0, 4) +
@@ -120,14 +139,13 @@ const statusBadgeClass = (status: Withdrawal['status']) => {
                 {{ withdrawal.status === 'PENDING' ? 'Pending' : 'No TX available' }}
               </p>
 
-              <p class="text-gray-200 text-xs">{{ formatDate(withdrawal.createdAt) }}</p>
+              <p class="text-white text-xs">{{ formatDate(withdrawal.createdAt) }}</p>
             </div>
           </div>
 
           <div class="text-[#FFD983] text-sm flex flex-col justify-between items-end h-full">
-            <p class="font-semibold leading-tight">
-              {{ formatTon(withdrawal.amountTon) }}<br /><span
-                class="text-gray-200 uppercase text-xs"
+            <p class="font-semibold leading-tight text-end">
+              {{ formatTon(withdrawal.amountTon) }}<br /><span class="text-white uppercase text-xs"
                 >ton</span
               >
             </p>
@@ -141,9 +159,38 @@ const statusBadgeClass = (status: Withdrawal['status']) => {
           </div>
         </div>
 
-        <RouterLink to="/withdraw" class="text-center text-white underline text-sm font-semibold">
-          Go Back
-        </RouterLink>
+        <!-- <div
+          class="bg-[rgba(0,123,113,0.5)] rounded-md border border-white p-3 flex justify-between items-center"
+        >
+          <div class="flex gap-3 items-center">
+            <img :src="WalletImage" class="w-6" alt="" />
+
+            <div class="text-xs text-white font-semibold flex flex-col gap-1 items-start">
+              <p class="leading-tight font-normal">
+                TON withdrawal to:<br /><span class="font-bold"> Unknown address </span>
+              </p>
+
+              <p class="text-[#ffd983] text-xs">
+                {{ 'No TX available' }}
+              </p>
+
+              <p class="text-white text-xs">12.12.2012</p>
+            </div>
+          </div>
+
+          <div class="text-[#FFD983] text-sm flex flex-col justify-between items-end h-full">
+            <p class="font-semibold leading-tight text-end">
+              {{ (2).toFixed(2) }}<br /><span class="text-white uppercase text-xs">ton</span>
+            </p>
+
+            <span
+              class="px-3 py-1 rounded-full text-xs font-semibold shadow-sm"
+              :class="statusBadgeClass('PENDING')"
+            >
+              {{ 'PENDING' }}
+            </span>
+          </div>
+        </div> -->
       </div>
     </div>
   </div>
