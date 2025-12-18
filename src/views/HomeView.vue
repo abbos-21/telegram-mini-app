@@ -180,7 +180,7 @@ const backgroundImage = computed(() => {
         <RouterLink to="/leaderboard" class="flex flex-col items-center gap-1">
           <img :src="PodiumImage" class="w-8" />
           <span
-            class="bg-[#00C5A6] text-white text-[10px] font-bold px-1 py-px rounded-md w-20 text-center"
+            class="bg-[#00C5A6] text-white text-[10px] font-bold px-1 py-px rounded-md w-25 text-center"
           >
             {{ timeLeftLabel }}
           </span>
