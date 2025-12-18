@@ -197,7 +197,30 @@ onBeforeUnmount(() => {
 <template>
   <!-- APP -->
 
-  <div class="app-container">
+  <LoaderComponent v-if="loading" />
+
+  <div
+    v-else-if="authFailed"
+    class="fixed inset-0 flex items-center justify-center z-50 px-4 bg-sky-400"
+  >
+    <div
+      class="text-center p-8 bg-white/10 backdrop-blur-xl rounded-2xl max-w-sm w-full border border-white"
+    >
+      <h3 class="text-xl font-bold text-white mb-4">Connection Lost</h3>
+      <p class="text-sm text-white mb-8">Tap below to reconnect to the game</p>
+
+      <button
+        @click="handleRetry"
+        class="w-full px-6 py-4 text-white font-bold rounded-md border border-white"
+      >
+        🔄 Tap to Reconnect
+      </button>
+
+      <p class="text-xs text-white mt-6">Works only in Telegram Mobile</p>
+    </div>
+  </div>
+
+  <div class="app-container" v-else>
     <audio
       ref="audioRef"
       loop
