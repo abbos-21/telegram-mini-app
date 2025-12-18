@@ -1,11 +1,13 @@
 <script setup lang="ts">
+import { LeaderboardBackgroundImage } from '@/assets/backgrounds/winter'
 import { ArrowBackIcon, CupIcon, InfoIcon, SwitchIcon } from '@/assets/icons/winter'
 import { CoinImage, UserImage } from '@/assets/images/winter'
 </script>
 
 <template>
   <div
-    class="bg-leaderboard w-full h-full bg-cover bg-center bg-no-repeat p-2 relative flex flex-col justify-between text-white"
+    class="w-full h-full bg-cover bg-center bg-no-repeat p-2 relative flex flex-col justify-between text-white"
+    :style="{ backgroundImage: `url(${LeaderboardBackgroundImage})` }"
   >
     <div class="flex flex-col gap-2 items-center">
       <div class="flex justify-between items-center p-4 w-full">

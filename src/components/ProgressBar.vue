@@ -33,15 +33,12 @@ const progressPercentage = computed(() => {
 .container {
   font-weight: bold;
   color: white;
-  font-size: 15px;
 }
 
 .progress {
   padding: 4px;
   background: rgba(0, 0, 0, calc(0.25 + 0.25 / 4));
-  border-top-right-radius: 4px;
-  border-bottom-right-radius: 4px;
-  border-radius: 5px;
+  border-radius: 6px;
   box-shadow:
     inset 0 1px 2px rgba(0, 0, 0, 0.25),
     0 1px rgba(255, 255, 255, 0.08);

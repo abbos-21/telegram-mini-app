@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
-import { CoinIcon, CloseIcon, AdIcon, LeftArrowIcon, RightArrowIcon } from '@/assets/icons'
-import { HeartImage, FlashImage } from '@/assets/images'
+import { LeftArrowIcon, RightArrowIcon } from '@/assets/icons'
+import { HeartImage, FlashImage, AdButtonImage, CloseImage } from '@/assets/images/winter'
 import { useGame } from '@/composables/useGame'
 import { useAdsgram } from '@adsgram/vue'
 import { runChainUntilSuccess } from '@/utils/chainFunction'
 import LoaderComponent from './LoaderComponent.vue'
+import { PopupBackgroundImage } from '@/assets/backgrounds/winter'
 
 // const blockId = import.meta.env.VITE_BLOCK_ID
 const healthRewardBlockId = import.meta.env.VITE_HEALTH_REWARD_BLOCK_ID
 const energyRewardBlockId = import.meta.env.VITE_ENERGY_REWARD_BLOCK_ID
-const { recoverEnergy, recoverHealth, mine, sync, getUserData } = useGame() // recoverEnergyFree, recoverHealthFree
+const { mine, sync, getUserData } = useGame() // recoverEnergyFree, recoverHealthFree, recoverEnergy, recoverHealth,
 
 interface Props {
   isOpen: boolean
@@ -57,12 +58,12 @@ const prevSection = () => {
 }
 const closePopup = () => emit('close')
 
-const performRecovery = () => {
-  const action = currentSectionData.value.action
-  if (action === 'health') recoverHealth()
-  else if (action === 'energy') recoverEnergy()
-  closePopup()
-}
+// const performRecovery = () => {
+//   const action = currentSectionData.value.action
+//   if (action === 'health') recoverHealth()
+//   else if (action === 'energy') recoverEnergy()
+//   closePopup()
+// }
 
 // const performFreeRecovery = () => {
 //   const action = currentSectionData.value.action
@@ -71,10 +72,10 @@ const performRecovery = () => {
 //   closePopup()
 // }
 
-const buyWithCoins = () => {
-  console.log('Buying with 25 coins for:', currentSectionData.value.title)
-  performRecovery()
-}
+// const buyWithCoins = () => {
+//   console.log('Buying with 25 coins for:', currentSectionData.value.title)
+//   performRecovery()
+// }
 
 // const watchAd = async () => {
 //   try {
@@ -204,40 +205,34 @@ onUnmounted(() => {
       @click="closePopup"
     >
       <div
-        class="bg-[#FAC487] border-2 border-black rounded-lg p-6 max-w-sm w-full mx-4 relative shadow-2xl popup-container"
+        class="border-2 border-white rounded-xl p-6 max-w-sm w-full mx-4 relative shadow-2xl popup-container bg-cover bg-center bg-no-repeat text-white"
+        :style="{ backgroundImage: `url(${PopupBackgroundImage})` }"
         @click.stop
       >
-        <button
-          @click="closePopup"
-          class="absolute -top-3 -right-3 w-12 h-10 bg-gradient-to-b from-red-400 to-red-600 text-white rounded-lg flex items-center justify-center border-2 border-black shadow-lg"
-        >
-          <CloseIcon class="w-6 h-6" />
+        <button @click="closePopup" class="absolute -top-4 -right-4 w-15">
+          <img :src="CloseImage" alt="close" />
         </button>
 
         <div class="mt-4">
           <div class="flex justify-center mb-4">
             <div
-              class="w-24 h-24 bg-white border-2 border-black rounded-full flex items-center justify-center"
+              class="w-30 h-30 border-2 border-white rounded-full flex items-center justify-center"
             >
-              <img
-                :src="currentSectionData.image"
-                :alt="currentSectionData.title"
-                class="w-16 h-16 object-contain"
-              />
+              <img :src="currentSectionData.image" :alt="currentSectionData.title" class="w-20" />
             </div>
           </div>
 
-          <h3 class="text-xl font-bold text-center mb-3 text-black">
+          <h3 class="text-xl font-bold text-center mb-3">
             {{ currentSectionData.title }}
           </h3>
 
-          <div class="bg-white border border-black rounded-lg p-4 mb-4">
-            <p class="text-center text-gray-800 leading-relaxed">
+          <div class="border-2 border-white rounded-xl p-4 mb-4">
+            <p class="text-center leading-relaxed font-medium">
               {{ currentSectionData.content }}
             </p>
           </div>
 
-          <div class="flex gap-3 mb-4">
+          <div class="flex mb-4 justify-center items-center">
             <!-- <button
               @click="buyWithCoins"
               class="flex-1 bg-[#D68C62] border-2 border-black rounded-lg p-3 flex items-center justify-center gap-2 hover:bg-[#C47A4F] transition-colors shadow-lg"
@@ -246,47 +241,38 @@ onUnmounted(() => {
               <span class="font-bold text-black">25</span>
             </button> -->
 
-            <button
-              @click="watchAd"
-              :disabled="isLoading"
-              class="flex-1 bg-[#4CAF50] border-2 border-black rounded-lg p-3 flex items-center justify-center gap-2 hover:bg-[#45a049] transition-colors shadow-lg disabled:opacity-60 w-full"
-            >
-              <AdIcon class="w-8 h-8" />
-              <span class="font-bold text-white">
-                {{ isLoading ? 'Loading...' : 'Free' }}
-              </span>
+            <button @click="watchAd" :disabled="isLoading" class="w-40">
+              <img :src="AdButtonImage" alt="ad-free" />
             </button>
           </div>
 
           <div class="flex justify-between items-center">
             <button
               @click="prevSection"
-              class="w-12 h-12 bg-[#D68C62] border-2 border-black rounded-full flex items-center justify-center hover:bg-[#C47A4F] transition-colors shadow-lg"
+              class="w-12 h-12 border-2 border-white rounded-full flex items-center justify-center"
             >
-              <LeftArrowIcon class="w-6 h-6 text-black" />
+              <LeftArrowIcon class="w-6 h-6" />
             </button>
 
             <div class="flex space-x-2">
               <div
                 v-for="(section, index) in sections"
                 :key="section.id"
-                class="w-4 h-4 rounded-full border-2 border-black transition-colors"
-                :class="index === currentSection ? 'bg-[#D68C62]' : 'bg-white'"
+                class="w-4 h-4 rounded-full border-2 border-white transition-colors"
+                :class="index === currentSection ? 'bg-white' : 'bg-transparent'"
               ></div>
             </div>
 
             <button
               @click="nextSection"
-              class="w-12 h-12 bg-[#D68C62] border-2 border-black rounded-full flex items-center justify-center hover:bg-[#C47A4F] transition-colors shadow-lg"
+              class="w-12 h-12 border-2 border-white rounded-full flex items-center justify-center"
             >
-              <RightArrowIcon class="w-6 h-6 text-black" />
+              <RightArrowIcon class="w-6 h-6" />
             </button>
           </div>
 
           <div class="text-center mt-3">
-            <span
-              class="bg-white border border-black rounded-full px-3 py-1 text-sm font-bold text-gray-800"
-            >
+            <span class="border-2 border-white rounded-full px-3 py-1 text-sm font-bold">
               {{ currentSection + 1 }} of {{ sections.length }}
             </span>
           </div>
@@ -334,28 +320,5 @@ button:hover {
 
 button:active {
   transform: translateY(0);
-}
-
-.content-scroll {
-  scrollbar-width: thin;
-  scrollbar-color: #d68c62 #fac487;
-}
-
-.content-scroll::-webkit-scrollbar {
-  width: 6px;
-}
-
-.content-scroll::-webkit-scrollbar-track {
-  background: #fac487;
-  border-radius: 3px;
-}
-
-.content-scroll::-webkit-scrollbar-thumb {
-  background: #d68c62;
-  border-radius: 3px;
-}
-
-.content-scroll::-webkit-scrollbar-thumb:hover {
-  background: #c47a4f;
 }
 </style>

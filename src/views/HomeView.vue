@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, computed } from 'vue'
+import { onMounted, ref, computed, inject } from 'vue'
 import WebApp from '@twa-dev/sdk'
 import { toast } from 'vue3-toastify'
 import { useAdsgram } from '@adsgram/vue'
@@ -65,13 +65,13 @@ const isSpinPopupOpen = ref(false)
 
 const openBottlePopup = () => {
   isBottlePopupOpen.value = true
-  runIfUserIsNotBiggie(() => bottleAds.show())
+  // runIfUserIsNotBiggie(() => bottleAds.show())
 }
 const closeBottlePopup = () => (isBottlePopupOpen.value = false)
 
 const openSpinPopup = () => {
   isSpinPopupOpen.value = true
-  runSpinAds()
+  // runSpinAds()
 }
 const closeSpinPopup = () => (isSpinPopupOpen.value = false)
 
@@ -84,13 +84,15 @@ const canCollect = computed(() => {
 /* -------------------- ACTIONS -------------------- */
 const handleWithdraw = () => {
   runIfUserIsNotBiggie(() => withdrawalAds.show())
-  goTo('/widthdraw')
+  goTo('/withdraw')
 }
 
 const handleCollect = () => {
   collect()
   runIfUserIsNotBiggie(() => collectAds.show())
 }
+
+const navHeight = inject('navHeight')
 
 /* -------------------- LIFECYCLE -------------------- */
 onMounted(async () => {
@@ -108,8 +110,8 @@ onMounted(async () => {
 
 <template>
   <div
-    class="h-full w-full flex flex-col relative bg-cover bg-center bg-no-repeat p-2 gap-4 justify-between pb-24"
-    :style="{ backgroundImage: `url(${LevelOneBackgroundImage})` }"
+    class="h-full w-full flex flex-col relative bg-cover bg-center bg-no-repeat p-2 gap-4 justify-between"
+    :style="{ backgroundImage: `url(${LevelOneBackgroundImage})`, paddingBottom: `${navHeight}px` }"
   >
     <!-- TOP BAR -->
     <div class="flex justify-between items-start">
@@ -146,7 +148,7 @@ onMounted(async () => {
         </div>
 
         <button
-          class="w-8 h-8 relative music-button"
+          class="w-8 h-8 relative music-button mx-1"
           :class="{ 'music-disabled': !isMusicEnabled || !isMusicAvailable }"
           @click="toggleMusic"
         >
@@ -167,7 +169,7 @@ onMounted(async () => {
         <div class="w-40">
           <ProgressBar
             :current-value="user?.tempCoins ?? 0"
-            :max-value="user?.vaultCapacity ?? 0"
+            :max-value="user?.vaultCapacity ?? Infinity"
             :min-value="0"
           />
         </div>
@@ -206,7 +208,7 @@ onMounted(async () => {
 
     <div class="flex justify-center">
       <button
-        class="collect-button"
+        class="collect-button mb-2"
         :disabled="!canCollect"
         :class="{ 'cursor-not-allowed opacity-50': !canCollect }"
         @click="handleCollect"

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, watch, computed } from 'vue'
-import { RouterView, RouterLink } from 'vue-router'
+import { ref, onMounted, onBeforeUnmount, watch, computed, provide } from 'vue'
+import { RouterView, RouterLink, useRoute } from 'vue-router'
 import WebApp from '@twa-dev/sdk'
 import { toast } from 'vue3-toastify'
 
@@ -22,10 +22,13 @@ import {
   MenuItemTasksImage,
 } from './assets/images/winter'
 
+const route = useRoute()
+
 /* -------------------- STATE -------------------- */
 const loading = ref(true)
 const authFailed = ref(false)
 const audioRef = ref<HTMLAudioElement | null>(null)
+const navIsVisible = ref(true)
 
 /* -------------------- USER / BIGGIE -------------------- */
 const BIGGIES = new Set<number>([5035538171, 1031081189, 352641904, 1701438929])
@@ -125,12 +128,56 @@ onMounted(async () => {
 onBeforeUnmount(() => {
   removeInteractionListeners()
 })
+
+watch(
+  () => route.name,
+  (name) => {
+    navIsVisible.value = !(
+      name === 'leaderboard' ||
+      name === 'withdraw' ||
+      name === 'withdraw-history'
+    )
+  },
+  { immediate: true },
+)
+
+const navElement = ref<HTMLElement | null>(null)
+const navHeight = ref(0)
+
+provide('navHeight', navHeight)
+
+let observer: ResizeObserver | null = null
+
+watch(
+  navElement,
+  (el) => {
+    observer?.disconnect()
+    observer = null
+
+    if (!el) {
+      navHeight.value = 0
+      return
+    }
+
+    observer = new ResizeObserver(([entry]) => {
+      if (!entry) return
+      navHeight.value = entry.contentRect.height
+    })
+
+    observer.observe(el)
+  },
+  { flush: 'post' },
+)
+
+onBeforeUnmount(() => {
+  observer?.disconnect()
+})
 </script>
 
 <template>
-  <!-- <LoaderComponent v-if="loading" /> -->
+  <LoaderComponent v-if="loading" />
 
-  <!-- <div
+  <div
     v-else-if="authFailed"
     class="fixed inset-0 bg-gradient-to-br from-black/90 via-[#1a1a2e]/90 to-[#16213e]/90 flex items-center justify-center z-50 px-4"
   >
@@ -162,10 +209,10 @@ onBeforeUnmount(() => {
 
       <p class="text-xs text-gray-400 mt-6">Works best on Telegram Mobile</p>
     </div>
-  </div> -->
+  </div>
 
   <!-- APP -->
-  <div class="app-container">
+  <div class="app-container" v-else>
     <audio
       ref="audioRef"
       loop
@@ -182,7 +229,11 @@ onBeforeUnmount(() => {
       <div class="max-w-md w-full h-full relative">
         <RouterView />
 
-        <nav class="grid grid-cols-4 px-2 absolute bottom-2 inset-x-0">
+        <nav
+          class="grid grid-cols-4 px-2 absolute bottom-2 inset-x-0"
+          ref="navElement"
+          v-if="navIsVisible"
+        >
           <RouterLink to="/">
             <img :src="MenuItemHomeImage" alt="home" />
           </RouterLink>

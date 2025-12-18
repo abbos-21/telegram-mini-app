@@ -1,36 +1,8 @@
-<template>
-  <div class="spin-wheel-wrapper">
-    <div class="pointer">▼</div>
-
-    <div class="wheel border-2" :style="wheelStyle" @transitionend="onTransitionEnd" ref="wheelRef">
-      <div
-        v-for="(segment, i) in segments"
-        :key="i"
-        class="label"
-        :style="labelStyle(i)"
-        v-html="segment.label"
-      ></div>
-    </div>
-
-    <button
-      :disabled="spinning || !canSpin"
-      @click="handleSpin"
-      class="bg-[#D68C62] border-2 border-black rounded-lg px-8 py-3 flex items-center gap-2 hover:bg-[#C47A4F] transition-colors shadow-lg cursor-pointer font-bold text-black text-lg disabled:opacity-50 disabled:cursor-not-allowed"
-    >
-      {{ spinning ? 'Spinning…' : canSpin ? 'Spin' : 'Come Back Later' }}
-    </button>
-
-    <div v-if="resultLabel" class="text-lg font-semibold mt-2">You won: {{ resultLabel }}</div>
-
-    <div v-if="cooldownRemaining" class="text-gray-600 text-sm mt-1">
-      Next spin in: {{ cooldownRemaining.hours }}h {{ cooldownRemaining.minutes }}m
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { ref, computed, onMounted, type CSSProperties } from 'vue'
 import { useSpinWheel } from '@/composables/useSpinWheel'
+import { SpinPointerIcon } from '@/assets/icons/winter'
+import { CoinImage, SpinButtonImage } from '@/assets/images/winter'
 
 interface Segment {
   label: string
@@ -45,14 +17,14 @@ const emit = defineEmits<{
 const { canSpin, cooldownRemaining, spin, fetchStatus } = useSpinWheel()
 
 const segments = computed<Segment[]>(() => [
-  { label: '5 🪙', color: '#F44336' },
-  { label: '10 🪙', color: '#E91E63' },
-  { label: '15 🪙', color: '#9C27B0' },
-  { label: '20 🪙', color: '#3F51B5' },
-  { label: '25 🪙', color: '#03A9F4' },
-  { label: '30 🪙', color: '#4CAF50' },
-  { label: '35 🪙', color: '#FF9800' },
-  { label: '40 🪙', color: '#8BC34A' },
+  { label: '-5', color: '#FFE07D' },
+  { label: '10', color: '#b3e59f' },
+  { label: '15', color: '#7ca1bc' },
+  { label: '20', color: '#FFC251' },
+  { label: '25', color: '#E28086' },
+  { label: '30', color: '#beddf3' },
+  { label: '35', color: '#D8BFD8' },
+  { label: '40', color: '#F4A300' },
 ])
 
 const size = 250
@@ -98,7 +70,6 @@ function labelStyle(index: number): CSSProperties {
     transformOrigin: '0 0',
     transform: `rotate(${rotation}deg) translate(${distance}px, -50%) rotate(90deg)`,
     textAlign: 'center',
-    fontSize: '14px',
     color: '#fff',
     whiteSpace: 'nowrap',
     pointerEvents: 'none',
@@ -152,12 +123,57 @@ function onTransitionEnd(e: TransitionEvent) {
 onMounted(fetchStatus)
 </script>
 
+<template>
+  <div class="spin-wheel-wrapper">
+    <SpinPointerIcon class="w-6 -mb-5 z-10 text-[#eaf3f9]" />
+
+    <div
+      class="wheel border-[#eaf3f9] border-8"
+      :style="wheelStyle"
+      @transitionend="onTransitionEnd"
+      ref="wheelRef"
+    >
+      <div
+        v-for="(segment, i) in segments"
+        :key="i"
+        class="label"
+        :style="labelStyle(i)"
+        v-html="segment.label"
+      ></div>
+    </div>
+
+    <!-- <button
+      :disabled="spinning || !canSpin"
+      @click="handleSpin"
+      class="bg-[#D68C62] border-2 border-black rounded-lg px-8 py-3 flex items-center gap-2 hover:bg-[#C47A4F] transition-colors shadow-lg cursor-pointer font-bold text-black text-lg disabled:opacity-50 disabled:cursor-not-allowed mt-6"
+    >
+      {{ spinning ? 'Spinning…' : canSpin ? 'Spin' : 'Come Back Later' }}
+    </button> -->
+
+    <button :disabled="spinning || !canSpin" @click="handleSpin" class="w-40 mt-4">
+      <img :src="SpinButtonImage" alt="spin" />
+    </button>
+
+    <div class="font-bold mt-2 flex items-center justify-center gap-1" v-if="resultLabel">
+      <p>You won:</p>
+
+      <div class="flex justify-center gap-1 items-center">
+        <span>{{ resultLabel }}</span>
+        <img :src="CoinImage" class="w-4" alt="coin" />
+      </div>
+    </div>
+
+    <div v-if="cooldownRemaining" class="text-xs font-bold mt-2">
+      Next spin in: {{ cooldownRemaining.hours }}h {{ cooldownRemaining.minutes }}m :
+    </div>
+  </div>
+</template>
+
 <style scoped>
 .spin-wheel-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
 }
 
 .wheel {
@@ -166,12 +182,5 @@ onMounted(fetchStatus)
 
 .label {
   text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
-}
-
-.pointer {
-  font-size: 24px;
-  margin-bottom: -12px;
-  pointer-events: none;
-  z-index: 2;
 }
 </style>

@@ -141,7 +141,7 @@ const statusBadgeClass = (status: Withdrawal['status']) => {
           </div>
         </div>
 
-        <RouterLink to="/widthdraw" class="text-center text-white underline text-sm font-semibold">
+        <RouterLink to="/withdraw" class="text-center text-white underline text-sm font-semibold">
           Go Back
         </RouterLink>
       </div>

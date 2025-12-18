@@ -237,7 +237,7 @@ onMounted(async () => {
             Withdraw
           </button>
 
-          <RouterLink to="/widthdraw-history" class="flex justify-center items-center">
+          <RouterLink to="/withdraw-history" class="flex justify-center items-center">
             <img :src="ClockBackImage" class="w-6" alt="" />
             <p class="text-white text-xs font-semibold">Transaction History</p>
           </RouterLink>

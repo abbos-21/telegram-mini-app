@@ -3,8 +3,8 @@ import HomeView from '../views/HomeView.vue'
 import TaskView from '../views/TaskView.vue'
 import ShopView from '../views/ShopView.vue'
 import FriendsView from '../views/FriendsView.vue'
-import WidthdrawView from '../views/WidthdrawView.vue'
-import WidthdrawHistoryView from '@/views/WidthdrawHistoryView.vue'
+import WithdrawView from '../views/WithdrawView.vue'
+import WithdrawHistoryView from '@/views/WithdrawHistoryView.vue'
 import LeaderboardView from '@/views/LeaderboardView.vue'
 
 const router = createRouter({
@@ -46,14 +46,14 @@ const router = createRouter({
       component: FriendsView,
     },
     {
-      path: '/widthdraw',
-      name: 'widthdraw',
-      component: WidthdrawView,
+      path: '/withdraw',
+      name: 'withdraw',
+      component: WithdrawView,
     },
     {
-      path: '/widthdraw-history',
-      name: 'widthdraw-history',
-      component: WidthdrawHistoryView,
+      path: '/withdraw-history',
+      name: 'withdraw-history',
+      component: WithdrawHistoryView,
     },
     {
       path: '/leaderboard',

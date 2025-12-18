@@ -6,6 +6,7 @@ import LoaderComponent from '@/components/LoaderComponent.vue'
 import { userService } from '@/api/userService'
 import type { User } from '@/api/types'
 import { TealSnowBackgroundImage } from '@/assets/backgrounds/winter'
+import { toast } from 'vue3-toastify'
 
 /* -------------------- state -------------------- */
 type ReferralRewardsArray = [string, number][]
@@ -17,14 +18,17 @@ const referralCounts = ref<Record<number, number>>({})
 const referralEarnings = ref<number>(0)
 const referralRewards = ref<ReferralRewardsArray>([])
 const loading = ref<boolean>(false)
-const copied = ref<boolean>(false)
+// const copied = ref<boolean>(false)
 
 /* -------------------- actions -------------------- */
 const copyLink = async (e: Event) => {
   e.preventDefault()
   await navigator.clipboard.writeText(referralLink.value)
-  copied.value = true
-  setTimeout(() => (copied.value = false), 1500)
+  toast.success('Copied!', {
+    autoClose: 500,
+  })
+  // copied.value = true
+  // setTimeout(() => (copied.value = false), 1500)
 }
 
 /* -------------------- api -------------------- */
@@ -70,7 +74,7 @@ onMounted(loadReferralData)
 
   <div
     class="w-full h-full bg-cover bg-center bg-no-repeat p-2 relative flex flex-col"
-    :style="{ backgroundImage: `url${TealSnowBackgroundImage}` }"
+    :style="{ backgroundImage: `url(${TealSnowBackgroundImage})` }"
   >
     <div class="flex flex-col gap-4 text-white overflow-y-scroll scrollbar-hide">
       <h1 class="uppercase text-center text-lg font-bold">invite and earn!</h1>
@@ -91,8 +95,7 @@ onMounted(loadReferralData)
             type="submit"
             class="bg-transparent text-sm px-4 py-2 border border-white rounded-md"
           >
-            <span v-if="!copied">Copy</span>
-            <span v-else>✓</span>
+            <span>Copy</span>
           </button>
         </form>
       </div>

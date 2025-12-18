@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import SpinWheel from './SpinWheel.vue'
-import { CloseIcon } from '@/assets/icons'
 import { useGame } from '@/composables/useGame'
 import { runChainUntilSuccess } from '@/utils/chainFunction'
+import { PopupBackgroundImage } from '@/assets/backgrounds/winter'
+import { CloseImage } from '@/assets/images/winter'
 
 interface Props {
   isOpen: boolean
@@ -54,10 +55,11 @@ const handleSpinning = (value: boolean) => {
       @click="closePopup"
     >
       <div
-        class="bg-[#FAC487] border-2 border-black rounded-lg p-6 max-w-sm w-full mx-4 relative shadow-2xl popup-container"
+        class="border-2 border-white rounded-xl p-6 pt-8 max-w-sm w-full mx-4 relative shadow-2xl popup-container bg-cover bg-center bg-no-repeat text-white"
+        :style="{ backgroundImage: `url(${PopupBackgroundImage})` }"
         @click.stop
       >
-        <button
+        <!-- <button
           @click="closePopup"
           :disabled="isSpinning"
           :class="[
@@ -69,6 +71,10 @@ const handleSpinning = (value: boolean) => {
           title="Close"
         >
           <CloseIcon class="w-6 h-6" />
+        </button> -->
+
+        <button @click="closePopup" :disabled="isSpinning" class="absolute -top-4 -right-4 w-15">
+          <img :src="CloseImage" alt="close" />
         </button>
 
         <SpinWheel @spinning="handleSpinning" />
