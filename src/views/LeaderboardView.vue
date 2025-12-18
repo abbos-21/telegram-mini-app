@@ -1,7 +1,68 @@
 <script setup lang="ts">
+import { ref, onMounted, computed, inject } from 'vue'
+import { RouterLink } from 'vue-router'
+
+import { leaderboardService } from '@/api/leaderboardService'
+import type { Season, LeaderboardResponse } from '@/api/types'
+
 import { LeaderboardBackgroundImage } from '@/assets/backgrounds/winter'
 import { ArrowBackIcon, CupIcon, InfoIcon, SwitchIcon } from '@/assets/icons/winter'
 import { CoinImage, UserImage } from '@/assets/images/winter'
+
+/* -------------------- state -------------------- */
+const season = ref<Season | null>(null)
+const timeLeft = ref({
+  days: 0,
+  hours: 0,
+  minutes: 0,
+  seconds: 0,
+  expired: false,
+})
+
+const users = ref<LeaderboardResponse['users']>([])
+const loading = ref(true)
+
+const currentLevel = ref(1)
+
+/* -------------------- computed -------------------- */
+const timeLeftLabel = computed(() => {
+  if (timeLeft.value.expired) return 'Season ended'
+
+  const { days, hours, minutes, seconds } = timeLeft.value
+  return `${days}d ${hours}h ${minutes}m ${seconds}s`
+})
+
+/* -------------------- methods -------------------- */
+const fetchSeason = async () => {
+  const res = await leaderboardService.getSeason()
+  season.value = res.data.season
+  timeLeft.value = res.data.timeLeft
+}
+
+const fetchUsers = async () => {
+  const res = await leaderboardService.getUsers(currentLevel.value)
+  users.value = res.data.users
+}
+
+const prevLevel = async () => {
+  if (currentLevel.value <= 1) return
+  currentLevel.value--
+  await fetchUsers()
+}
+
+const nextLevel = async () => {
+  currentLevel.value++
+  await fetchUsers()
+}
+
+/* -------------------- lifecycle -------------------- */
+onMounted(async () => {
+  loading.value = true
+  await Promise.all([fetchSeason(), fetchUsers()])
+  loading.value = false
+})
+const withdrawRate: number | undefined = inject('withdrawRate')
+const numberFixed = (val: number, decimals = 2) => val.toFixed(decimals)
 </script>
 
 <template>
@@ -9,6 +70,7 @@ import { CoinImage, UserImage } from '@/assets/images/winter'
     class="w-full h-full bg-cover bg-center bg-no-repeat p-2 relative flex flex-col justify-between text-white"
     :style="{ backgroundImage: `url(${LeaderboardBackgroundImage})` }"
   >
+    <!-- HEADER -->
     <div class="flex flex-col gap-2 items-center">
       <div class="flex justify-between items-center p-4 w-full">
         <RouterLink
@@ -20,16 +82,16 @@ import { CoinImage, UserImage } from '@/assets/images/winter'
 
         <div class="flex justify-center gap-4 items-center">
           <button
-            type="button"
             class="w-8 h-8 bg-[rgba(60,143,151,0.5)] rounded-full border border-white flex justify-center items-center"
           >
             <SwitchIcon class="w-4 opacity-60" />
           </button>
 
-          <h1 class="uppercase font-bold text-xl">season 1</h1>
+          <h1 class="uppercase font-bold text-xl">
+            {{ season?.name ?? 'season' }}
+          </h1>
 
           <button
-            type="button"
             class="w-8 h-8 bg-[rgba(60,143,151,0.5)] rounded-full border border-white flex justify-center items-center"
           >
             <SwitchIcon class="w-4 rotate-180" />
@@ -37,7 +99,6 @@ import { CoinImage, UserImage } from '@/assets/images/winter'
         </div>
 
         <button
-          type="button"
           class="w-8 h-8 bg-[rgba(60,143,151,0.5)] rounded-full border border-white flex justify-center items-center"
         >
           <InfoIcon class="w-6" />
@@ -47,170 +108,79 @@ import { CoinImage, UserImage } from '@/assets/images/winter'
       <div
         class="border border-[#b6d4d7] bg-[rgba(60,143,151,0.5)] px-4 py-2 rounded-full font-bold"
       >
-        29d 10h 54m 53s
+        {{ timeLeftLabel }}
       </div>
     </div>
 
     <div class="flex flex-col gap-2 flex-1 px-4 my-4 scrollbar-hide overflow-y-scroll">
       <div
+        v-for="(user, index) in users"
+        :key="user.id"
         class="flex justify-between items-center border border-[#b6d4d7] bg-[rgba(60,143,151,0.5)] p-2 rounded-xl"
       >
         <div class="flex items-center gap-2">
-          <img :src="UserImage" class="w-12" alt="user-image" />
+          <img :src="UserImage" class="w-12" />
 
           <div class="flex flex-col gap-1 font-bold leading-none">
-            <h2 class="text-sm">Shaxzod</h2>
-            <p class="text-xs opacity-60">@shakh_oripov</p>
+            <h2 class="text-sm">{{ user.firstName ?? user.lastName ?? 'No name user' }}</h2>
+            <p class="text-xs opacity-60" v-if="user.username">@{{ user.username }}</p>
+            <p class="text-xs opacity-60" v-else>No username</p>
 
             <div class="text-xs flex gap-1 items-center">
-              <img :src="CoinImage" class="w-4" alt="coin-image" />
-              <span>123 345</span>
+              <img :src="CoinImage" class="w-4" />
+              <span>{{ user.totalCoins.toLocaleString() }}</span>
             </div>
           </div>
         </div>
 
-        <div class="flex flex-col items-center gap-1 font-bold leading-none">
-          <CupIcon class="w-6 text-orange-400" />
-          <p class="text-xs">5000 coins</p>
-          <p class="text-[10px] opacity-60">= 0.2 USDT</p>
-        </div>
-      </div>
+        <!-- RANK -->
+        <!-- <div class="flex flex-col items-center gap-1 font-bold leading-none">
+          <CupIcon v-if="index === 0" class="w-6 text-orange-400" />
+          <CupIcon v-else-if="index === 1" class="w-6 text-slate-400" />
+          <CupIcon v-else-if="index === 2" class="w-6 text-[#C67747]" />
+          <h1 v-else>#{{ index + 1 }}</h1>
 
-      <div
-        class="flex justify-between items-center border border-[#b6d4d7] bg-[rgba(60,143,151,0.5)] p-2 rounded-xl"
-      >
-        <div class="flex items-center gap-2">
-          <img :src="UserImage" class="w-12" alt="user-image" />
-
-          <div class="flex flex-col gap-1 font-bold leading-none">
-            <h2 class="text-sm">Shaxzod</h2>
-            <p class="text-xs opacity-60">@shakh_oripov</p>
-
-            <div class="text-xs flex gap-1 items-center">
-              <img :src="CoinImage" class="w-4" alt="coin-image" />
-              <span>123 345</span>
-            </div>
-          </div>
-        </div>
+          <p class="text-xs">50000 coins</p>
+          <p class="text-[10px] opacity-60">= {{ (50000 / withdrawRate).toFixed(2) }} TON</p>
+        </div> -->
 
         <div class="flex flex-col items-center gap-1 font-bold leading-none">
-          <CupIcon class="w-6 text-slate-400" />
-          <p class="text-xs">5000 coins</p>
-          <p class="text-[10px] opacity-60">= 0.2 USDT</p>
-        </div>
-      </div>
+          <CupIcon v-if="index === 0" class="w-6 text-orange-400" />
+          <CupIcon v-else-if="index === 1" class="w-6 text-slate-400" />
+          <CupIcon v-else-if="index === 2" class="w-6 text-[#C67747]" />
+          <h1 v-else>#{{ index + 1 }}</h1>
 
-      <div
-        class="flex justify-between items-center border border-[#b6d4d7] bg-[rgba(60,143,151,0.5)] p-2 rounded-xl"
-      >
-        <div class="flex items-center gap-2">
-          <img :src="UserImage" class="w-12" alt="user-image" />
+          <p class="text-xs">{{ index === 0 ? 500000 : index === 9 ? 50000 : 10000 }} coins</p>
 
-          <div class="flex flex-col gap-1 font-bold leading-none">
-            <h2 class="text-sm">Shaxzod</h2>
-            <p class="text-xs opacity-60">@shakh_oripov</p>
-
-            <div class="text-xs flex gap-1 items-center">
-              <img :src="CoinImage" class="w-4" alt="coin-image" />
-              <span>123 345</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="flex flex-col items-center gap-1 font-bold leading-none">
-          <CupIcon class="w-6 text-[#C67747]" />
-          <p class="text-xs">5000 coins</p>
-          <p class="text-[10px] opacity-60">= 0.2 USDT</p>
-        </div>
-      </div>
-
-      <div
-        class="flex justify-between items-center border border-[#b6d4d7] bg-[rgba(60,143,151,0.5)] p-2 rounded-xl"
-      >
-        <div class="flex items-center gap-2">
-          <img :src="UserImage" class="w-12" alt="user-image" />
-
-          <div class="flex flex-col gap-1 font-bold leading-none">
-            <h2 class="text-sm">Shaxzod</h2>
-            <p class="text-xs opacity-60">@shakh_oripov</p>
-
-            <div class="text-xs flex gap-1 items-center">
-              <img :src="CoinImage" class="w-4" alt="coin-image" />
-              <span>123 345</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="flex flex-col items-center gap-1 font-bold leading-none">
-          <h1>#4</h1>
-          <p class="text-xs">5000 coins</p>
-          <p class="text-[10px] opacity-60">= 0.2 USDT</p>
-        </div>
-      </div>
-
-      <div
-        class="flex justify-between items-center border border-[#b6d4d7] bg-[rgba(60,143,151,0.5)] p-2 rounded-xl"
-      >
-        <div class="flex items-center gap-2">
-          <img :src="UserImage" class="w-12" alt="user-image" />
-
-          <div class="flex flex-col gap-1 font-bold leading-none">
-            <h2 class="text-sm">Shaxzod</h2>
-            <p class="text-xs opacity-60">@shakh_oripov</p>
-
-            <div class="text-xs flex gap-1 items-center">
-              <img :src="CoinImage" class="w-4" alt="coin-image" />
-              <span>123 345</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="flex flex-col items-center gap-1 font-bold leading-none">
-          <h1>#5</h1>
-          <p class="text-xs">5000 coins</p>
-          <p class="text-[10px] opacity-60">= 0.2 USDT</p>
-        </div>
-      </div>
-
-      <div
-        class="flex justify-between items-center border border-[#b6d4d7] bg-[rgba(60,143,151,0.5)] p-2 rounded-xl"
-      >
-        <div class="flex items-center gap-2">
-          <img :src="UserImage" class="w-12" alt="user-image" />
-
-          <div class="flex flex-col gap-1 font-bold leading-none">
-            <h2 class="text-sm">Shaxzod</h2>
-            <p class="text-xs opacity-60">@shakh_oripov</p>
-
-            <div class="text-xs flex gap-1 items-center">
-              <img :src="CoinImage" class="w-4" alt="coin-image" />
-              <span>123 345</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="flex flex-col items-center gap-1 font-bold leading-none">
-          <h1>#6</h1>
-          <p class="text-xs">5000 coins</p>
-          <p class="text-[10px] opacity-60">= 0.2 USDT</p>
+          <p class="text-[10px] opacity-60">
+            =
+            {{
+              numberFixed(
+                index === 0 ? 500000 : index === 9 ? 50000 : 10000 / (withdrawRate ?? Infinity),
+                2,
+              )
+            }}
+            TON
+          </p>
         </div>
       </div>
     </div>
 
+    <!-- LEVEL SWITCH -->
     <div class="flex justify-center gap-4 items-center p-4">
       <button
-        type="button"
+        @click="prevLevel"
         class="w-8 h-8 bg-[rgba(60,143,151,0.5)] rounded-full border border-white flex justify-center items-center"
       >
         <SwitchIcon class="w-4 opacity-60" />
       </button>
 
       <div class="border border-white rounded-full bg-[rgba(60,143,151,0.5)] px-4 py-1">
-        <h1 class="uppercase font-bold text-lg">level 1</h1>
+        <h1 class="uppercase font-bold text-lg">level {{ currentLevel }}</h1>
       </div>
 
       <button
-        type="button"
+        @click="nextLevel"
         class="w-8 h-8 bg-[rgba(60,143,151,0.5)] rounded-full border border-white flex justify-center items-center"
       >
         <SwitchIcon class="w-4 rotate-180" />

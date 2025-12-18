@@ -193,6 +193,28 @@ export interface TasksResponse {
 
 export type TasksApiResponse = ApiResponse<TasksResponse>
 
+export interface LeaderboardResponse {
+  users: User[]
+}
+
+export interface Season {
+  id: number
+  name: string
+  start: string
+  end: string
+}
+
+export interface SeasonResponse {
+  season: Season
+  timeLeft: {
+    days: number
+    hours: number
+    minutes: number
+    seconds: number
+    expired: boolean
+  }
+}
+
 export interface ApiError {
   response: {
     data: {
