@@ -32,11 +32,9 @@ const waitForInitData = async (): Promise<string> => {
 export const authService = {
   loginWithTelegram: async (): Promise<AuthApiResponse> => {
     try {
-      // Signal WebApp is ready (critical for Desktop)
       WebApp.ready()
       WebApp.expand()
 
-      // Wait for initData with retry
       const initData = await waitForInitData()
       const ref = WebApp.initDataUnsafe?.start_param || null
 
@@ -44,13 +42,11 @@ export const authService = {
         throw new Error('Failed to get Telegram initData')
       }
 
-      // Authenticate with backend
       const { data } = await apiClient.post<AuthApiResponse>('/auth', {
         initData,
         ref,
       })
 
-      // Store token & user
       localStorage.setItem('token', data.data.token)
       localStorage.setItem('user', JSON.stringify(data.data.user))
 

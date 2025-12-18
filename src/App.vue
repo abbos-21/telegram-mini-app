@@ -21,6 +21,7 @@ import {
   MenuItemShopImage,
   MenuItemTasksImage,
 } from './assets/images/winter'
+import { withdrawService } from './api/withdrawService'
 
 const route = useRoute()
 
@@ -112,12 +113,31 @@ const authenticate = async () => {
 
 const handleRetry = () => authenticate()
 
+const isTelegramMobile = (): boolean => {
+  const platform = WebApp.platform
+  return platform === 'android' || platform === 'ios'
+}
+
+const withdrawRate = ref<number | null>(null)
+provide('withdrawRate', withdrawRate)
+
 /* -------------------- LIFECYCLE -------------------- */
 onMounted(async () => {
+  WebApp.ready()
+
+  if (!isTelegramMobile()) {
+    authFailed.value = true
+    loading.value = false
+
+    toast.error('This game works only in Telegram Mobile')
+    return
+  }
+
+  WebApp.expand()
   try {
-    WebApp.ready()
-    WebApp.expand()
     await authenticate()
+    const withdrawDataResponse = await withdrawService.getWithdrawalData()
+    withdrawRate.value = withdrawDataResponse.data.rate
   } catch {
     authFailed.value = true
   } finally {
@@ -175,9 +195,9 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <!-- <LoaderComponent v-if="loading" /> -->
+  <LoaderComponent v-if="loading" />
 
-  <!-- <div
+  <div
     v-else-if="authFailed"
     class="fixed inset-0 bg-gradient-to-br from-black/90 via-[#1a1a2e]/90 to-[#16213e]/90 flex items-center justify-center z-50 px-4"
   >
@@ -209,10 +229,10 @@ onBeforeUnmount(() => {
 
       <p class="text-xs text-gray-400 mt-6">Works best on Telegram Mobile</p>
     </div>
-  </div> -->
+  </div>
 
   <!-- APP -->
-  <div class="app-container">
+  <div class="app-container" v-else>
     <audio
       ref="audioRef"
       loop

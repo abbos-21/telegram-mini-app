@@ -93,6 +93,7 @@ const handleCollect = () => {
 }
 
 const navHeight = inject('navHeight')
+const withdrawRate: number | undefined = inject('withdrawRate')
 
 /* -------------------- LIFECYCLE -------------------- */
 onMounted(async () => {
@@ -123,7 +124,9 @@ onMounted(async () => {
           <img :src="CoinImage" class="w-5 h-5" />
           <div class="text-center">
             <p class="font-bold text-sm">{{ user?.coins.toFixed(2) ?? 0 }}</p>
-            <p class="text-[10px] font-bold text-gray-500">= 0.4 TON</p>
+            <p class="text-[10px] font-bold text-gray-500">
+              {{ (user?.coins ?? 0) / (withdrawRate ?? Infinity) }} TON
+            </p>
           </div>
           <img :src="WithdrawImage" class="w-5 h-5" />
         </button>
