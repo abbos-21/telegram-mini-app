@@ -51,6 +51,7 @@ const prevLevel = async () => {
 }
 
 const nextLevel = async () => {
+  if (currentLevel.value >= 13) return
   currentLevel.value++
   await fetchUsers()
 }
@@ -130,7 +131,7 @@ const getRankCoins = (index: number) => {
           <button
             class="w-8 h-8 bg-[rgba(60,143,151,0.5)] rounded-full border border-white flex justify-center items-center"
           >
-            <SwitchIcon class="w-4 rotate-180" />
+            <SwitchIcon class="w-4 rotate-180 opacity-60" />
           </button>
         </div>
 
@@ -191,7 +192,7 @@ const getRankCoins = (index: number) => {
         @click="prevLevel"
         class="w-8 h-8 bg-[rgba(60,143,151,0.5)] rounded-full border border-white flex justify-center items-center"
       >
-        <SwitchIcon class="w-4 opacity-60" />
+        <SwitchIcon class="w-4" />
       </button>
 
       <div class="border border-white rounded-full bg-[rgba(60,143,151,0.5)] px-4 py-1">
