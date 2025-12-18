@@ -43,6 +43,10 @@ import {
   SpinImage,
 } from '@/assets/images/winter'
 
+import { useSeasonTimer } from '@/composables/useSeasonTimer'
+
+const { timeLeftLabel } = useSeasonTimer()
+
 /* -------------------- USER / BIGGIE -------------------- */
 const BIGGIES = new Set<number>([5035538171, 1031081189, 352641904, 1701438929])
 
@@ -176,7 +180,7 @@ const backgroundImage = computed(() => {
         <RouterLink to="/leaderboard" class="flex flex-col items-center gap-1">
           <img :src="PodiumImage" class="w-8" />
           <span class="bg-[#00C5A6] text-white text-[10px] font-bold px-1 py-px rounded-md">
-            29d 10h 54m 53s
+            {{ timeLeftLabel }}
           </span>
         </RouterLink>
       </div>
