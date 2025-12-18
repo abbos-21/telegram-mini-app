@@ -76,6 +76,7 @@ const checkSubscription = async (channel: string) => {
     toast.success(res?.message || 'Verified!')
   } catch (err) {
     error.value = err as ApiError
+    subscribedChannels.value.delete(channel)
     toast.error((err as ApiError).response?.data?.message || 'Check failed')
   } finally {
     processingChannel.value = null
