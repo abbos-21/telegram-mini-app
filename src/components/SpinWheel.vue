@@ -7,6 +7,7 @@ import { CoinImage, SpinButtonImage } from '@/assets/images/winter'
 interface Segment {
   label: string
   color: string
+  value: number // numeric value for reliable matching
 }
 
 const emit = defineEmits<{
@@ -17,19 +18,19 @@ const emit = defineEmits<{
 const { canSpin, cooldownRemaining, spin, fetchStatus } = useSpinWheel()
 
 const segments = computed<Segment[]>(() => [
-  { label: '+5', color: '#FFE07D' },
-  { label: '10', color: '#b3e59f' },
-  { label: '15', color: '#7ca1bc' },
-  { label: '20', color: '#FFC251' },
-  { label: '25', color: '#E28086' },
-  { label: '30', color: '#beddf3' },
-  { label: '35', color: '#D8BFD8' },
-  { label: '40', color: '#F4A300' },
+  { label: '+5', color: '#FFE07D', value: 5 },
+  { label: '10', color: '#b3e59f', value: 10 },
+  { label: '15', color: '#7ca1bc', value: 15 },
+  { label: '20', color: '#FFC251', value: 20 },
+  { label: '25', color: '#E28086', value: 25 },
+  { label: '30', color: '#beddf3', value: 30 },
+  { label: '35', color: '#D8BFD8', value: 35 },
+  { label: '40', color: '#F4A300', value: 40 },
 ])
 
 const size = 250
-const spins = 5
-const duration = 4000
+const spins = 5 // number of full rotations during animation
+const duration = 4000 // ms
 
 const wheelRef = ref<HTMLDivElement | null>(null)
 const spinning = ref(false)
@@ -38,6 +39,7 @@ const result = ref<number | null>(null)
 const resPrize = ref<number | null>(null)
 
 const degPer = computed(() => 360 / segments.value.length)
+
 const wheelBackground = computed(() => {
   const parts = segments.value.map(
     (s, i) => `${s.color} ${i * degPer.value}deg ${(i + 1) * degPer.value}deg`,
@@ -80,9 +82,12 @@ function labelStyle(index: number): CSSProperties {
 async function handleSpin() {
   if (spinning.value || !canSpin.value) return
 
+  // Clear previous results
+  result.value = null
+  resPrize.value = null
+
   spinning.value = true
   emit('spinning', true)
-  result.value = null
 
   const res = await spin()
   if (!res) {
@@ -92,31 +97,42 @@ async function handleSpin() {
   }
 
   resPrize.value = res.prize
-  const chosenIndex = segments.value.findIndex((s) => s.label.includes(String(resPrize.value)))
-  const index = chosenIndex === -1 ? 0 : chosenIndex
+
+  // Find segment by exact numeric value (much more reliable than string matching)
+  const chosenIndex = segments.value.findIndex((s) => s.value === res.prize)
+  const index = chosenIndex === -1 ? 0 : chosenIndex // fallback (shouldn't happen)
 
   const segmentCenter = index * degPer.value + degPer.value / 2
-  const rotationNeededMod = (270 - segmentCenter + 360) % 360
-  const fullRotation = spins * 360
+  const rotationNeededMod = (270 - segmentCenter + 360) % 360 // pointer is at top (270° in standard position)
 
+  const fullRotation = spins * 360
   currentRotation.value = currentRotation.value + fullRotation + rotationNeededMod
 }
 
 function onTransitionEnd(e: TransitionEvent) {
   if (e.propertyName !== 'transform') return
+
   spinning.value = false
   emit('spinning', false)
 
-  const prizeSegmentIndex = segments.value.findIndex((s) =>
-    s.label.includes(String(resPrize.value)),
-  )
+  if (resPrize.value === null) return
 
-  if (prizeSegmentIndex !== -1 && segments.value[prizeSegmentIndex]) {
+  const prizeSegmentIndex = segments.value.findIndex((s) => s.value === resPrize.value)
+
+  if (prizeSegmentIndex !== -1) {
     result.value = prizeSegmentIndex
-    emit('finish', {
-      index: prizeSegmentIndex,
-      label: segments.value[prizeSegmentIndex].label,
-    })
+    const prizeSegment = segments.value[prizeSegmentIndex]
+    if (prizeSegment) {
+      emit('finish', {
+        index: prizeSegmentIndex,
+        label: prizeSegment.label,
+      })
+    }
+
+    // === Critical Fix: Normalize rotation to clean 0–360° range ===
+    const segmentCenter = prizeSegmentIndex * degPer.value + degPer.value / 2
+    const normalizedRotation = (270 - segmentCenter + 360) % 360
+    currentRotation.value = normalizedRotation
   }
 }
 
@@ -126,7 +142,6 @@ onMounted(fetchStatus)
 <template>
   <div class="spin-wheel-wrapper">
     <SpinPointerIcon class="w-6 -mb-5 z-10 text-[#eaf3f9]" />
-
     <div
       class="wheel border-[#eaf3f9] border-8"
       :style="wheelStyle"
@@ -142,25 +157,16 @@ onMounted(fetchStatus)
       ></div>
     </div>
 
-    <!-- <button
-      :disabled="spinning || !canSpin"
-      @click="handleSpin"
-      class="bg-[#D68C62] border-2 border-black rounded-lg px-8 py-3 flex items-center gap-2 hover:bg-[#C47A4F] transition-colors shadow-lg cursor-pointer font-bold text-black text-lg disabled:opacity-50 disabled:cursor-not-allowed mt-6"
-    >
-      {{ spinning ? 'Spinning…' : canSpin ? 'Spin' : 'Come Back Later' }}
-    </button> -->
-
     <button
       :disabled="spinning || !canSpin"
       @click="handleSpin"
-      class="w-40 mt-4 disabled:opacity-50 disabled:cursor-not-allowed!"
+      class="w-40 mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
     >
       <img :src="SpinButtonImage" alt="spin" />
     </button>
 
     <div class="font-bold mt-2 flex items-center justify-center gap-1" v-if="resultLabel">
       <p>You won:</p>
-
       <div class="flex justify-center gap-1 items-center">
         <span>{{ resultLabel }}</span>
         <img :src="CoinImage" class="w-4" alt="coin" />
@@ -179,11 +185,9 @@ onMounted(fetchStatus)
   flex-direction: column;
   align-items: center;
 }
-
 .wheel {
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
 }
-
 .label {
   text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
 }
