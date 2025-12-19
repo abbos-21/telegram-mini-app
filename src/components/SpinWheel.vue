@@ -127,7 +127,9 @@ function onTransitionEnd(e: TransitionEvent) {
   if (e.target !== wheelRef.value) return
 
   if (spinning.value) {
-    reset()
+    setTimeout(() => {
+      reset()
+    }, 1000)
     return
   }
 
