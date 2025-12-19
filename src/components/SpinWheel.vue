@@ -187,7 +187,9 @@ async function watchSpinAd() {
 
     if (result.done && !result.error) {
       loading.value = true
-      await fetchStatus()
+      setTimeout(() => {
+        fetchStatus()
+      }, 1000)
     }
   } catch (err) {
     console.log('Error showing ad: ', err)
@@ -231,10 +233,10 @@ async function watchSpinAd() {
       <img :src="AdButtonImage" alt="ad" />
     </button>
 
-    <div v-if="resultLabel" class="font-bold mt-2 flex gap-1">
+    <div v-if="resultLabel" class="font-bold mt-2 flex gap-1 items-center">
       <span>You won:</span>
       <span>{{ resultLabel }}</span>
-      <img :src="CoinImage" class="w-4" alt="coin" />
+      <img :src="CoinImage" class="w-4 h-4" alt="coin" />
     </div>
   </div>
 </template>
