@@ -4,18 +4,14 @@ import { gameService } from '@/api/gameService'
 const canSpin = ref(false)
 const lastPrize = ref<number | null>(null)
 const isSpinning = ref(false)
-const loading = ref(false)
 
 export function useSpinWheel() {
   const fetchStatus = async () => {
     try {
-      loading.value = true
       const res = await gameService.getSpinWheelStatus()
       canSpin.value = res.data.canSpin
     } catch (err) {
       console.error('Failed to fetch spin status:', err)
-    } finally {
-      loading.value = false
     }
   }
 
@@ -42,6 +38,5 @@ export function useSpinWheel() {
     lastPrize,
     fetchStatus,
     spin,
-    loading,
   }
 }
