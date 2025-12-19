@@ -182,7 +182,7 @@ const getRankCoins = (index: number) => {
 
             <div class="text-xs flex gap-1 items-center">
               <img :src="CoinImage" class="w-4" />
-              <span>{{ user.totalCoins.toLocaleString() }}</span>
+              <span>{{ Math.round(user.totalCoins).toLocaleString() }}</span>
             </div>
           </div>
         </div>
