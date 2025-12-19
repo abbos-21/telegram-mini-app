@@ -155,14 +155,18 @@ const checkSubscription = async (channel: string) => {
     </div>
 
     <!-- COMPLETED TASKS -->
-    <div v-for="channel in allTasks" :key="channel" class="bg-white/60 rounded-xl p-2 opacity-70">
+    <div
+      v-for="channel in allTasks"
+      :key="channel"
+      class="bg-[rgba(179,223,220,0.75)] rounded-xl p-2 opacity-75 text-neutral-600"
+    >
       <div class="flex justify-between items-center">
         <div class="flex gap-2 items-center">
           <img :src="TaskImage" class="w-12" />
           <h1 class="font-bold truncate">{{ channel }}</h1>
         </div>
 
-        <button disabled class="rounded-full bg-gray-300 px-4 py-1 font-bold">Subscribed</button>
+        <button disabled class="rounded-full bg-white px-4 py-1 font-bold">Subscribed</button>
       </div>
     </div>
   </div>
