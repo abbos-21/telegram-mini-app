@@ -12,7 +12,7 @@ let timer: number | null = null
 
 export function useSpinWheel() {
   const cooldownRemaining = computed(() => {
-    if (remainingSeconds.value === null) return null
+    if (remainingSeconds.value === null || remainingSeconds.value <= 0) return null
 
     const hours = Math.floor(remainingSeconds.value / 3600)
     const minutes = Math.floor((remainingSeconds.value % 3600) / 60)
@@ -30,7 +30,9 @@ export function useSpinWheel() {
 
   const onCooldownFinished = async () => {
     stopTimer()
-    remainingSeconds.value = null
+    remainingSeconds.value = 0
+    canSpin.value = true
+    lastPrize.value = null
 
     await fetchStatus()
   }
