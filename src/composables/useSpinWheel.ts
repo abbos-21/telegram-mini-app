@@ -1,5 +1,6 @@
 import { ref, computed, onUnmounted } from 'vue'
 import { gameService } from '@/api/gameService'
+import { toast } from 'vue3-toastify'
 
 const canSpin = ref(false)
 const lastPrize = ref<number | null>(null)
@@ -77,6 +78,9 @@ export function useSpinWheel() {
       const res = await gameService.spinWheel()
       lastPrize.value = res.data.prize
       canSpin.value = false
+      setTimeout(() => {
+        toast.success(`You won ${lastPrize.value} coins! Keep going!`)
+      }, 4000)
       await fetchStatus()
       return res.data
     } catch (err) {
