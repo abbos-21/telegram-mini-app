@@ -119,21 +119,22 @@ function onTransitionEnd(e: TransitionEvent) {
 
   const prizeSegmentIndex = segments.value.findIndex((s) => s.value === resPrize.value)
 
-  if (prizeSegmentIndex !== -1) {
-    result.value = prizeSegmentIndex
-    const prizeSegment = segments.value[prizeSegmentIndex]
-    if (prizeSegment) {
-      emit('finish', {
-        index: prizeSegmentIndex,
-        label: prizeSegment.label,
-      })
-    }
-
-    // === Critical Fix: Normalize rotation to clean 0–360° range ===
-    const segmentCenter = prizeSegmentIndex * degPer.value + degPer.value / 2
-    const normalizedRotation = (270 - segmentCenter + 360) % 360
-    currentRotation.value = normalizedRotation
+  if (prizeSegmentIndex === -1) {
+    console.warn('Invalid prize received:', resPrize.value)
+    currentRotation.value = 270 % 360 // safe default
+    return
   }
+
+  result.value = prizeSegmentIndex
+
+  emit('finish', {
+    index: prizeSegmentIndex,
+    label: segments.value[prizeSegmentIndex]?.label ?? '',
+  })
+
+  const segmentCenter = prizeSegmentIndex * degPer.value + degPer.value / 2
+  const normalizedRotation = (270 - segmentCenter + 360) % 360
+  currentRotation.value = normalizedRotation
 }
 
 onMounted(fetchStatus)
