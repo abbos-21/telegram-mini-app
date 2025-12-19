@@ -27,7 +27,6 @@ export function useSpinWheel() {
       const res = await gameService.spinWheel()
       lastPrize.value = res.data.prize
       canSpin.value = false
-      await fetchStatus()
       return res.data
     } catch (err) {
       console.error('Spin failed:', err)

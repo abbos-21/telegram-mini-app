@@ -15,6 +15,7 @@ interface Segment {
 }
 
 const { canSpin, lastPrize, spin, fetchStatus, loading } = useSpinWheel()
+const isLoading = ref<boolean>(false)
 
 // const wonPrize = ref<number>(5)
 
@@ -170,7 +171,14 @@ async function watchAd() {
     const result = await show()
 
     if (result.done && !result.error) {
-      await fetchStatus()
+      isLoading.value = true
+      setTimeout(async () => {
+        try {
+          await fetchStatus()
+        } finally {
+          isLoading.value = false
+        }
+      }, 1000)
     }
   } catch (err) {
     console.log('Error showing ad: ', err)
@@ -183,7 +191,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <LoaderComponent v-if="loading" />
+  <LoaderComponent v-if="isLoading || loading" />
   <div class="spin-wheel-wrapper">
     <SpinPointerIcon class="w-6 -mb-5 z-10 text-[#eaf3f9]" />
 
