@@ -1,14 +1,12 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, type CSSProperties } from 'vue'
-import { useSpinWheel } from '@/composables/useSpinWheel'
+import { ref, computed, type CSSProperties, onMounted } from 'vue'
 import { SpinPointerIcon } from '@/assets/icons/winter'
 import { AdButtonImage, CoinImage, SpinButtonImage } from '@/assets/images/winter'
-import { useAdsgram } from '@adsgram/vue'
+import { useSpinWheel } from '@/composables/useSpinWheel'
 import LoaderComponent from './LoaderComponent.vue'
+import { useAdsgram } from '@adsgram/vue'
 
-/* =========================
-   Types
-========================= */
+const spinRewardBlockId = import.meta.env.VITE_SPIN_REWARD_BLOCK_ID
 
 interface Segment {
   label: string
@@ -16,37 +14,17 @@ interface Segment {
   color: string
 }
 
-/* =========================
-   Emits
-========================= */
+const { canSpin, lastPrize, spin, fetchStatus, loading } = useSpinWheel()
 
-const emit = defineEmits<{
-  (e: 'finish', payload: { index: number; label: string }): void
-  (e: 'spinning', spinning: boolean): void
-}>()
-
-const spinRewardBlockId = import.meta.env.VITE_SPIN_REWARD_BLOCK_ID
-
-/* =========================
-   Composables
-========================= */
-
-const { canSpin, spin, fetchStatus } = useSpinWheel()
-
-/* =========================
-   Constants
-========================= */
+// const wonPrize = ref<number>(5)
 
 const SIZE = 250
 const SPINS = 5
-const DURATION = 4000
-const POINTER_ANGLE = 270 // top
+const SPIN_DURATION = 4000
+const RESET_DURATION = 800
+const POINTER_ANGLE = 270
 
-/* =========================
-   Segments
-========================= */
-
-const segments = computed<Segment[]>(() => [
+const segments = ref<Segment[]>([
   { label: '+5', value: 5, color: '#FFE07D' },
   { label: '10', value: 10, color: '#b3e59f' },
   { label: '15', value: 15, color: '#7ca1bc' },
@@ -57,18 +35,11 @@ const segments = computed<Segment[]>(() => [
   { label: '40', value: 40, color: '#F4A300' },
 ])
 
-/* =========================
-   State
-========================= */
-
 const wheelRef = ref<HTMLDivElement | null>(null)
 const spinning = ref(false)
-const currentRotation = ref(0)
+const resetting = ref(false)
+const rotation = ref(0)
 const resultIndex = ref<number | null>(null)
-
-/* =========================
-   Computed
-========================= */
 
 const degPer = computed(() => 360 / segments.value.length)
 
@@ -83,19 +54,88 @@ const wheelStyle = computed<CSSProperties>(() => ({
   height: `${SIZE}px`,
   borderRadius: '50%',
   background: wheelBackground.value,
-  transform: `rotate(${currentRotation.value}deg)`,
-  transition: spinning.value ? `transform ${DURATION}ms cubic-bezier(.22,.9,.31,1)` : 'none',
+  transform: `rotate(${rotation.value}deg) translateZ(0)`,
+
+  transition: spinning.value
+    ? `transform ${SPIN_DURATION}ms cubic-bezier(.22,.9,.31,1)`
+    : resetting.value
+      ? `transform ${RESET_DURATION}ms ease-in-out`
+      : 'none',
+
   position: 'relative',
   overflow: 'hidden',
+  willChange: 'transform',
+  backfaceVisibility: 'hidden',
 }))
 
 const resultLabel = computed(() =>
-  resultIndex.value !== null ? (segments.value[resultIndex.value]?.label ?? '') : '',
+  resultIndex.value !== null ? segments.value[resultIndex.value]?.label : '',
 )
 
-/* =========================
-   Methods
-========================= */
+async function spinWheel() {
+  if (spinning.value || resetting.value) return
+
+  await spin()
+
+  const index = segments.value.findIndex((s) => s.value === lastPrize.value)
+  if (index === -1) return
+
+  spinning.value = true
+  resultIndex.value = index
+
+  const segmentCenter = index * degPer.value + degPer.value / 2
+
+  rotation.value = SPINS * 360 + (POINTER_ANGLE - segmentCenter)
+}
+
+// function reset() {
+//   if (!wheelRef.value) return
+
+//   resetting.value = true
+//   spinning.value = false
+
+//   rotation.value = rotation.value % 360
+
+//   requestAnimationFrame(() => {
+//     rotation.value = 0
+//   })
+// }
+
+async function reset() {
+  if (!wheelRef.value) return
+
+  // Add this check to avoid setting resetting=true when no animation is needed
+  if (rotation.value % 360 === 0) {
+    rotation.value = 0
+    resetting.value = false
+    spinning.value = false
+    return
+  }
+
+  resetting.value = true
+  spinning.value = false
+
+  rotation.value = rotation.value % 360
+
+  requestAnimationFrame(() => {
+    rotation.value = 0
+  })
+
+  await fetchStatus()
+}
+
+function onTransitionEnd(e: TransitionEvent) {
+  if (e.target !== wheelRef.value) return
+
+  if (spinning.value) {
+    reset()
+    return
+  }
+
+  if (resetting.value) {
+    resetting.value = false
+  }
+}
 
 function labelStyle(index: number): CSSProperties {
   const rotation = degPer.value * index + degPer.value / 2
@@ -114,75 +154,7 @@ function labelStyle(index: number): CSSProperties {
   }
 }
 
-async function handleSpin() {
-  if (spinning.value || !canSpin.value) return
-
-  resetWheel() // 🔥 HARD RESET BEFORE EVERY SPIN
-
-  spinning.value = true
-  emit('spinning', true)
-  resultIndex.value = null
-
-  const res = await spin()
-  if (!res) {
-    spinning.value = false
-    emit('spinning', false)
-    return
-  }
-
-  const index = segments.value.findIndex((s) => s.value === res.prize)
-
-  if (index === -1) return
-
-  resultIndex.value = index
-
-  const segmentCenter = index * degPer.value + degPer.value / 2
-
-  const targetRotation = SPINS * 360 + (POINTER_ANGLE - segmentCenter)
-
-  currentRotation.value += targetRotation
-}
-
-function onTransitionEnd(e: TransitionEvent) {
-  if (e.target !== wheelRef.value) return
-
-  resetWheel()
-
-  emit('spinning', false)
-
-  if (resultIndex.value !== null) {
-    emit('finish', {
-      index: resultIndex.value,
-      label: segments.value[resultIndex.value]?.label ?? '',
-    })
-  }
-}
-/* =========================
-   Lifecycle
-========================= */
-
-const loading = ref<boolean>(false)
-
-onMounted(fetchStatus)
-
-function resetWheel() {
-  if (!wheelRef.value) return
-
-  // 1️⃣ Disable animation
-  spinning.value = false
-
-  // 2️⃣ Normalize angle
-  currentRotation.value = currentRotation.value % 360
-
-  // 3️⃣ Force DOM reflow (VERY IMPORTANT)
-  void wheelRef.value.offsetHeight
-
-  // 4️⃣ Re-enable animation on next spin
-}
-
-async function watchSpinAd() {
-  resetWheel()
-  resultIndex.value = null
+async function watchAd() {
   const { show, addEventListener } = useAdsgram({
     blockId: spinRewardBlockId,
   })
@@ -198,19 +170,16 @@ async function watchSpinAd() {
     const result = await show()
 
     if (result.done && !result.error) {
-      loading.value = true
-      setTimeout(() => {
-        fetchStatus().then(() => {
-          loading.value = false
-        })
-      }, 1000)
+      await fetchStatus()
     }
   } catch (err) {
     console.log('Error showing ad: ', err)
-  } finally {
-    loading.value = false
   }
 }
+
+onMounted(async () => {
+  await fetchStatus()
+})
 </script>
 
 <template>
@@ -235,22 +204,20 @@ async function watchSpinAd() {
     </div>
 
     <button
-      :disabled="spinning"
+      class="w-40 mt-4 disabled:opacity-50"
+      :disabled="spinning || resetting"
+      @click="spinWheel"
       v-if="canSpin"
-      @click="handleSpin"
-      class="w-40 mt-4 disabled:opacity-50 disabled:cursor-not-allowed!"
     >
       <img :src="SpinButtonImage" alt="spin" />
     </button>
 
-    <button v-else class="w-40 mt-4" @click="watchSpinAd">
-      <img :src="AdButtonImage" alt="ad" />
-    </button>
+    <button v-else class="w-40 mt-4" @click="watchAd"><img :src="AdButtonImage" alt="ad" /></button>
 
     <div v-if="resultLabel" class="font-bold mt-2 flex gap-1 items-center">
       <span>You won:</span>
       <span>{{ resultLabel }}</span>
-      <img :src="CoinImage" class="w-4 h-4" alt="coin" />
+      <img :src="CoinImage" class="w-4" alt="coin" />
     </div>
   </div>
 </template>
