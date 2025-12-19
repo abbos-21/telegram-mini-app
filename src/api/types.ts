@@ -79,21 +79,16 @@ export type GameRecoveryResponseData = UserDataResponse
 export type GameRecoveryApiResponse = ApiResponse<GameRecoveryResponseData>
 
 export interface GameSpinWheelStatusApiResponse {
-  status: string
+  success: boolean
   data: {
     canSpin: boolean
-    remaining?: {
-      hours: number
-      minutes: number
-    }
   }
 }
 
 export interface GameSpinWheelSpinApiResponse {
-  status: string
+  success: boolean
   data: {
     prize: number
-    nextSpinAt: string
   }
 }
 

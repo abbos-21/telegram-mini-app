@@ -2,7 +2,6 @@ import { ref } from 'vue'
 import { gameService } from '@/api/gameService'
 
 const canSpin = ref(false)
-const cooldownRemaining = ref<{ hours: number; minutes: number } | null>(null)
 const lastPrize = ref<number | null>(null)
 const isSpinning = ref(false)
 
@@ -11,7 +10,6 @@ export function useSpinWheel() {
     try {
       const res = await gameService.getSpinWheelStatus()
       canSpin.value = res.data.canSpin
-      cooldownRemaining.value = res.data.remaining ?? null
     } catch (err) {
       console.error('Failed to fetch spin status:', err)
     }
@@ -38,7 +36,6 @@ export function useSpinWheel() {
   return {
     canSpin,
     isSpinning,
-    cooldownRemaining,
     lastPrize,
     fetchStatus,
     spin,
