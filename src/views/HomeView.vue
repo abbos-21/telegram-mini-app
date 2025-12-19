@@ -89,7 +89,7 @@ const closeBottlePopup = () => (isBottlePopupOpen.value = false)
 
 const openSpinPopup = () => {
   isSpinPopupOpen.value = true
-  runSpinAds()
+  // runSpinAds()
 }
 const closeSpinPopup = () => (isSpinPopupOpen.value = false)
 
