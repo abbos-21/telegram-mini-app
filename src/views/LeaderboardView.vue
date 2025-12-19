@@ -47,13 +47,17 @@ const fetchUsers = async () => {
 const prevLevel = async () => {
   if (currentLevel.value <= 1) return
   currentLevel.value--
+  loading.value = true
   await fetchUsers()
+  loading.value = false
 }
 
 const nextLevel = async () => {
   if (currentLevel.value >= 13) return
   currentLevel.value++
+  loading.value = true
   await fetchUsers()
+  loading.value = false
 }
 
 const updateTimeLeft = (endTime: string) => {
@@ -158,8 +162,21 @@ const getRankCoins = (index: number) => {
         <div class="flex items-center gap-2">
           <img :src="UserImage" class="w-12" />
 
-          <div class="flex flex-col gap-1 font-bold leading-none">
+          <!-- <div class="flex flex-col gap-1 font-bold leading-none">
             <h2 class="text-sm">{{ user.firstName ?? user.lastName ?? 'No name user' }}</h2>
+            <p class="text-xs opacity-60" v-if="user.username">@{{ user.username }}</p>
+            <p class="text-xs opacity-60" v-else>No username</p>
+
+            <div class="text-xs flex gap-1 items-center">
+              <img :src="CoinImage" class="w-4" />
+              <span>{{ user.totalCoins.toLocaleString() }}</span>
+            </div>
+          </div> -->
+
+          <div class="flex flex-col gap-1 font-bold leading-none">
+            <h2 class="text-sm truncate max-w-36">
+              {{ user.firstName ?? user.lastName ?? 'No name user' }}
+            </h2>
             <p class="text-xs opacity-60" v-if="user.username">@{{ user.username }}</p>
             <p class="text-xs opacity-60" v-else>No username</p>
 
