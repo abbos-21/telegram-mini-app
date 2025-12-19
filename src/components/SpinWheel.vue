@@ -117,6 +117,8 @@ function labelStyle(index: number): CSSProperties {
 async function handleSpin() {
   if (spinning.value || !canSpin.value) return
 
+  resetWheel() // 🔥 HARD RESET BEFORE EVERY SPIN
+
   spinning.value = true
   emit('spinning', true)
   resultIndex.value = null
@@ -130,11 +132,7 @@ async function handleSpin() {
 
   const index = segments.value.findIndex((s) => s.value === res.prize)
 
-  if (index === -1) {
-    spinning.value = false
-    emit('spinning', false)
-    return
-  }
+  if (index === -1) return
 
   resultIndex.value = index
 
@@ -148,11 +146,9 @@ async function handleSpin() {
 function onTransitionEnd(e: TransitionEvent) {
   if (e.target !== wheelRef.value) return
 
-  spinning.value = false
-  emit('spinning', false)
+  resetWheel()
 
-  // normalize rotation to avoid drift
-  currentRotation.value %= 360
+  emit('spinning', false)
 
   if (resultIndex.value !== null) {
     emit('finish', {
@@ -161,7 +157,6 @@ function onTransitionEnd(e: TransitionEvent) {
     })
   }
 }
-
 /* =========================
    Lifecycle
 ========================= */
@@ -170,7 +165,24 @@ const loading = ref<boolean>(false)
 
 onMounted(fetchStatus)
 
+function resetWheel() {
+  if (!wheelRef.value) return
+
+  // 1️⃣ Disable animation
+  spinning.value = false
+
+  // 2️⃣ Normalize angle
+  currentRotation.value = currentRotation.value % 360
+
+  // 3️⃣ Force DOM reflow (VERY IMPORTANT)
+  void wheelRef.value.offsetHeight
+
+  // 4️⃣ Re-enable animation on next spin
+}
+
 async function watchSpinAd() {
+  resetWheel()
+  resultIndex.value = null
   const { show, addEventListener } = useAdsgram({
     blockId: spinRewardBlockId,
   })
@@ -188,7 +200,9 @@ async function watchSpinAd() {
     if (result.done && !result.error) {
       loading.value = true
       setTimeout(() => {
-        fetchStatus()
+        fetchStatus().then(() => {
+          loading.value = false
+        })
       }, 1000)
     }
   } catch (err) {
