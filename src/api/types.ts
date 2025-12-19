@@ -82,6 +82,12 @@ export interface GameSpinWheelStatusApiResponse {
   success: boolean
   data: {
     canSpin: boolean
+    remaining: {
+      hours: number
+      minutes: number
+      seconds: number
+    }
+    lastWheelSpin: string
   }
 }
 
@@ -89,6 +95,7 @@ export interface GameSpinWheelSpinApiResponse {
   success: boolean
   data: {
     prize: number
+    nextSpinAt: string
   }
 }
 

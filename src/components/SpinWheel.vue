@@ -1,12 +1,9 @@
 <script setup lang="ts">
-import { ref, computed, type CSSProperties, onMounted } from 'vue'
+import { ref, computed, type CSSProperties, onMounted, nextTick } from 'vue'
 import { SpinPointerIcon } from '@/assets/icons/winter'
-import { AdButtonImage, SpinButtonImage } from '@/assets/images/winter' // CoinImage
+import { SpinButtonImage } from '@/assets/images/winter'
 import { useSpinWheel } from '@/composables/useSpinWheel'
 import LoaderComponent from './LoaderComponent.vue'
-import { useAdsgram } from '@adsgram/vue'
-
-const spinRewardBlockId = import.meta.env.VITE_SPIN_REWARD_BLOCK_ID
 
 interface Segment {
   label: string
@@ -14,10 +11,9 @@ interface Segment {
   color: string
 }
 
-const { canSpin, lastPrize, spin, fetchStatus } = useSpinWheel()
-const isLoading = ref<boolean>(false)
+const { canSpin, spin, fetchStatus, cooldownRemaining } = useSpinWheel()
 
-// const wonPrize = ref<number>(5)
+const isLoading = ref(false)
 
 const SIZE = 250
 const SPINS = 5
@@ -44,11 +40,12 @@ const resultIndex = ref<number | null>(null)
 
 const degPer = computed(() => 360 / segments.value.length)
 
-const wheelBackground = computed(() => {
-  return `conic-gradient(${segments.value
-    .map((s, i) => `${s.color} ${i * degPer.value}deg ${(i + 1) * degPer.value}deg`)
-    .join(', ')})`
-})
+const wheelBackground = computed(
+  () =>
+    `conic-gradient(${segments.value
+      .map((s, i) => `${s.color} ${i * degPer.value}deg ${(i + 1) * degPer.value}deg`)
+      .join(', ')})`,
+)
 
 const wheelStyle = computed<CSSProperties>(() => ({
   width: `${SIZE}px`,
@@ -56,80 +53,61 @@ const wheelStyle = computed<CSSProperties>(() => ({
   borderRadius: '50%',
   background: wheelBackground.value,
   transform: `rotate(${rotation.value}deg) translateZ(0)`,
-
   transition: spinning.value
     ? `transform ${SPIN_DURATION}ms cubic-bezier(.22,.9,.31,1)`
     : resetting.value
       ? `transform ${RESET_DURATION}ms ease-in-out`
       : 'none',
-
   position: 'relative',
   overflow: 'hidden',
   willChange: 'transform',
   backfaceVisibility: 'hidden',
 }))
 
-// const resultLabel = computed(() =>
-//   resultIndex.value !== null ? segments.value[resultIndex.value]?.label : '',
-// )
-
 async function spinWheel() {
-  if (spinning.value || resetting.value) return
+  if (spinning.value || resetting.value || !canSpin.value) return
 
-  await spin()
+  const res = await spin()
+  if (!res || res.prize == null) return
 
-  const index = segments.value.findIndex((s) => s.value === lastPrize.value)
+  const index = segments.value.findIndex((s) => s.value === res.prize)
   if (index === -1) return
 
   spinning.value = true
   resultIndex.value = index
 
   const segmentCenter = index * degPer.value + degPer.value / 2
-
   rotation.value = SPINS * 360 + (POINTER_ANGLE - segmentCenter)
 }
 
-// function reset() {
-//   if (!wheelRef.value) return
-
-//   resetting.value = true
-//   spinning.value = false
-
-//   rotation.value = rotation.value % 360
-
-//   requestAnimationFrame(() => {
-//     rotation.value = 0
-//   })
-// }
-
 async function reset() {
-  if (!wheelRef.value) return
+  if (resetting.value || !wheelRef.value) return
 
-  // Add this check to avoid setting resetting=true when no animation is needed
-  if (rotation.value % 360 === 0) {
+  const normalized = ((rotation.value % 360) + 360) % 360
+  if (normalized === 0) {
     rotation.value = 0
-    resetting.value = false
     spinning.value = false
+    resetting.value = false
+    resultIndex.value = null
     return
   }
 
   resetting.value = true
   spinning.value = false
 
-  rotation.value = rotation.value % 360
+  rotation.value = normalized
+  await nextTick()
 
-  requestAnimationFrame(() => {
-    rotation.value = 0
-  })
+  rotation.value -= normalized
+  resultIndex.value = null
 }
 
 function onTransitionEnd(e: TransitionEvent) {
   if (e.target !== wheelRef.value) return
+  if (e.propertyName !== 'transform') return
 
   if (spinning.value) {
-    setTimeout(() => {
-      reset()
-    }, 1000)
+    setTimeout(() => reset(), 1000)
     return
   }
 
@@ -139,7 +117,7 @@ function onTransitionEnd(e: TransitionEvent) {
 }
 
 function labelStyle(index: number): CSSProperties {
-  const rotation = degPer.value * index + degPer.value / 2
+  const angle = degPer.value * index + degPer.value / 2
   const distance = SIZE * 0.42
 
   return {
@@ -147,41 +125,11 @@ function labelStyle(index: number): CSSProperties {
     top: '50%',
     left: '50%',
     transformOrigin: '0 0',
-    transform: `rotate(${rotation}deg) translate(${distance}px, -50%) rotate(90deg)`,
+    transform: `rotate(${angle}deg) translate(${distance}px, -50%) rotate(90deg)`,
     color: '#fff',
     fontWeight: 'bold',
     whiteSpace: 'nowrap',
     pointerEvents: 'none',
-  }
-}
-
-async function watchAd() {
-  const { show, addEventListener } = useAdsgram({
-    blockId: spinRewardBlockId,
-  })
-
-  addEventListener('onBannerNotFound', () => {
-    console.log('No ad available at the moment')
-  })
-  addEventListener('onTooLongSession', () => {
-    console.log('User session too long — ad not available')
-  })
-
-  try {
-    const result = await show()
-
-    if (result.done && !result.error) {
-      isLoading.value = true
-      setTimeout(async () => {
-        try {
-          await fetchStatus()
-        } finally {
-          isLoading.value = false
-        }
-      }, 1000)
-    }
-  } catch (err) {
-    console.log('Error showing ad: ', err)
   }
 }
 
@@ -192,6 +140,7 @@ onMounted(async () => {
 
 <template>
   <LoaderComponent v-if="isLoading" />
+
   <div class="spin-wheel-wrapper">
     <SpinPointerIcon class="w-6 -mb-5 z-10 text-[#eaf3f9]" />
 
@@ -213,20 +162,17 @@ onMounted(async () => {
 
     <button
       class="w-40 mt-4 disabled:opacity-50"
-      :disabled="spinning || resetting"
+      :disabled="spinning || resetting || !canSpin"
       @click="spinWheel"
-      v-if="canSpin"
     >
       <img :src="SpinButtonImage" alt="spin" />
     </button>
 
-    <button v-else class="w-40 mt-4" @click="watchAd"><img :src="AdButtonImage" alt="ad" /></button>
-
-    <!-- <div v-if="resultLabel" class="font-bold mt-2 flex gap-1 items-center">
-      <span>You won:</span>
-      <span>{{ resultLabel }}</span>
-      <img :src="CoinImage" class="w-4" alt="coin" />
-    </div> -->
+    <div v-if="cooldownRemaining" class="text-xs font-bold mt-2">
+      Next spin in:
+      {{ cooldownRemaining.hours }}h {{ cooldownRemaining.minutes }}m
+      {{ cooldownRemaining.seconds }}s
+    </div>
   </div>
 </template>
 
