@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, type CSSProperties, onMounted } from 'vue'
 import { SpinPointerIcon } from '@/assets/icons/winter'
-import { AdButtonImage, CoinImage, SpinButtonImage } from '@/assets/images/winter'
+import { AdButtonImage, SpinButtonImage } from '@/assets/images/winter' // CoinImage
 import { useSpinWheel } from '@/composables/useSpinWheel'
 import LoaderComponent from './LoaderComponent.vue'
 import { useAdsgram } from '@adsgram/vue'
@@ -16,7 +16,6 @@ interface Segment {
 
 const { canSpin, lastPrize, spin, fetchStatus } = useSpinWheel()
 const isLoading = ref<boolean>(false)
-const showResult = ref(false) // ← Add this
 
 // const wonPrize = ref<number>(5)
 
@@ -70,9 +69,9 @@ const wheelStyle = computed<CSSProperties>(() => ({
   backfaceVisibility: 'hidden',
 }))
 
-const resultLabel = computed(() =>
-  resultIndex.value !== null ? segments.value[resultIndex.value]?.label : '',
-)
+// const resultLabel = computed(() =>
+//   resultIndex.value !== null ? segments.value[resultIndex.value]?.label : '',
+// )
 
 async function spinWheel() {
   if (spinning.value || resetting.value) return
@@ -82,14 +81,14 @@ async function spinWheel() {
   const index = segments.value.findIndex((s) => s.value === lastPrize.value)
   if (index === -1) return
 
-  showResult.value = false
-
   spinning.value = true
   resultIndex.value = index
 
   const segmentCenter = index * degPer.value + degPer.value / 2
+
   rotation.value = SPINS * 360 + (POINTER_ANGLE - segmentCenter)
 }
+
 // function reset() {
 //   if (!wheelRef.value) return
 
@@ -106,40 +105,34 @@ async function spinWheel() {
 async function reset() {
   if (!wheelRef.value) return
 
+  // Add this check to avoid setting resetting=true when no animation is needed
   if (rotation.value % 360 === 0) {
     rotation.value = 0
     resetting.value = false
     spinning.value = false
-    showResult.value = false
     return
   }
 
   resetting.value = true
   spinning.value = false
-  showResult.value = false // Hide immediately when reset starts
 
   rotation.value = rotation.value % 360
 
   requestAnimationFrame(() => {
     rotation.value = 0
   })
-
-  await fetchStatus()
 }
 
 function onTransitionEnd(e: TransitionEvent) {
   if (e.target !== wheelRef.value) return
 
   if (spinning.value) {
-    // Spin just finished → show result and start reset
-    showResult.value = true
     reset()
     return
   }
 
   if (resetting.value) {
     resetting.value = false
-    showResult.value = false // Hide result when reset completes
   }
 }
 
@@ -227,11 +220,11 @@ onMounted(async () => {
 
     <button v-else class="w-40 mt-4" @click="watchAd"><img :src="AdButtonImage" alt="ad" /></button>
 
-    <div v-if="showResult && resultLabel" class="font-bold mt-2 flex gap-1 items-center">
+    <!-- <div v-if="resultLabel" class="font-bold mt-2 flex gap-1 items-center">
       <span>You won:</span>
       <span>{{ resultLabel }}</span>
       <img :src="CoinImage" class="w-4" alt="coin" />
-    </div>
+    </div> -->
   </div>
 </template>
 
