@@ -91,7 +91,10 @@ const openSpinPopup = () => {
   isSpinPopupOpen.value = true
   runSpinAds()
 }
-const closeSpinPopup = () => (isSpinPopupOpen.value = false)
+const closeSpinPopup = async () => {
+  isSpinPopupOpen.value = false
+  await getUserData()
+}
 
 /* -------------------- COMPUTED -------------------- */
 const canCollect = computed(() => {
