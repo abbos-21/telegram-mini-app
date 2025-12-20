@@ -9,3 +9,27 @@
 button {
   cursor: pointer;
 }
+
+.task {
+  --adsgram-task-font-size: 16px;
+  --adsgram-task-icon-size: 48px;
+  --adsgram-task-icon-title-gap: 8px;
+  --adsgram-task-button-width: 60px;
+  --adsgram-task-icon-border-radius: 12px;
+
+  display: block;
+  width: 100%;
+  padding: 8px;
+  border-radius: 12px;
+  background-color: white;
+  font-family: 'Inter', sans-serif;
+  font-weight: bold;
+  color: #525252;
+}
+
+.task > p {
+  width: calc(100% - 16px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

@@ -23,6 +23,7 @@ import {
 } from './assets/images/winter'
 import { withdrawService } from './api/withdrawService'
 import { blockListService } from './api/blockListService'
+import { BellIcon } from './assets/icons/winter'
 
 const route = useRoute()
 
@@ -279,8 +280,13 @@ onBeforeUnmount(() => {
           <RouterLink to="/shop">
             <img :src="MenuItemShopImage" alt="shop" />
           </RouterLink>
-          <RouterLink to="/tasks">
+          <RouterLink to="/tasks" class="relative">
             <img :src="MenuItemTasksImage" alt="tasks" />
+            <span
+              class="absolute w-6 h-6 rounded-full font-bold bg-red-500 text-white top-0 right-0 flex justify-center items-center"
+            >
+              <BellIcon class="w-4"
+            /></span>
           </RouterLink>
           <RouterLink to="/friends">
             <img :src="MenuItemFriendsImage" alt="friends" />
