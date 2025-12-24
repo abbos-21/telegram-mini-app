@@ -3,7 +3,7 @@ import { starsService } from '@/api/starsService'
 import { boxService } from '@/api/boxService'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import WebApp from '@twa-dev/sdk'
-import type { BoxReward } from '@/api/types'
+import type { ApiError, BoxReward } from '@/api/types'
 import { toast } from 'vue3-toastify'
 
 export function useBoxGame() {
@@ -23,6 +23,7 @@ export function useBoxGame() {
       flipped: boolean
     }>
   >([])
+  const error = ref<ApiError | null>(null)
 
   /* -------------------- Payments -------------------- */
 
@@ -106,8 +107,9 @@ export function useBoxGame() {
     try {
       loading.value = true
       await boxService.payWithCoins()
-    } catch (error) {
-      console.log(error)
+    } catch (err) {
+      error.value = err as ApiError
+      toast.error(error.value.response?.data?.message || 'Payment failed')
     } finally {
       const response = await boxService.getStatus()
       canPlay.value = response.data.user.canPlayBox
