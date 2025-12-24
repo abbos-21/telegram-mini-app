@@ -41,7 +41,10 @@ import {
   MusicImage,
   IceImage,
   SpinImage,
+  MysteryBoxImage,
 } from '@/assets/images/winter'
+import { useRouter } from 'vue-router'
+const router = useRouter()
 
 import { useSeasonTimer } from '@/composables/useSeasonTimer'
 
@@ -65,6 +68,7 @@ const withdrawalAds = useAdsgram({
   blockId: import.meta.env.VITE_WITHDRAWAL_BLOCK_ID,
 })
 const bottleAds = useAdsgram({ blockId: import.meta.env.VITE_BOTTLE_BLOCK_ID })
+const boxAds = useAdsgram({ blockId: import.meta.env.VITE_BOX_BLOCK_ID })
 
 const tasks: OrchestratorTask[] = [
   { name: 'Interstitial', probability: 25, fn: () => interstitialAds.show() },
@@ -80,6 +84,11 @@ const { goTo } = useNavigate()
 /* -------------------- POPUPS -------------------- */
 const isBottlePopupOpen = ref(false)
 const isSpinPopupOpen = ref(false)
+
+const openBoxRoute = () => {
+  runIfUserIsNotBiggie(() => boxAds.show())
+  router.push('/box')
+}
 
 const openBottlePopup = () => {
   isBottlePopupOpen.value = true
@@ -250,14 +259,20 @@ const backgroundImage = computed(() => {
     </div>
 
     <!-- ACTIONS -->
-    <div class="flex justify-between items-center">
+    <div class="flex justify-between items-start">
       <button @click="openBottlePopup">
         <img :src="IceImage" class="w-9" />
       </button>
 
-      <button @click="openSpinPopup">
-        <img :src="SpinImage" class="w-9" />
-      </button>
+      <div class="flex flex-col items-center gap-2 -me-3">
+        <button @click="openSpinPopup">
+          <img :src="SpinImage" class="w-9" />
+        </button>
+
+        <button @click="openBoxRoute">
+          <img :src="MysteryBoxImage" class="w-15" />
+        </button>
+      </div>
     </div>
 
     <div class="flex justify-center">

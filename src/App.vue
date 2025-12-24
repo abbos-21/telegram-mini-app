@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, watch, computed, provide } from 'vue'
-import { RouterView, RouterLink, useRoute } from 'vue-router'
+import { RouterView, RouterLink, useRoute, useRouter } from 'vue-router'
 import WebApp from '@twa-dev/sdk'
 import { toast } from 'vue3-toastify'
 
@@ -26,6 +26,7 @@ import { blockListService } from './api/blockListService'
 import { BellIcon } from './assets/icons/winter'
 
 const route = useRoute()
+const router = useRouter()
 
 /* -------------------- STATE -------------------- */
 const loading = ref(true)
@@ -45,7 +46,9 @@ const isUserBiggie = computed(
 
 /* -------------------- AUDIO -------------------- */
 watch(audioRef, (el) => {
-  if (el) setAudioElement(el)
+  if (!el) return
+  setAudioElement(el)
+  el.volume = 0.3
 })
 
 const resumeOnInteraction = () => {
@@ -133,9 +136,26 @@ const isTelegramMobile = (): boolean => {
 const withdrawRate = ref<number | null>(null)
 provide('withdrawRate', withdrawRate)
 
+const backButtonHandler = () => {
+  router.push('/')
+}
+
+watch(
+  () => route.path,
+  (newPath) => {
+    if (newPath === '/test') {
+      WebApp.BackButton.show()
+    } else {
+      WebApp.BackButton.hide()
+    }
+  },
+  { immediate: true }, // Run immediately on mount to set initial state
+)
+
 onMounted(() => {
   WebApp.ready()
   WebApp.expand()
+  WebApp.BackButton.onClick(backButtonHandler)
   bootstrapApp()
 })
 
@@ -149,7 +169,8 @@ watch(
     navIsVisible.value = !(
       name === 'leaderboard' ||
       name === 'withdraw' ||
-      name === 'withdraw-history'
+      name === 'withdraw-history' ||
+      name === 'box'
     )
   },
   { immediate: true },

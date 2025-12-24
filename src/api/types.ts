@@ -42,6 +42,8 @@ export interface User {
 
   lastWheelSpin: string | null
 
+  canPlayBox: boolean
+
   withdrawals: Withdrawal[]
 }
 
@@ -219,6 +221,23 @@ export interface SeasonResponse {
     seconds: number
     expired: boolean
   }
+}
+
+export interface InvoiceLinkResponse {
+  invoiceLink: string
+}
+
+export interface BoxResponse {
+  user: User
+}
+
+export interface BoxReward {
+  id: number
+  name: string
+}
+
+export interface BoxRewardResponse {
+  rewardList: BoxReward[]
 }
 
 export interface ApiError {
