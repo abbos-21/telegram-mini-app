@@ -117,7 +117,7 @@ onUnmounted(() => {
 
   <div class="my-4 flex flex-col gap-4 overflow-y-scroll scrollbar-hide">
     <!-- eslint-disable -->
-    <AdsgramTask
+    <!-- <AdsgramTask
       :blockId="result"
       :debug="false"
       class="task"
@@ -125,7 +125,7 @@ onUnmounted(() => {
       :onError="handleError"
       v-html="rawHtml"
     >
-    </AdsgramTask>
+    </AdsgramTask> -->
 
     <!-- ACTIVE TASKS -->
     <div
