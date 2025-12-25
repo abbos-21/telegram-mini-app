@@ -284,19 +284,15 @@ const backgroundImage = computed(() => {
       </div>
     </div>
 
-    <div
-      class="flex justify-center items-center absolute inset-x-0"
+    <button
+      class="collect-button absolute left-1/2 -translate-x-1/2 mb-2"
       :style="{ bottom: `${navHeight}px` }"
+      :disabled="!canCollect"
+      :class="{ 'cursor-not-allowed opacity-50': !canCollect }"
+      @click="handleCollect"
     >
-      <button
-        class="collect-button mb-2"
-        :disabled="!canCollect"
-        :class="{ 'cursor-not-allowed opacity-50': !canCollect }"
-        @click="handleCollect"
-      >
-        <img :src="CollectButtonImage" class="w-full" />
-      </button>
-    </div>
+      <img :src="CollectButtonImage" class="w-full" />
+    </button>
   </div>
 
   <BottlePopup :is-open="isBottlePopupOpen" @close="closeBottlePopup" />
