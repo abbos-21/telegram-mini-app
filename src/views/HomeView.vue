@@ -275,7 +275,10 @@ const backgroundImage = computed(() => {
       </div>
     </div>
 
-    <div class="flex justify-center">
+    <div
+      class="flex justify-center items-center absolute inset-x-0"
+      :style="{ bottom: `${navHeight}px` }"
+    >
       <button
         class="collect-button mb-2"
         :disabled="!canCollect"
