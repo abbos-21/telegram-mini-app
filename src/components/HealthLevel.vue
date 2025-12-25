@@ -99,6 +99,12 @@ const segments = Array.from({ length: 10 }, (_, i) => i + 1)
   flex-direction: column-reverse;
 }
 
+@media only screen and (max-height: 590px) {
+  .health-bar {
+    height: 98px;
+  }
+}
+
 .health-bar-green {
   border-color: #46edd5;
 }

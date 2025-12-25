@@ -228,7 +228,7 @@ const backgroundImage = computed(() => {
 
     <!-- STATS -->
     <div>
-      <div class="flex justify-center">
+      <div class="flex justify-center progress-bar-wrapper">
         <div class="w-40">
           <ProgressBar
             :current-value="user?.tempCoins ?? 0"
@@ -247,6 +247,15 @@ const backgroundImage = computed(() => {
           :show-glow="true"
           :animated="true"
         />
+
+        <div class="w-40 progress-bar-wrapper-sm">
+          <ProgressBar
+            :current-value="user?.tempCoins ?? 0"
+            :max-value="user?.vaultCapacity ?? Infinity"
+            :min-value="0"
+          />
+        </div>
+
         <EnergyLevel
           :current-value="user?.currentEnergy ?? 0"
           :max-value="user?.maxEnergy ?? 0"
@@ -318,6 +327,20 @@ const backgroundImage = computed(() => {
 @media (max-width: 320px) {
   .collect-button {
     width: 128px;
+  }
+}
+
+.progress-bar-wrapper-sm {
+  display: none;
+}
+
+@media (max-height: 590px) {
+  .progress-bar-wrapper {
+    display: none;
+  }
+
+  .progress-bar-wrapper-sm {
+    display: block;
   }
 }
 </style>
