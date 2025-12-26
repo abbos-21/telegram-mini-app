@@ -82,7 +82,7 @@ const checkSubscription = async (channel: string) => {
 // TASK AD
 
 const handleReward = () => {
-  toast.success('20 coins have been successfully added to your balance!')
+  toast.success('10 coins have been successfully added to your balance!')
 }
 
 const handleError = (event: CustomEvent<string>) => {
@@ -90,7 +90,7 @@ const handleError = (event: CustomEvent<string>) => {
 }
 
 const rawHtml = ref<string>(
-  "<span slot='reward' style='font-size: 14px; display: flex; align-items: center; gap: 4px;'><img src='/coin.png' style='width: 16px; height: 16px;' alt='coin-image' />30</span><div slot='button' style='background-color: #00bc7d; color: white; border-radius: 6px; padding: 4px 0; font-weight: bold;'>Go</div><div slot='claim' style='background-color: #ffac33; color: white; border-radius: 6px; padding: 4px 0; font-weight: bold;'>Claim</div><div slot='done' style='background-color: #00b8db; color: white; border-radius: 6px; padding: 4px 0; font-weight: bold;'>Done</div>",
+  "<span slot='reward' style='font-size: 14px; display: flex; align-items: center; gap: 4px;'><img src='/coin.png' style='width: 16px; height: 16px;' alt='coin-image' />10</span><div slot='button' style='background-color: #00bc7d; color: white; border-radius: 6px; padding: 4px 0; font-weight: bold;'>Go</div><div slot='claim' style='background-color: #ffac33; color: white; border-radius: 6px; padding: 4px 0; font-weight: bold;'>Claim</div><div slot='done' style='background-color: #00b8db; color: white; border-radius: 6px; padding: 4px 0; font-weight: bold;'>Done</div>",
 )
 </script>
 
