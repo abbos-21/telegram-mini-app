@@ -39,10 +39,11 @@ const BIGGIES = new Set<number>([5035538171, 1031081189, 352641904, 1701438929])
 
 const telegramUserId = computed<number | null>(() => WebApp.initDataUnsafe?.user?.id ?? null)
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const isUserBiggie = computed(
   () => telegramUserId.value !== null && BIGGIES.has(telegramUserId.value),
 )
+
+provide('isUserBiggie', isUserBiggie)
 
 /* -------------------- AUDIO -------------------- */
 watch(audioRef, (el) => {
@@ -301,13 +302,23 @@ onBeforeUnmount(() => {
           <RouterLink to="/shop">
             <img :src="MenuItemShopImage" alt="shop" />
           </RouterLink>
-          <RouterLink to="/tasks" class="relative">
+          <RouterLink to="/tasks" class="relative" v-if="isUserBiggie">
             <img :src="MenuItemTasksImage" alt="tasks" />
             <span
               class="absolute w-6 h-6 rounded-full font-bold bg-red-500 text-white top-0 right-0 flex justify-center items-center"
             >
-              <BellIcon class="w-4"
-            /></span>
+              <BellIcon class="w-4" />
+            </span>
+          </RouterLink>
+
+          <RouterLink to="/tasks" class="relative" v-else>
+            <img :src="MenuItemTasksImage" alt="tasks" />
+            <span
+              class="absolute w-10 h-5 rounded-full font-bold bg-red-500 text-white top-0 right-0 flex justify-center items-center text-xs"
+            >
+              <!-- <BellIcon class="w-4" /> -->
+              Hey!
+            </span>
           </RouterLink>
           <RouterLink to="/friends">
             <img :src="MenuItemFriendsImage" alt="friends" />

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue'
+import { ref, inject } from 'vue'
 import WebApp from '@twa-dev/sdk'
 import { toast } from 'vue3-toastify'
 
@@ -11,6 +11,7 @@ import { CoinImage, TaskImage } from '@/assets/images/winter'
 import LoaderComponent from '@/components/LoaderComponent.vue'
 import { AdsgramTask } from '@adsgram/vue'
 
+const isUserBiggie = inject('isUserBiggie')
 const loading = ref(false)
 const error = ref<ApiError | null>(null)
 
@@ -91,25 +92,6 @@ const handleError = (event: CustomEvent<string>) => {
 const rawHtml = ref<string>(
   "<span slot='reward' style='font-size: 14px; display: flex; align-items: center; gap: 4px;'><img src='/coin.png' style='width: 16px; height: 16px;' alt='coin-image' />30</span><div slot='button' style='background-color: #00bc7d; color: white; border-radius: 6px; padding: 4px 0; font-weight: bold;'>Go</div><div slot='claim' style='background-color: #ffac33; color: white; border-radius: 6px; padding: 4px 0; font-weight: bold;'>Claim</div><div slot='done' style='background-color: #00b8db; color: white; border-radius: 6px; padding: 4px 0; font-weight: bold;'>Done</div>",
 )
-
-const result = ref()
-
-function pickWithProbability(a: string, b: string) {
-  return Math.random() < 0.25 ? a : b
-}
-
-onMounted(async () => {
-  result.value = pickWithProbability(
-    import.meta.env.VITE_TASK_BLOCK_ID,
-    import.meta.env.VITE_TASK_BLOCK_ID_2,
-  )
-
-  await mountFetch()
-})
-
-onUnmounted(() => {
-  result.value = null
-})
 </script>
 
 <template>
@@ -117,15 +99,16 @@ onUnmounted(() => {
 
   <div class="my-4 flex flex-col gap-4 overflow-y-scroll scrollbar-hide">
     <!-- eslint-disable -->
-    <!-- <AdsgramTask
-      :blockId="result"
+    <AdsgramTask
+      v-if="!isUserBiggie"
+      blockId="task-19654"
       :debug="false"
       class="task"
       :onReward="handleReward"
       :onError="handleError"
       v-html="rawHtml"
     >
-    </AdsgramTask> -->
+    </AdsgramTask>
 
     <!-- ACTIVE TASKS -->
     <div
