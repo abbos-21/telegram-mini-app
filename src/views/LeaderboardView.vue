@@ -269,7 +269,7 @@ const getRankLabel = (index: number): string => {
             />
 
             <!-- RANK NUMBER (fallback) -->
-            <span v-else class="text-sm">
+            <span v-else>
               {{ getRankLabel(index) }}
             </span>
 
