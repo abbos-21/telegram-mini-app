@@ -7,8 +7,9 @@ import type { Season, LeaderboardResponse } from '@/api/types'
 
 import { LeaderboardBackgroundImage } from '@/assets/backgrounds/winter'
 import { ArrowBackIcon, CupIcon, InfoIcon, SwitchIcon } from '@/assets/icons/winter'
-import { CoinImage, UserImage } from '@/assets/images/winter'
+import { CoinImage, IceCreamImage, UserImage } from '@/assets/images/winter'
 import LoaderComponent from '@/components/LoaderComponent.vue'
+import TelegramStarIcon from '@/assets/icons/winter/star.svg?url'
 
 /* -------------------- state -------------------- */
 const season = ref<Season | null>(null)
@@ -95,13 +96,82 @@ onBeforeUnmount(() => {
   if (timerInterval) clearInterval(timerInterval)
 })
 
+type Gift = {
+  name: string
+  price: number
+  img: string
+}
+
 const withdrawRate: number | undefined = inject('withdrawRate')
 
-const getRankCoins = (index: number) => {
-  if (index < 10) {
-    return 50000 - index * 1000
-  }
-  return 25000
+const giftsByLevel: Record<number, Gift[]> = {
+  1: [
+    { name: '50 Stars', price: 0.5, img: TelegramStarIcon },
+    { name: '21 Stars', price: 0.21, img: TelegramStarIcon },
+    { name: '13 Stars', price: 0.13, img: TelegramStarIcon },
+    {
+      name: '3000 coins',
+      price: Math.round(3000 / (withdrawRate ?? Infinity)),
+      img: TelegramStarIcon,
+    },
+    {
+      name: '3000 coins',
+      price: Math.round(3000 / (withdrawRate ?? Infinity)),
+      img: TelegramStarIcon,
+    },
+    {
+      name: '3000 coins',
+      price: Math.round(3000 / (withdrawRate ?? Infinity)),
+      img: TelegramStarIcon,
+    },
+    {
+      name: '3000 coins',
+      price: Math.round(3000 / (withdrawRate ?? Infinity)),
+      img: TelegramStarIcon,
+    },
+    {
+      name: '3000 coins',
+      price: Math.round(3000 / (withdrawRate ?? Infinity)),
+      img: TelegramStarIcon,
+    },
+    {
+      name: '3000 coins',
+      price: Math.round(3000 / (withdrawRate ?? Infinity)),
+      img: TelegramStarIcon,
+    },
+    {
+      name: '3000 coins',
+      price: Math.round(3000 / (withdrawRate ?? Infinity)),
+      img: TelegramStarIcon,
+    },
+  ],
+}
+
+const currentLevelGifts = computed<Gift[]>(() => {
+  return giftsByLevel[currentLevel.value] ?? []
+})
+
+const getGiftForRank = (index: number): Gift | null => {
+  return currentLevelGifts.value[index] ?? null
+}
+
+type RankVisual = {
+  icon?: typeof CupIcon
+  color?: string
+}
+
+const rankVisuals: Record<number, RankVisual> = {
+  0: { icon: CupIcon, color: '#FFAC33' }, // gold
+  1: { icon: CupIcon, color: '#ABB0B1' }, // silver
+  2: { icon: CupIcon, color: '#C67747' }, // bronze
+}
+
+const getRankVisual = (index: number): RankVisual | null => {
+  return rankVisuals[index] ?? null
+}
+
+const getRankLabel = (index: number): string => {
+  return `#${index + 1}`
 }
 </script>
 
@@ -157,7 +227,7 @@ const getRankCoins = (index: number) => {
       <div
         v-for="(user, index) in users"
         :key="user.id"
-        class="flex justify-between items-center border border-[#b6d4d7] bg-[rgba(60,143,151,0.5)] p-2 rounded-xl"
+        class="flex justify-between items-center border border-[#b6d4d7] bg-[rgba(60,143,151,0.5)] p-2 px-4 rounded-xl"
       >
         <div class="flex items-center gap-2">
           <img :src="UserImage" class="w-12" />
@@ -187,18 +257,35 @@ const getRankCoins = (index: number) => {
           </div>
         </div>
 
-        <!-- RANK -->
-        <div class="flex flex-col items-center gap-1 font-bold leading-none">
-          <CupIcon v-if="index === 0" class="w-6 text-orange-400" />
-          <CupIcon v-else-if="index === 1" class="w-6 text-slate-400" />
-          <CupIcon v-else-if="index === 2" class="w-6 text-[#C67747]" />
-          <h1 v-else>#{{ index + 1 }}</h1>
+        <div class="flex flex-col items-center gap-2 font-bold leading-none">
+          <!-- ICON / RANK -->
+          <div class="flex items-center gap-2">
+            <!-- CUP (if exists) -->
+            <component
+              v-if="getRankVisual(index)"
+              :is="getRankVisual(index)!.icon"
+              class="w-6"
+              :style="{ color: getRankVisual(index)!.color }"
+            />
 
-          <p class="text-xs">{{ getRankCoins(index).toLocaleString() }} coins</p>
+            <!-- RANK NUMBER (fallback) -->
+            <span v-else class="text-sm">
+              {{ getRankLabel(index) }}
+            </span>
 
-          <p class="text-[10px] opacity-60">
-            = {{ (getRankCoins(index) / (withdrawRate ?? Infinity)).toFixed(2) }} TON
-          </p>
+            <!-- GIFT ICON -->
+            <img
+              v-if="getGiftForRank(index)?.img"
+              :src="getGiftForRank(index)!.img"
+              class="w-6 h-6"
+            />
+          </div>
+
+          <!-- GIFT INFO -->
+          <div v-if="getGiftForRank(index)" class="flex flex-col items-center text-xs">
+            <span>{{ getGiftForRank(index)!.name }}</span>
+            <span class="text-[10px] opacity-60"> = {{ getGiftForRank(index)!.price }} TON </span>
+          </div>
         </div>
       </div>
     </div>
