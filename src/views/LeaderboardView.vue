@@ -7,7 +7,16 @@ import type { Season, LeaderboardResponse } from '@/api/types'
 
 import { LeaderboardBackgroundImage } from '@/assets/backgrounds/winter'
 import { ArrowBackIcon, CupIcon, InfoIcon, SwitchIcon } from '@/assets/icons/winter'
-import { CoinImage, IceCreamImage, UserImage } from '@/assets/images/winter'
+import {
+  CoinImage,
+  HappyBrownieImage,
+  IceCreamImage,
+  InstantRamenImage,
+  SnoopDoggImage,
+  StarNotepadImage,
+  SwagBagImage,
+  UserImage,
+} from '@/assets/images/winter'
 import LoaderComponent from '@/components/LoaderComponent.vue'
 import TelegramStarIcon from '@/assets/icons/winter/star.svg?url'
 
@@ -147,44 +156,137 @@ const giftsByLevel: Record<number, Gift[]> = {
   ],
 
   2: [
+    { name: '100 Stars', price: 1, img: TelegramStarIcon },
     { name: '50 Stars', price: 0.5, img: TelegramStarIcon },
     { name: '21 Stars', price: 0.21, img: TelegramStarIcon },
+    {
+      name: '6000 coins',
+      price: 0.06,
+      img: CoinImage,
+    },
+    {
+      name: '6000 coins',
+      price: 0.06,
+      img: CoinImage,
+    },
+    {
+      name: '6000 coins',
+      price: 0.06,
+      img: CoinImage,
+    },
+    {
+      name: '6000 coins',
+      price: 0.06,
+      img: CoinImage,
+    },
+    {
+      name: '6000 coins',
+      price: 0.06,
+      img: CoinImage,
+    },
+    {
+      name: '6000 coins',
+      price: 0.06,
+      img: CoinImage,
+    },
+    {
+      name: '6000 coins',
+      price: 0.06,
+      img: CoinImage,
+    },
+  ],
+
+  3: [
+    { name: 'Instant Ramen', price: 2.2, img: InstantRamenImage },
+    { name: '100 Stars', price: 1, img: TelegramStarIcon },
+    { name: '50 Stars', price: 0.5, img: TelegramStarIcon },
+    {
+      name: '10000 coins',
+      price: 0.1,
+      img: CoinImage,
+    },
+    {
+      name: '10000 coins',
+      price: 0.1,
+      img: CoinImage,
+    },
+    {
+      name: '10000 coins',
+      price: 0.1,
+      img: CoinImage,
+    },
+    {
+      name: '10000 coins',
+      price: 0.1,
+      img: CoinImage,
+    },
+    {
+      name: '10000 coins',
+      price: 0.1,
+      img: CoinImage,
+    },
+    {
+      name: '10000 coins',
+      price: 0.1,
+      img: CoinImage,
+    },
+    {
+      name: '10000 coins',
+      price: 0.1,
+      img: CoinImage,
+    },
+  ],
+
+  4: [
+    { name: 'Star Notepad', price: 3, img: StarNotepadImage },
+    { name: '150 Stars', price: 1.5, img: TelegramStarIcon },
+    { name: '75 Stars', price: 0.75, img: TelegramStarIcon },
     { name: '13 Stars', price: 0.13, img: TelegramStarIcon },
-    {
-      name: '3000 coins',
-      price: 0.03,
-      img: CoinImage,
-    },
-    {
-      name: '3000 coins',
-      price: 0.03,
-      img: CoinImage,
-    },
-    {
-      name: '3000 coins',
-      price: 0.03,
-      img: CoinImage,
-    },
-    {
-      name: '3000 coins',
-      price: 0.03,
-      img: CoinImage,
-    },
-    {
-      name: '3000 coins',
-      price: 0.03,
-      img: CoinImage,
-    },
-    {
-      name: '3000 coins',
-      price: 0.03,
-      img: CoinImage,
-    },
-    {
-      name: '3000 coins',
-      price: 0.03,
-      img: CoinImage,
-    },
+    { name: '13 Stars', price: 0.13, img: TelegramStarIcon },
+    { name: '13 Stars', price: 0.13, img: TelegramStarIcon },
+    { name: '13 Stars', price: 0.13, img: TelegramStarIcon },
+    { name: '13 Stars', price: 0.13, img: TelegramStarIcon },
+    { name: '13 Stars', price: 0.13, img: TelegramStarIcon },
+    { name: '13 Stars', price: 0.13, img: TelegramStarIcon },
+  ],
+
+  5: [
+    { name: 'Snoop Dogg', price: 4, img: SnoopDoggImage },
+    { name: '200 Stars', price: 2, img: TelegramStarIcon },
+    { name: '100 Stars', price: 1, img: TelegramStarIcon },
+    { name: '21 Stars', price: 0.21, img: TelegramStarIcon },
+    { name: '21 Stars', price: 0.21, img: TelegramStarIcon },
+    { name: '21 Stars', price: 0.21, img: TelegramStarIcon },
+    { name: '21 Stars', price: 0.21, img: TelegramStarIcon },
+    { name: '21 Stars', price: 0.21, img: TelegramStarIcon },
+    { name: '21 Stars', price: 0.21, img: TelegramStarIcon },
+    { name: '21 Stars', price: 0.21, img: TelegramStarIcon },
+  ],
+
+  6: [
+    { name: 'Swag Bag', price: 5, img: SwagBagImage },
+    { name: '250 Stars', price: 2.5, img: TelegramStarIcon },
+    { name: '125 Stars', price: 1.25, img: TelegramStarIcon },
+    { name: '21 Stars', price: 0.21, img: TelegramStarIcon },
+    { name: '21 Stars', price: 0.21, img: TelegramStarIcon },
+    { name: '21 Stars', price: 0.21, img: TelegramStarIcon },
+    { name: '21 Stars', price: 0.21, img: TelegramStarIcon },
+    { name: '21 Stars', price: 0.21, img: TelegramStarIcon },
+    { name: '21 Stars', price: 0.21, img: TelegramStarIcon },
+    { name: '21 Stars', price: 0.21, img: TelegramStarIcon },
+  ],
+
+  7: [
+    { name: 'Happy Brownie', price: 6, img: HappyBrownieImage },
+    { name: '300 Stars', price: 3, img: TelegramStarIcon },
+    { name: '150 Stars', price: 1.5, img: TelegramStarIcon },
+    { name: '50 Stars', price: 0.5, img: TelegramStarIcon },
+    { name: '50 Stars', price: 0.5, img: TelegramStarIcon },
+    { name: '50 Stars', price: 0.5, img: TelegramStarIcon },
+    { name: '50 Stars', price: 0.5, img: TelegramStarIcon },
+    { name: '50 Stars', price: 0.5, img: TelegramStarIcon },
+    { name: '50 Stars', price: 0.5, img: TelegramStarIcon },
+    { name: '50 Stars', price: 0.5, img: TelegramStarIcon },
   ],
 }
 
