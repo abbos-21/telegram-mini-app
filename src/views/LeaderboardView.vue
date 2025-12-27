@@ -230,7 +230,7 @@ const getRankLabel = (index: number): string => {
         class="flex justify-between items-center border border-[#b6d4d7] bg-[rgba(60,143,151,0.5)] p-2 px-4 rounded-xl"
       >
         <div class="flex items-center gap-2">
-          <img :src="UserImage" class="w-12" />
+          <img :src="UserImage" class="w-14" />
 
           <!-- <div class="flex flex-col gap-1 font-bold leading-none">
             <h2 class="text-sm">{{ user.firstName ?? user.lastName ?? 'No name user' }}</h2>
@@ -257,7 +257,7 @@ const getRankLabel = (index: number): string => {
           </div>
         </div>
 
-        <div class="flex flex-col items-center gap-2 font-bold leading-none">
+        <div class="flex flex-col items-end gap-2 font-bold leading-none">
           <!-- ICON / RANK -->
           <div class="flex items-center gap-2">
             <!-- CUP (if exists) -->
