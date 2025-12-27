@@ -145,6 +145,47 @@ const giftsByLevel: Record<number, Gift[]> = {
       img: CoinImage,
     },
   ],
+
+  2: [
+    { name: '50 Stars', price: 0.5, img: TelegramStarIcon },
+    { name: '21 Stars', price: 0.21, img: TelegramStarIcon },
+    { name: '13 Stars', price: 0.13, img: TelegramStarIcon },
+    {
+      name: '3000 coins',
+      price: 0.03,
+      img: CoinImage,
+    },
+    {
+      name: '3000 coins',
+      price: 0.03,
+      img: CoinImage,
+    },
+    {
+      name: '3000 coins',
+      price: 0.03,
+      img: CoinImage,
+    },
+    {
+      name: '3000 coins',
+      price: 0.03,
+      img: CoinImage,
+    },
+    {
+      name: '3000 coins',
+      price: 0.03,
+      img: CoinImage,
+    },
+    {
+      name: '3000 coins',
+      price: 0.03,
+      img: CoinImage,
+    },
+    {
+      name: '3000 coins',
+      price: 0.03,
+      img: CoinImage,
+    },
+  ],
 }
 
 const currentLevelGifts = computed<Gift[]>(() => {
@@ -227,7 +268,7 @@ const getRankLabel = (index: number): string => {
       <div
         v-for="(user, index) in users"
         :key="user.id"
-        class="flex justify-between items-center border border-[#b6d4d7] bg-[rgba(60,143,151,0.5)] p-2 px-4 rounded-xl"
+        class="flex justify-between items-center border border-[#b6d4d7] bg-[rgba(60,143,151,0.5)] p-2 px-3 rounded-xl"
       >
         <div class="flex items-center gap-2">
           <img :src="UserImage" class="w-14" />
