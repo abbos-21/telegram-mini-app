@@ -302,23 +302,23 @@ onBeforeUnmount(() => {
           <RouterLink to="/shop">
             <img :src="MenuItemShopImage" alt="shop" />
           </RouterLink>
-          <RouterLink to="/tasks" class="relative" v-if="isUserBiggie">
+          <RouterLink to="/tasks" class="relative">
             <img :src="MenuItemTasksImage" alt="tasks" />
-            <span
+            <!-- <span
               class="absolute w-6 h-6 rounded-full font-bold bg-red-500 text-white top-0 right-0 flex justify-center items-center"
             >
               <BellIcon class="w-4" />
-            </span>
+            </span> -->
           </RouterLink>
 
-          <RouterLink to="/tasks" class="relative" v-else>
+          <!-- <RouterLink to="/tasks" class="relative" v-else>
             <img :src="MenuItemTasksImage" alt="tasks" />
             <span
               class="hey-badge absolute w-10 h-5 rounded-full font-bold bg-red-500 text-white top-0 right-0 flex justify-center items-center text-xs"
             >
               Hey!
             </span>
-          </RouterLink>
+          </RouterLink> -->
           <RouterLink to="/friends">
             <img :src="MenuItemFriendsImage" alt="friends" />
           </RouterLink>
