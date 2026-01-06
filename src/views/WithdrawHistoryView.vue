@@ -57,7 +57,7 @@ const statusBadgeClass = (status: Withdrawal['status']) => {
     case 'FAILED':
       return 'bg-red-500 text-white'
     default:
-      return 'bg-gray-500 text-white'
+      return 'bg-red-500 text-white'
   }
 }
 </script>
