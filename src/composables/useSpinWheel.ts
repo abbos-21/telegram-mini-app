@@ -81,7 +81,13 @@ export function useSpinWheel() {
       lastPrize.value = res.data.prize
       canSpin.value = false
       setTimeout(() => {
-        toast.success(`You won ${lastPrize.value} coins! Keep going!`)
+        if (lastPrize.value === 1) {
+          toast.success(`Congratulations! You won the gift. Admins will send it to you soon.`)
+        } else if (lastPrize.value === 13) {
+          toast.success(`Congratulations! You won 13 stars. Admins will send them to you soon.`)
+        } else {
+          toast.success(`You won ${lastPrize.value} coins! Keep going!`)
+        }
       }, 4000)
       await fetchStatus()
       return res.data

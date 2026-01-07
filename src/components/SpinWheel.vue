@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { ref, computed, type CSSProperties, onMounted, nextTick } from 'vue'
 import { SpinPointerIcon } from '@/assets/icons/winter'
-import { SpinButtonImage } from '@/assets/images/winter'
+import { IceCreamImage, SpinButtonImage } from '@/assets/images/winter'
 import { useSpinWheel } from '@/composables/useSpinWheel'
 import LoaderComponent from './LoaderComponent.vue'
+import TelegramStarIcon from '@/assets/icons/winter/star.svg?url'
 
 interface Segment {
   label: string
@@ -22,14 +23,14 @@ const RESET_DURATION = 800
 const POINTER_ANGLE = 270
 
 const segments = ref<Segment[]>([
-  { label: '+5', value: 5, color: '#FFE07D' },
-  { label: '10', value: 10, color: '#b3e59f' },
-  { label: '15', value: 15, color: '#7ca1bc' },
-  { label: '20', value: 20, color: '#FFC251' },
-  { label: '25', value: 25, color: '#E28086' },
-  { label: '30', value: 30, color: '#beddf3' },
-  { label: '35', value: 35, color: '#D8BFD8' },
-  { label: '40', value: 40, color: '#F4A300' },
+  { label: '🎁', value: 1, color: '#FFE07D' },
+  { label: '13⭐️', value: 13, color: '#b3e59f' },
+  { label: '50', value: 50, color: '#7ca1bc' },
+  { label: '100', value: 100, color: '#FFC251' },
+  { label: '150', value: 150, color: '#E28086' },
+  { label: '250', value: 250, color: '#beddf3' },
+  { label: '300', value: 300, color: '#D8BFD8' },
+  { label: '400', value: 400, color: '#F4A300' },
 ])
 
 const wheelRef = ref<HTMLDivElement | null>(null)
@@ -156,7 +157,12 @@ onMounted(async () => {
         class="label"
         :style="labelStyle(i)"
       >
-        {{ segment.label }}
+        <img :src="IceCreamImage" alt="ice-cream" class="w-8" v-if="segment.value === 1" />
+        <span v-else-if="segment.value === 13" class="flex items-center gap-px -ms-2">
+          <span>{{ segment.value }}</span>
+          <img :src="TelegramStarIcon" alt="star" class="w-6" />
+        </span>
+        <span v-else>{{ segment.label }}</span>
       </div>
     </div>
 
