@@ -111,6 +111,7 @@ const watchAd = async () => {
       toast.info(
         `Daily ${action} refill limit exceeded. Try after ${formatTime(response.data.secondsLeft)}`,
       )
+      return
     }
 
     const { show, addEventListener } = useAdsgram({
@@ -147,9 +148,11 @@ const watchAd = async () => {
     if (user.value?.energyRefillLimit === 0) {
       const response = await infoService.getNextRefillUpdate()
 
-      return toast.info(
+      toast.info(
         `Daily ${action} refill limit exceeded. Try after ${formatTime(response.data.secondsLeft)}`,
       )
+
+      return
     }
     const { show, addEventListener } = useAdsgram({
       blockId: energyRewardBlockId,
