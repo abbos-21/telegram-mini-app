@@ -7,11 +7,13 @@ import { useAdsgram } from '@adsgram/vue'
 import { runChainUntilSuccess } from '@/utils/chainFunction'
 import LoaderComponent from './LoaderComponent.vue'
 import { PopupBackgroundImage } from '@/assets/backgrounds/winter'
+import { infoService } from '@/api/infoService'
+import { toast } from 'vue3-toastify'
 
 // const blockId = import.meta.env.VITE_BLOCK_ID
 const healthRewardBlockId = import.meta.env.VITE_HEALTH_REWARD_BLOCK_ID
 const energyRewardBlockId = import.meta.env.VITE_ENERGY_REWARD_BLOCK_ID
-const { mine, sync, getUserData } = useGame() // recoverEnergyFree, recoverHealthFree, recoverEnergy, recoverHealth,
+const { mine, sync, getUserData, user } = useGame() // recoverEnergyFree, recoverHealthFree, recoverEnergy, recoverHealth,
 
 interface Props {
   isOpen: boolean
@@ -93,10 +95,24 @@ const closePopup = () => emit('close')
 //   }
 // }
 
+function formatTime(sec: number) {
+  const h = Math.floor(sec / 3600)
+  const m = Math.floor((sec % 3600) / 60)
+  const s = sec % 60
+  return `${h}h ${m}m ${s}s`
+}
+
 const watchAd = async () => {
   const action = currentSectionData.value.action
 
   if (action === 'health') {
+    if (user.value?.healthRefillLimit === 0) {
+      const response = await infoService.getNextRefillUpdate()
+      toast.info(
+        `Daily ${action} refill limit exceeded. Try after ${formatTime(response.data.secondsLeft)}`,
+      )
+    }
+
     const { show, addEventListener } = useAdsgram({
       blockId: healthRewardBlockId,
     })
@@ -128,6 +144,13 @@ const watchAd = async () => {
       console.log('Error showing ad: ', err)
     }
   } else if (action === 'energy') {
+    if (user.value?.energyRefillLimit === 0) {
+      const response = await infoService.getNextRefillUpdate()
+
+      return toast.info(
+        `Daily ${action} refill limit exceeded. Try after ${formatTime(response.data.secondsLeft)}`,
+      )
+    }
     const { show, addEventListener } = useAdsgram({
       blockId: energyRewardBlockId,
     })

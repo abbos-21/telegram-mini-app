@@ -45,6 +45,9 @@ export interface User {
   canPlayBox: boolean
 
   withdrawals: Withdrawal[]
+
+  energyRefillLimit: number
+  healthRefillLimit: number
 }
 
 export interface ApiResponse<T> {
@@ -238,6 +241,11 @@ export interface BoxReward {
 
 export interface BoxRewardResponse {
   rewardList: BoxReward[]
+}
+
+export interface InfoNextRefillResponse {
+  secondsLeft: number
+  nextUpdateAt: string
 }
 
 export interface ApiError {

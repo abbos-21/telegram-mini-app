@@ -23,7 +23,7 @@ import {
 } from './assets/images/winter'
 import { withdrawService } from './api/withdrawService'
 import { blockListService } from './api/blockListService'
-import { BellIcon } from './assets/icons/winter'
+// import { BellIcon } from './assets/icons/winter'
 
 const route = useRoute()
 const router = useRouter()
