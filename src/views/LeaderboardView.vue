@@ -10,6 +10,7 @@ import { ArrowBackIcon, CupIcon, InfoIcon, SwitchIcon } from '@/assets/icons/win
 import {
   CoinImage,
   HappyBrownieImage,
+  HappyPinkieImage,
   IceCreamImage,
   InstantRamenImage,
   SnoopDoggImage,
@@ -288,6 +289,8 @@ const giftsByLevel: Record<number, Gift[]> = {
     { name: '50 Stars', price: 0.5, img: TelegramStarIcon },
     { name: '50 Stars', price: 0.5, img: TelegramStarIcon },
   ],
+
+  8: [{ name: 'Happy Brownie', price: 7, img: HappyPinkieImage }],
 }
 
 const currentLevelGifts = computed<Gift[]>(() => {
