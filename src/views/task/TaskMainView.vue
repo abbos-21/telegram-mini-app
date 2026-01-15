@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, inject, onMounted } from 'vue'
+import { ref, inject, onMounted, computed } from 'vue'
 import WebApp from '@twa-dev/sdk'
 import { toast } from 'vue3-toastify'
 
@@ -15,8 +15,8 @@ const isUserBiggie = inject('isUserBiggie')
 const loading = ref(false)
 const error = ref<ApiError | null>(null)
 
-const tasks = ref<string[]>([])
-const allTasks = ref<string[]>([])
+const tasks = ref<string[]>([]) // active tasks
+const allTasks = ref<string[]>([]) // completed tasks
 
 const subscribedChannels = ref<Set<string>>(new Set())
 const processingChannel = ref<string | null>(null)
@@ -45,6 +45,27 @@ const mountFetch = async () => {
     loading.value = false
   }
 }
+
+/* -------------------- computed: sorted tasks -------------------- */
+const activeTasksSorted = computed(() => {
+  return [...tasks.value].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }))
+})
+
+const completedTasksSorted = computed(() => {
+  return [...allTasks.value].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }))
+})
+
+// Optional: uncomment and customize if you want to show only specific channels
+
+const allowedChannels = ['@brunoplay_news', '@brunoplay_chat']
+
+const filteredActiveTasks = computed(() => {
+  return activeTasksSorted.value.filter((channel) => allowedChannels.includes(channel))
+})
+
+const filteredCompletedTasks = computed(() => {
+  return completedTasksSorted.value.filter((channel) => allowedChannels.includes(channel))
+})
 
 /* -------------------- actions -------------------- */
 const toggle = (channel: string) => {
@@ -80,7 +101,6 @@ const checkSubscription = async (channel: string) => {
 }
 
 // TASK AD
-
 const handleReward = () => {
   toast.success('10 coins have been successfully added to your balance!')
 }
@@ -102,6 +122,7 @@ onMounted(async () => {
   <LoaderComponent v-if="loading" />
 
   <div class="my-4 flex flex-col gap-4 overflow-y-scroll scrollbar-hide">
+    <!-- ADSGRAM TASK -->
     <!-- eslint-disable -->
     <AdsgramTask
       v-if="!isUserBiggie"
@@ -111,12 +132,11 @@ onMounted(async () => {
       :onReward="handleReward"
       :onError="handleError"
       v-html="rawHtml"
-    >
-    </AdsgramTask>
+    />
 
-    <!-- ACTIVE TASKS -->
+    <!-- ACTIVE TASKS (sorted) -->
     <div
-      v-for="channel in tasks"
+      v-for="channel in filteredActiveTasks"
       :key="channel"
       class="bg-[rgba(179,223,220,0.75)] rounded-xl p-2 text-neutral-600"
     >
@@ -179,9 +199,9 @@ onMounted(async () => {
       </div>
     </div>
 
-    <!-- COMPLETED TASKS -->
+    <!-- COMPLETED TASKS (sorted) -->
     <div
-      v-for="channel in allTasks"
+      v-for="channel in filteredCompletedTasks"
       :key="channel"
       class="bg-[rgba(179,223,220,0.75)] rounded-xl p-2 opacity-75 text-neutral-600"
     >
