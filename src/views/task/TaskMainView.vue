@@ -7,7 +7,7 @@ import { taskService } from '@/api/taskService'
 import type { ApiError } from '@/api/types'
 
 import { ChevronIcon } from '@/assets/icons/winter'
-import { CoinImage, TaskImage } from '@/assets/images/winter'
+import { CoinImage, TaskChatImage, TaskImage } from '@/assets/images/winter'
 import LoaderComponent from '@/components/LoaderComponent.vue'
 import { AdsgramTask } from '@adsgram/vue'
 
@@ -100,6 +100,22 @@ const checkSubscription = async (channel: string) => {
   }
 }
 
+const taskImages: Record<string, string> = {
+  '@brunoplay_news': TaskImage, // put real path
+  '@brunoplay_chat': TaskChatImage, // put real path
+  // Example future ones:
+  // '@example_channel': '/assets/images/tasks/example.png',
+  // '@another_one':     new URL('@/assets/images/another.jpg', import.meta.url).href,
+}
+
+// Fallback image when no specific one is found
+const fallbackTaskImage = TaskImage
+
+// Helper to get correct image per channel
+const getTaskImage = (channel: string) => {
+  return taskImages[channel] || fallbackTaskImage
+}
+
 // TASK AD
 const handleReward = () => {
   toast.success('10 coins have been successfully added to your balance!')
@@ -146,7 +162,7 @@ onMounted(async () => {
         @click="toggle(channel)"
       >
         <div class="flex gap-2 items-center">
-          <img :src="TaskImage" class="w-12" />
+          <img :src="getTaskImage(channel)" class="w-12" />
           <h1 class="font-bold text-start truncate">Join {{ channel }}</h1>
         </div>
 
@@ -207,7 +223,7 @@ onMounted(async () => {
     >
       <div class="flex justify-between items-center">
         <div class="flex gap-2 items-center">
-          <img :src="TaskImage" class="w-12" />
+          <img :src="getTaskImage(channel)" class="w-12" />
           <h1 class="font-bold truncate">{{ channel }}</h1>
         </div>
 
