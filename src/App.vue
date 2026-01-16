@@ -171,7 +171,8 @@ watch(
       name === 'leaderboard' ||
       name === 'withdraw' ||
       name === 'withdraw-history' ||
-      name === 'box'
+      name === 'box' ||
+      name === 'game'
     )
   },
   { immediate: true },
@@ -251,9 +252,9 @@ onBeforeUnmount(() => {
 <template>
   <!-- APP -->
 
-  <LoaderComponent v-if="loading" />
+  <!-- <LoaderComponent v-if="loading" /> -->
 
-  <div
+  <!-- <div
     v-else-if="authFailed"
     class="fixed inset-0 flex items-center justify-center z-50 px-4 bg-sky-400"
   >
@@ -272,9 +273,9 @@ onBeforeUnmount(() => {
 
       <p class="text-xs text-white mt-6">Works only in Telegram Mobile</p>
     </div>
-  </div>
+  </div> -->
 
-  <div class="app-container" v-else>
+  <div class="app-container">
     <audio
       ref="audioRef"
       loop
@@ -302,23 +303,23 @@ onBeforeUnmount(() => {
           <RouterLink to="/shop">
             <img :src="MenuItemShopImage" alt="shop" />
           </RouterLink>
-          <RouterLink to="/tasks" class="relative">
+          <!-- <RouterLink to="/tasks" class="relative">
             <img :src="MenuItemTasksImage" alt="tasks" />
-            <!-- <span
+            <span
               class="absolute w-6 h-6 rounded-full font-bold bg-red-500 text-white top-0 right-0 flex justify-center items-center"
             >
               <BellIcon class="w-4" />
-            </span> -->
-          </RouterLink>
+            </span>
+          </RouterLink> -->
 
-          <!-- <RouterLink to="/tasks" class="relative" v-else>
+          <RouterLink to="/tasks" class="relative">
             <img :src="MenuItemTasksImage" alt="tasks" />
             <span
               class="hey-badge absolute w-10 h-5 rounded-full font-bold bg-red-500 text-white top-0 right-0 flex justify-center items-center text-xs"
             >
               Hey!
             </span>
-          </RouterLink> -->
+          </RouterLink>
           <RouterLink to="/friends">
             <img :src="MenuItemFriendsImage" alt="friends" />
           </RouterLink>

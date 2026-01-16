@@ -21,6 +21,7 @@
     "@twa-dev/sdk": "^8.0.2",
     "animate.css": "^4.1.1",
     "axios": "^1.12.2",
+    "kaboom": "^3000.1.17",
     "monetag-tg-sdk": "^1.0.1",
     "pinia": "^3.0.3",
     "tailwindcss": "^4.1.14",

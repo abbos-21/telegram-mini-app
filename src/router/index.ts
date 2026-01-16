@@ -7,6 +7,7 @@ import WithdrawView from '../views/WithdrawView.vue'
 import WithdrawHistoryView from '@/views/WithdrawHistoryView.vue'
 import LeaderboardView from '@/views/LeaderboardView.vue'
 import BoxView from '@/views/BoxView.vue'
+import GameView from '@/views/GameView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -65,6 +66,11 @@ const router = createRouter({
       path: '/box',
       name: 'box',
       component: BoxView,
+    },
+    {
+      path: '/game',
+      name: 'game',
+      component: GameView,
     },
   ],
 })

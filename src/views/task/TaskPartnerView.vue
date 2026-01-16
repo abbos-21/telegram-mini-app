@@ -57,7 +57,21 @@ const completedTasksSorted = computed(() => {
 
 // Optional: uncomment and customize if you want to show only specific channels
 
-const allowedChannels = ['@coinup_projects', '@CoinUPuz']
+const allowedChannels = [
+  '@CoinUPuz',
+  '@coinup_projects',
+
+  '@zrbtua',
+  '@perviu1million',
+  '@tmton',
+  '@TON_Elixir',
+  '@Crypto_Meteora',
+  '@CryptoZaryad',
+  '@kopee4ka_k_kopee4ke1',
+  '@cryptomaxbablo',
+  '@Hamsters_APProach',
+  '@bronia_tg',
+]
 
 const filteredActiveTasks = computed(() => {
   return activeTasksSorted.value.filter((channel) => allowedChannels.includes(channel))
@@ -101,11 +115,19 @@ const checkSubscription = async (channel: string) => {
 }
 
 const taskImages: Record<string, string> = {
-  // '@brunoplay_news': TaskImage, // put real path
-  // '@brunoplay_chat': TaskChatImage, // put real path
-  // Example future ones:
-  // '@example_channel': '/assets/images/tasks/example.png',
-  // '@another_one':     new URL('@/assets/images/another.jpg', import.meta.url).href,
+  '@CoinUPuz': '/CoinUPuz.jpg',
+  '@coinup_projects': '/coinup_projects.jpg',
+
+  '@zrbtua': '/zrbtua.jpg',
+  '@perviu1million': '/perviu1million.jpg',
+  '@tmton': '/tmton.jpg',
+  '@TON_Elixir': '/TON_Elixir.jpg',
+  '@Crypto_Meteora': '/Crypto_Meteora.jpg',
+  '@CryptoZaryad': '/CryptoZaryad.jpg',
+  '@kopee4ka_k_kopee4ke1': '/kopee4ka_k_kopee4ke1.jpg',
+  '@cryptomaxbablo': '/cryptomaxbablo.jpg',
+  '@Hamsters_APProach': '/Hamsters_APProach.jpg',
+  '@bronia_tg': '/bronia_tg.jpg',
 }
 
 // Fallback image when no specific one is found
