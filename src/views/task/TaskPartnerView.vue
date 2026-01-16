@@ -184,7 +184,7 @@ onMounted(async () => {
         @click="toggle(channel)"
       >
         <div class="flex items-center gap-2 min-w-0 flex-1">
-          <img :src="getTaskImage(channel)" class="w-12 rounded-sm shrink-0" />
+          <img :src="getTaskImage(channel)" class="w-12 rounded-lg shrink-0" />
           <h1 class="font-bold text-start truncate">Join {{ channel }}</h1>
         </div>
 
