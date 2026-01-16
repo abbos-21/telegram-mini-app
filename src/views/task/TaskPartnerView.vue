@@ -180,22 +180,24 @@ onMounted(async () => {
     >
       <button
         type="button"
-        class="w-full flex justify-between items-center"
+        class="w-full flex items-center justify-between gap-3 min-w-0"
         @click="toggle(channel)"
       >
-        <div class="flex gap-2 items-center">
-          <img :src="getTaskImage(channel)" class="w-12" />
+        <div class="flex items-center gap-2 min-w-0 flex-1">
+          <img :src="getTaskImage(channel)" class="w-12 rounded-sm shrink-0" />
           <h1 class="font-bold text-start truncate">Join {{ channel }}</h1>
         </div>
 
-        <div class="flex gap-4 items-center px-2 shrink-0">
-          <div class="flex gap-1 items-center rounded-full bg-[#FFAC33] px-2 py-px">
+        <div class="flex gap-4 items-center shrink-0">
+          <div
+            class="flex gap-1 items-center rounded-full bg-[#FFAC33] px-2 py-px whitespace-nowrap"
+          >
             <img :src="CoinImage" class="w-6" />
             <span class="font-bold text-sm">20</span>
           </div>
 
           <ChevronIcon
-            class="w-4 transition-transform"
+            class="w-4 transition-transform shrink-0"
             :class="openedTask === channel ? 'rotate-180' : ''"
           />
         </div>
