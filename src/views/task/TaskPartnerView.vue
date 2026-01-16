@@ -245,13 +245,20 @@ onMounted(async () => {
       :key="channel"
       class="bg-[rgba(179,223,220,0.75)] rounded-xl p-2 opacity-75 text-neutral-600"
     >
-      <div class="flex justify-between items-center">
-        <div class="flex gap-2 items-center">
-          <img :src="getTaskImage(channel)" class="w-12" />
-          <h1 class="font-bold truncate">{{ channel }}</h1>
+      <div class="flex items-center justify-between gap-3 min-w-0">
+        <div class="flex items-center gap-2 min-w-0 flex-1">
+          <img :src="getTaskImage(channel)" class="w-12 shrink-0 rounded-lg" />
+          <h1 class="font-bold truncate">
+            {{ channel }}
+          </h1>
         </div>
 
-        <button disabled class="rounded-full bg-white px-4 py-1 font-bold">Subscribed</button>
+        <button
+          disabled
+          class="shrink-0 rounded-full bg-white px-4 py-1 font-bold whitespace-nowrap"
+        >
+          Subscribed
+        </button>
       </div>
     </div>
   </div>
