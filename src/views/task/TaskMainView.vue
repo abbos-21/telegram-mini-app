@@ -206,7 +206,7 @@ onMounted(async () => {
       </div>
     </div>
 
-    <AdsgramTask
+    <!-- <AdsgramTask
       v-if="!isUserBiggie"
       blockId="task-19654"
       :debug="false"
@@ -214,7 +214,7 @@ onMounted(async () => {
       :onReward="handleReward"
       :onError="handleError"
       v-html="rawHtml"
-    />
+    /> -->
 
     <!-- COMPLETED TASKS (sorted) -->
     <div
