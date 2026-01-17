@@ -148,8 +148,6 @@ const navHeight = inject('navHeight')
           </div>
         </div>
       </div>
-
-      <RouterLink to="/game" class="text-xs">Play</RouterLink>
     </div>
   </div>
 </template>
