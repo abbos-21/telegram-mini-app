@@ -2,6 +2,7 @@
 import { ref, onMounted, inject } from 'vue'
 import { CoinImage } from '@/assets/images/winter'
 import LoaderComponent from '@/components/LoaderComponent.vue'
+import { RouterLink } from 'vue-router'
 
 import { userService } from '@/api/userService'
 import type { User } from '@/api/types'
@@ -147,6 +148,8 @@ const navHeight = inject('navHeight')
           </div>
         </div>
       </div>
+
+      <RouterLink to="/game" class="text-xs">Play</RouterLink>
     </div>
   </div>
 </template>
