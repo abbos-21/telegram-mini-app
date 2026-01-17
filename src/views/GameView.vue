@@ -12,8 +12,8 @@ const CONFIG = {
   COIN_SPAWN_MIN: 1.5,
   COIN_SPAWN_MAX: 3,
   JUMP_FORCE: 800,
-  SPEED: 640,
-  BG_SPEED: 320,
+  SPEED: 400,
+  BG_SPEED: 300,
   ACCELERATION: 2, // Pixels per second increase per second
   POINTS_PER_SECOND: 60,
   GRAVITY: 2400,
