@@ -141,7 +141,6 @@ onMounted(async () => {
     <!-- ADSGRAM TASK -->
     <!-- eslint-disable -->
     <AdsgramTask
-      v-if="!isUserBiggie"
       blockId="task-19654"
       :debug="false"
       class="task"
