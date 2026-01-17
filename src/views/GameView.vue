@@ -6,19 +6,19 @@ const canvas = ref<HTMLCanvasElement | null>(null)
 
 // 1. GAME CONFIGURATION
 const CONFIG = {
-  FLOOR_HEIGHT: 156,
-  OBSTACLE_HEIGHT: 60,
-  COIN_WIDTH: 18,
+  FLOOR_HEIGHT: 210,
+  OBSTACLE_HEIGHT: 80,
+  COIN_WIDTH: 32,
   COIN_SPAWN_MIN: 1.5,
   COIN_SPAWN_MAX: 3,
-  JUMP_FORCE: 600,
-  SPEED: 300,
-  BG_SPEED: 225,
+  JUMP_FORCE: 800,
+  SPEED: 400,
+  BG_SPEED: 300,
   ACCELERATION: 2, // Pixels per second increase per second
   POINTS_PER_SECOND: 60,
-  GRAVITY: 1800,
-  WIDTH: 360,
-  HEIGHT: 640,
+  GRAVITY: 2400,
+  WIDTH: 480,
+  HEIGHT: 854,
 }
 
 onMounted(() => {
@@ -31,11 +31,10 @@ onMounted(() => {
     width: CONFIG.WIDTH,
     height: CONFIG.HEIGHT,
     letterbox: true,
-    pixelDensity: 1,
   })
 
   // 3. LOAD ASSETS
-  loadSprite('player', '/car.png')
+  loadSprite('player', '/car128.png')
   loadSprite('background', '/background.png')
   loadSprite('ice-cream', '/ice-cream.png')
   loadSprite('coin', '/coin.png')
@@ -84,7 +83,7 @@ onMounted(() => {
 
     // -- PLAYER --
     const player = add([
-      sprite('player', { width: 48 }),
+      sprite('player', { width: 64 }),
       pos(80, height() - CONFIG.FLOOR_HEIGHT - 128),
       area(),
       body(),
@@ -97,22 +96,9 @@ onMounted(() => {
     const coinLabel = add([text('Coins: 0'), pos(24, 56), z(20)])
 
     // -- MOVER UPDATE (for obstacles & coins) --
-    // onUpdate('mover', (m) => {
-    //   if (isGameOver) return
-    //   m.pos.x -= currentSpeed * dt()
-    // })
-
-    // Add this (can be inside onUpdate("mover") or separate onUpdate)
-    onUpdate('mover', (obj) => {
+    onUpdate('mover', (m) => {
       if (isGameOver) return
-
-      obj.pos.x -= currentSpeed * dt()
-
-      // Destroy when completely off left side (+ some margin)
-      if (obj.pos.x < -200) {
-        // -200 gives small buffer
-        destroy(obj)
-      }
+      m.pos.x -= currentSpeed * dt()
     })
 
     // -- GAME LOOP --
@@ -187,16 +173,16 @@ onMounted(() => {
 
         if (side === 0) {
           // before obstacle
-          coinX = ice.pos.x - rand(75, 150)
-          coinY = rand(floorTop - 100, floorTop - 30)
+          coinX = ice.pos.x - rand(100, 220)
+          coinY = rand(floorTop - 140, floorTop - 40)
         } else if (side === 1) {
           // after obstacle
-          coinX = ice.pos.x + rand(90, 200)
-          coinY = rand(floorTop - 100, floorTop - 30)
+          coinX = ice.pos.x + rand(120, 260)
+          coinY = rand(floorTop - 140, floorTop - 40)
         } else {
           // above the ice-cream (jump over)
-          coinX = ice.pos.x + rand(15, 45) // slightly offset
-          coinY = floorTop - CONFIG.OBSTACLE_HEIGHT - rand(45, 105)
+          coinX = ice.pos.x + rand(20, 60) // slightly offset
+          coinY = floorTop - CONFIG.OBSTACLE_HEIGHT - rand(60, 140)
         }
 
         add([

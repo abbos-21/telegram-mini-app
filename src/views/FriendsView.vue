@@ -2,7 +2,6 @@
 import { ref, onMounted, inject } from 'vue'
 import { CoinImage } from '@/assets/images/winter'
 import LoaderComponent from '@/components/LoaderComponent.vue'
-import { RouterLink } from 'vue-router'
 
 import { userService } from '@/api/userService'
 import type { User } from '@/api/types'
