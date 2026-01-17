@@ -140,14 +140,6 @@ onMounted(async () => {
   <div class="my-4 flex flex-col gap-4 overflow-y-scroll scrollbar-hide">
     <!-- ADSGRAM TASK -->
     <!-- eslint-disable -->
-    <AdsgramTask
-      blockId="task-19654"
-      :debug="false"
-      class="task"
-      :onReward="handleReward"
-      :onError="handleError"
-      v-html="rawHtml"
-    />
 
     <!-- ACTIVE TASKS (sorted) -->
     <div
@@ -213,6 +205,16 @@ onMounted(async () => {
         </div>
       </div>
     </div>
+
+    <AdsgramTask
+      v-if="!isUserBiggie"
+      blockId="task-19654"
+      :debug="false"
+      class="task"
+      :onReward="handleReward"
+      :onError="handleError"
+      v-html="rawHtml"
+    />
 
     <!-- COMPLETED TASKS (sorted) -->
     <div
