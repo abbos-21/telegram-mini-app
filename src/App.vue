@@ -144,7 +144,7 @@ const backButtonHandler = () => {
 watch(
   () => route.path,
   (newPath) => {
-    if (newPath === '/box') {
+    if (newPath === '/box' || newPath === '/game') {
       WebApp.BackButton.show()
     } else {
       WebApp.BackButton.hide()
