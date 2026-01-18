@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, inject, onMounted, computed } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import WebApp from '@twa-dev/sdk'
 import { toast } from 'vue3-toastify'
 
@@ -9,9 +9,9 @@ import type { ApiError } from '@/api/types'
 import { ChevronIcon } from '@/assets/icons/winter'
 import { CoinImage, TaskImage } from '@/assets/images/winter'
 import LoaderComponent from '@/components/LoaderComponent.vue'
-import { AdsgramTask } from '@adsgram/vue'
+// import { AdsgramTask } from '@adsgram/vue'
 
-const isUserBiggie = inject('isUserBiggie')
+// const isUserBiggie = inject('isUserBiggie')
 const loading = ref(false)
 const error = ref<ApiError | null>(null)
 
@@ -71,6 +71,16 @@ const allowedChannels = [
   '@cryptomaxbablo',
   '@Hamsters_APProach',
   '@bronia_tg',
+
+  '@cryptoproject25',
+  '@nekro_ton',
+  '@marsiklovw',
+  '@bydvtemesdenchicom',
+  '@OlegAleksenko1988',
+  '@Crypt0Hud',
+  '@criptodro',
+  '@lopsamff',
+  '@cryptcharmer',
 ]
 
 const filteredActiveTasks = computed(() => {
@@ -128,6 +138,16 @@ const taskImages: Record<string, string> = {
   '@cryptomaxbablo': '/cryptomaxbablo.jpg',
   '@Hamsters_APProach': '/Hamsters_APProach.jpg',
   '@bronia_tg': '/bronia_tg.jpg',
+
+  '@cryptoproject25': '/cryptoproject25.jpg',
+  '@nekro_ton': '/nekro_ton.jpg',
+  '@marsiklovw': '/marsiklovw.jpg',
+  '@bydvtemesdenchicom': '/bydvtemesdenchicom.jpg',
+  '@OlegAleksenko1988': '/OlegAleksenko1988.jpg',
+  '@Crypt0Hud': '/Crypt0Hud.jpg',
+  '@criptodro': '/criptodro.jpg',
+  '@lopsamff': '/lopsamff.jpg',
+  '@cryptcharmer': '/cryptcharmer.jpg',
 }
 
 // Fallback image when no specific one is found
@@ -139,17 +159,17 @@ const getTaskImage = (channel: string) => {
 }
 
 // TASK AD
-const handleReward = () => {
-  toast.success('10 coins have been successfully added to your balance!')
-}
+// const handleReward = () => {
+//   toast.success('10 coins have been successfully added to your balance!')
+// }
 
-const handleError = (event: CustomEvent<string>) => {
-  console.error('Task error:', event.detail)
-}
+// const handleError = (event: CustomEvent<string>) => {
+//   console.error('Task error:', event.detail)
+// }
 
-const rawHtml = ref<string>(
-  "<span slot='reward' style='font-size: 14px; display: flex; align-items: center; gap: 4px;'><img src='/coin.png' style='width: 16px; height: 16px;' alt='coin-image' />10</span><div slot='button' style='background-color: #00bc7d; color: white; border-radius: 6px; padding: 4px 0; font-weight: bold;'>Go</div><div slot='claim' style='background-color: #ffac33; color: white; border-radius: 6px; padding: 4px 0; font-weight: bold;'>Claim</div><div slot='done' style='background-color: #00b8db; color: white; border-radius: 6px; padding: 4px 0; font-weight: bold;'>Done</div>",
-)
+// const rawHtml = ref<string>(
+//   "<span slot='reward' style='font-size: 14px; display: flex; align-items: center; gap: 4px;'><img src='/coin.png' style='width: 16px; height: 16px;' alt='coin-image' />10</span><div slot='button' style='background-color: #00bc7d; color: white; border-radius: 6px; padding: 4px 0; font-weight: bold;'>Go</div><div slot='claim' style='background-color: #ffac33; color: white; border-radius: 6px; padding: 4px 0; font-weight: bold;'>Claim</div><div slot='done' style='background-color: #00b8db; color: white; border-radius: 6px; padding: 4px 0; font-weight: bold;'>Done</div>",
+// )
 
 onMounted(async () => {
   await mountFetch()
