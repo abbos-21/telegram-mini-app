@@ -3,7 +3,7 @@ import type { ApiResponse, SeasonResponse, LeaderboardResponse } from './types'
 
 export const leaderboardService = {
   getSeason: async (): Promise<ApiResponse<SeasonResponse>> => {
-    const response = await apiClient.get<ApiResponse<SeasonResponse>>('/leaderboard/season/1')
+    const response = await apiClient.get<ApiResponse<SeasonResponse>>('/leaderboard/season/2')
     return response.data
   },
 
