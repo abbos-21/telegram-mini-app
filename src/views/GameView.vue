@@ -31,7 +31,7 @@ onMounted(async () => {
     width: CONFIG.WIDTH,
     height: CONFIG.HEIGHT,
     letterbox: true,
-    pixelDensity: 1,
+    // pixelDensity: 1,
   })
 
   // 3. LOAD ALL ASSETS AND WAIT
