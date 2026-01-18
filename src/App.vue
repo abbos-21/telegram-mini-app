@@ -317,7 +317,7 @@ onBeforeUnmount(() => {
             <span
               class="hey-badge absolute w-10 h-5 rounded-full font-bold bg-red-500 text-white top-0 right-0 flex justify-center items-center text-xs"
             >
-              Hey!
+              New!
             </span>
           </RouterLink>
           <RouterLink to="/friends">
