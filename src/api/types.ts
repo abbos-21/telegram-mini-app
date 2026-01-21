@@ -43,6 +43,7 @@ export interface User {
   lastWheelSpin: string | null
 
   canPlayBox: boolean
+  canPlayCar: boolean
 
   withdrawals: Withdrawal[]
 
@@ -246,6 +247,10 @@ export interface BoxRewardResponse {
 export interface InfoNextRefillResponse {
   secondsLeft: number
   nextUpdateAt: string
+}
+
+export interface CarGameResponse {
+  user: User
 }
 
 export interface ApiError {

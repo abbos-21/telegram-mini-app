@@ -155,7 +155,7 @@ const levelBackgrounds = [
 ]
 
 const backgroundImage = computed(() => {
-  const level = user.value?.level ?? 0
+  const level = user.value?.level ?? 1
 
   // Clamp level to available backgrounds
   const index = Math.min(Math.max(level - 1, 0), levelBackgrounds.length - 1)

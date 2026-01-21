@@ -1,6 +1,19 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue"
-import kaboom from "kaboom"
+import { ref, onMounted } from 'vue'
+import kaboom from 'kaboom'
+import { carGameService } from '@/api/carGameService'
+
+const loading = ref<boolean>(false)
+const canPlay = ref<boolean>(false)
+
+const getStatus = async () => {
+  try {
+    const response = await carGameService.getStatus()
+    canPlay.value = response.data.user.canPlayCar
+  } catch (err) {
+    console.log('Error while getting status: ', err)
+  }
+}
 
 const canvas = ref<HTMLCanvasElement | null>(null)
 
@@ -46,19 +59,20 @@ onMounted(async () => {
   ======================= */
   try {
     await Promise.all([
-      k.loadSprite("player", "/car128.png"),
-      k.loadSprite("background", "/background.png"),
-      k.loadSprite("ice", "/ice-cream.png"),
-      k.loadSprite("coin", "/coin.png"),
-      k.loadSound("crash", "/crash.mp3"),
-      k.loadSound("bg", "/noise.mp3"),
-      k.loadSound("collect", "/collect.mp3"),
+      k.loadSprite('play', '/play.png'),
+      k.loadSprite('player', '/car128.png'),
+      k.loadSprite('background', '/background.png'),
+      k.loadSprite('ice', '/ice-cream.png'),
+      k.loadSprite('coin', '/coin.png'),
+      k.loadSound('crash', '/crash.mp3'),
+      k.loadSound('bg', '/noise.mp3'),
+      k.loadSound('collect', '/collect.mp3'),
     ])
   } catch {
     k.add([
-      k.text("Asset loading failed 😢", { size: 28 }),
+      k.text('Asset loading failed 😢', { size: 28 }),
       k.pos(k.center()),
-      k.anchor("center"),
+      k.anchor('center'),
       k.color(255, 80, 80),
     ])
     return
@@ -67,7 +81,7 @@ onMounted(async () => {
   /* =======================
      GAME SCENE
   ======================= */
-  k.scene("game", () => {
+  k.scene('game', () => {
     k.setGravity(CONFIG.GRAVITY)
 
     let score = 0
@@ -77,19 +91,19 @@ onMounted(async () => {
     // const lastIce: any = null
 
     /* ---- MUSIC ---- */
-    const music = k.play("bg", { loop: true, volume: 0 })
+    const music = k.play('bg', { loop: true, volume: 0 })
     k.tween(0, 0.6, 1.5, (v) => (music.volume = v))
 
     /* ---- BACKGROUND ---- */
     for (let i = 0; i < 2; i++) {
       k.add([
-        k.sprite("background", { width: k.width(), height: k.height() }),
+        k.sprite('background', { width: k.width(), height: k.height() }),
         k.pos(i * k.width(), 0),
-        "bg",
+        'bg',
       ])
     }
 
-    k.onUpdate("bg", (b) => {
+    k.onUpdate('bg', (b) => {
       if (gameOver) return
       b.pos.x -= CONFIG.BG_SPEED * k.dt()
       if (b.pos.x <= -k.width()) b.pos.x += k.width() * 2
@@ -99,7 +113,7 @@ onMounted(async () => {
     k.add([
       k.rect(k.width(), CONFIG.FLOOR_HEIGHT),
       k.pos(0, k.height()),
-      k.anchor("botleft"),
+      k.anchor('botleft'),
       k.body({ isStatic: true }),
       k.area(),
       k.opacity(0),
@@ -107,7 +121,7 @@ onMounted(async () => {
 
     /* ---- PLAYER ---- */
     const player = k.add([
-      k.sprite("player", { width: 64 }),
+      k.sprite('player', { width: 64 }),
       k.pos(80, k.height() - CONFIG.FLOOR_HEIGHT - 128),
       k.area(),
       k.body(),
@@ -115,17 +129,16 @@ onMounted(async () => {
     ])
 
     /* ---- UI ---- */
-    const scoreText = k.add([k.text("Score: 0"), k.pos(20, 20)])
-    const coinText = k.add([k.text("Coins: 0"), k.pos(20, 52)])
+    const scoreText = k.add([k.text('Score: 0'), k.pos(20, 20)])
+    const coinText = k.add([k.text('Coins: 0'), k.pos(20, 52)])
 
     /* ---- MOVERS ---- */
-    k.onUpdate("mover", (m) => {
+    k.onUpdate('mover', (m) => {
       if (!gameOver) m.pos.x -= currentSpeed() * k.dt()
     })
 
     /* ---- SPEED ---- */
-    const currentSpeed = () =>
-      CONFIG.SPEED + gameTime * CONFIG.ACCELERATION
+    const currentSpeed = () => CONFIG.SPEED + gameTime * CONFIG.ACCELERATION
 
     /* ---- GAME LOOP ---- */
     k.onUpdate(() => {
@@ -137,7 +150,7 @@ onMounted(async () => {
 
       if (player.pos.y > k.height() + 100) {
         music.stop()
-        k.go("lose", { score: Math.floor(score), coins })
+        k.go('lose', { score: Math.floor(score), coins })
       }
     })
 
@@ -147,15 +160,15 @@ onMounted(async () => {
         player.jump(CONFIG.JUMP_FORCE)
       }
     }
-    k.onKeyPress("space", jump)
+    k.onKeyPress('space', jump)
     k.onClick(jump)
 
     /* ---- COIN TEXT ---- */
     const spawnCoinText = (p: { x: number; y: number }) => {
       const t = k.add([
-        k.text("+1", { size: 24 }),
+        k.text('+1', { size: 24 }),
         k.pos(p.x, p.y),
-        k.anchor("center"),
+        k.anchor('center'),
         k.color(255, 215, 0),
         k.opacity(1),
       ])
@@ -221,82 +234,94 @@ onMounted(async () => {
     //   k.wait(k.rand(0.8, 1.5), spawnObstacle)
     // }
 
+    // k.wait(2, spawnObstacle)
+
     /* ---- SPAWN ---- */
     const spawnObstacle = () => {
       if (gameOver) return
 
       const floorY = k.height() - CONFIG.FLOOR_HEIGHT
 
-      // 1. Determine the wait time for the NEXT obstacle immediately
-      // We increased the max time slightly to allow distinct coin groups
-      const timeToNextObstacle = k.rand(0.8, 2.2)
+      // 1. Determine gap time (randomized for gameplay variety)
+      const timeToNext = k.rand(0.6, 2.4)
 
-      // 2. Spawn the current Obstacle
+      // 2. Spawn current Obstacle (The "Left" wall of the gap)
       k.add([
-        k.sprite("ice", { height: CONFIG.OBSTACLE_HEIGHT }),
+        k.sprite('ice', { height: CONFIG.OBSTACLE_HEIGHT }),
         k.pos(k.width(), floorY),
-        k.anchor("botleft"),
+        k.anchor('botleft'),
         k.area(),
         k.body({ isStatic: true }),
-        "obstacle",
-        "mover",
+        'obstacle',
+        'mover',
       ])
 
-      // 3. Look Forward: If the gap to the next obstacle is large, fill it with coins now
-      // We calculate approximate distance based on current speed
-      if (timeToNextObstacle > 1.2) {
-        // Calculate where the "middle" of the upcoming empty space is
-        // Speed * Time = Distance. We place coins roughly in the center of that time window.
-        const distanceToNext = currentSpeed() * timeToNextObstacle
-        const gapCenterOffset = distanceToNext / 2
+      // 3. Calculate Coin Placement
+      const speed = currentSpeed()
+      const totalGapDistance = speed * timeToNext
 
-        // Define coin group size based on the time gap
-        let numCoins = 1
-        if (timeToNextObstacle > 1.8) numCoins = k.randi(3, 5)
-        else if (timeToNextObstacle > 1.4) numCoins = k.randi(2, 3)
+      // Safety buffer: Minimum distance from an ice cream (in pixels)
+      // 160px ensures the player isn't mid-jump when coins appear
+      const safetyPadding = 160
 
+      // Available space for coins = Total Gap - (Padding on left + Padding on right)
+      const usableSpace = totalGapDistance - safetyPadding * 2
+
+      // Only spawn coins if the gap is wide enough
+      if (usableSpace > 50) {
+        // Randomize number of coins (1 to 5)
+        let numCoins = k.randi(1, 6)
         const spacing = 55
-        const totalWidth = (numCoins - 1) * spacing
+        let groupWidth = (numCoins - 1) * spacing
 
-        // Start X = Screen Width + Half the calculated gap - Half the coin group width
-        // This centers the coins in the upcoming empty space
-        const startX = k.width() + gapCenterOffset - (totalWidth / 2)
-        const coinY = floorY - 64
+        // If the random group is too wide for the gap, reduce coin count
+        while (groupWidth > usableSpace && numCoins > 0) {
+          numCoins--
+          groupWidth = (numCoins - 1) * spacing
+        }
 
-        for (let i = 0; i < numCoins; i++) {
-          k.add([
-            k.sprite("coin", { width: CONFIG.COIN_WIDTH }),
-            k.pos(startX + i * spacing, coinY),
-            k.anchor("center"),
-            k.area(),
-            "coin",
-            "mover",
-          ])
+        if (numCoins > 0) {
+          // RANDOMIZE POSITION:
+          // We can shift the group anywhere within the usable space
+          const maxShift = usableSpace - groupWidth
+          const randomShift = k.rand(0, maxShift)
+
+          // Final X = ScreenEdge + Padding + RandomShift
+          const startX = k.width() + safetyPadding + randomShift
+          const coinY = floorY - 64
+
+          for (let i = 0; i < numCoins; i++) {
+            k.add([
+              k.sprite('coin', { width: CONFIG.COIN_WIDTH }),
+              k.pos(startX + i * spacing, coinY),
+              k.anchor('center'),
+              k.area(),
+              'coin',
+              'mover',
+            ])
+          }
         }
       }
 
-      // 4. Wait for the pre-calculated time before spawning the next one
-      k.wait(timeToNextObstacle, spawnObstacle)
+      // 4. Wait for next cycle
+      k.wait(timeToNext, spawnObstacle)
     }
 
-    k.wait(2, spawnObstacle)
-
-    // k.wait(2, spawnObstacle)
+    // Start the loop
+    k.wait(3, spawnObstacle)
 
     /* ---- COLLISIONS ---- */
-    player.onCollide("obstacle", () => {
+    player.onCollide('obstacle', () => {
       if (gameOver) return
       gameOver = true
       k.shake(16)
-      k.play("crash")
+      k.play('crash')
       k.tween(music.volume, 0, 0.8, (v) => (music.volume = v))
-      k.wait(1, () =>
-        k.go("lose", { score: Math.floor(score), coins }),
-      )
+      k.wait(1, () => k.go('lose', { score: Math.floor(score), coins }))
     })
 
-    player.onCollide("coin", (c) => {
-      k.play("collect")
+    player.onCollide('coin', (c) => {
+      k.play('collect')
       coins++
       coinText.text = `Coins: ${coins}`
       spawnCoinText(c.pos)
@@ -307,27 +332,64 @@ onMounted(async () => {
   /* =======================
      LOSE SCENE
   ======================= */
-  k.scene("lose", (data?: { score: number; coins: number }) => {
+  // k.scene("lose", (data?: { score: number; coins: number }) => {
+  //   k.add([
+  //     k.sprite("background", { width: k.width(), height: k.height() }),
+  //   ])
+
+  //   k.add([
+  //     k.text(
+  //       data
+  //         ? `Score: ${data.score}\nCoins: ${data.coins}\n\nPress Space or Click`
+  //         : "Press Space or Click",
+  //       { align: "center" },
+  //     ),
+  //     k.pos(k.center()),
+  //     k.anchor("center"),
+  //   ])
+
+  //   k.onKeyPress("space", () => k.go("game"))
+  //   k.onClick(() => k.go("game"))
+  // })
+
+  k.scene('lose', (data?: { score: number; coins: number }) => {
+    // 1. Add Background
+    k.add([k.sprite('background', { width: k.width(), height: k.height() })])
+
+    // 2. Add Score Text
     k.add([
-      k.sprite("background", { width: k.width(), height: k.height() }),
+      k.text(data ? `Score: ${data.score}\nCoins: ${data.coins}` : '', {
+        size: 32,
+        align: 'center',
+      }),
+      k.pos(k.center().x, k.center().y - 100),
+      k.anchor('center'),
     ])
 
-    k.add([
-      k.text(
-        data
-          ? `Score: ${data.score}\nCoins: ${data.coins}\n\nPress Space or Click`
-          : "Press Space or Click",
-        { align: "center" },
-      ),
-      k.pos(k.center()),
-      k.anchor("center"),
+    // 3. Create the Button
+    const btn = k.add([
+      k.rect(240, 80, { radius: 8 }), // Shape and size
+      k.pos(k.center()), // Positioned in the middle
+      k.color(255, 255, 255), // Button color
+      k.outline(4), // Border
+      k.area(), // Required for clicking
+      k.anchor('center'),
     ])
 
-    k.onKeyPress("space", () => k.go("game"))
-    k.onClick(() => k.go("game"))
+    // 4. Add Text inside the Button
+    btn.add([
+      k.text('START', { size: 32 }),
+      k.color(0, 0, 0), // Text color (black)
+      k.anchor('center'),
+    ])
+
+    // 5. Button Logic
+    btn.onClick(() => {
+      k.go('game') // Only go to game if button is clicked
+    })
   })
 
-  k.go("lose")
+  k.go('lose')
 })
 </script>
 
