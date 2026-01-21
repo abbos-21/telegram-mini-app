@@ -7,7 +7,7 @@ const canvas = ref<HTMLCanvasElement | null>(null)
 /* =======================
    SCALE
 ======================= */
-const SCALE = 0.5 // 4x lower resolution
+const SCALE = 0.75 // 4x lower resolution
 
 const s = (v: number) => v * SCALE
 
