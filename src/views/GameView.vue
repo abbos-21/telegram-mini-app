@@ -352,15 +352,17 @@ onMounted(async () => {
     k.wait(3, spawnObstacle)
 
     /* ---- COLLISIONS ---- */
-    player.onCollide('obstacle', () => {
+    player.onCollide('obstacle', async () => {
       if (gameOver) return
       gameOver = true
       k.shake(16)
       k.play('crash')
       k.tween(music.volume, 0, 0.8, (v) => (music.volume = v))
+      await carGameService.reward({ coins: coins })
+      await getStatus()
+      await getInvoiceLink()
       k.wait(1, async () => {
         k.go('lose', { score: Math.floor(score), coins })
-        await carGameService.reward({ coins: coins })
       })
     })
 
