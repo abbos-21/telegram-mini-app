@@ -2,9 +2,13 @@
 import { ref, onMounted } from 'vue'
 import kaboom from 'kaboom'
 import { carGameService } from '@/api/carGameService'
+import { starsService } from '@/api/starsService'
+import WebApp from '@twa-dev/sdk'
+import { toast } from 'vue3-toastify'
 
 const loading = ref<boolean>(false)
 const canPlay = ref<boolean>(false)
+const invoiceLink = ref<string | null>(null)
 
 const getStatus = async () => {
   try {
@@ -13,6 +17,30 @@ const getStatus = async () => {
   } catch (err) {
     console.log('Error while getting status: ', err)
   }
+}
+
+const getInvoiceLink = async () => {
+  try {
+    const response = await starsService.getCarGameInvoiceLink()
+    invoiceLink.value = response.data.invoiceLink
+  } catch (err) {
+    console.log('Error while getting invoice link: ', err)
+  }
+}
+
+const openInvoice = () => {
+  if (!invoiceLink.value) return
+
+  WebApp.openInvoice(invoiceLink.value, (status) => {
+    if (status === 'paid') {
+      loading.value = true
+      window.location.reload()
+    } else if (status === 'failed') {
+      toast.error('Payment failed, please try again')
+      loading.value = true
+      window.location.reload()
+    }
+  })
 }
 
 const canvas = ref<HTMLCanvasElement | null>(null)
@@ -45,7 +73,8 @@ const CONFIG = {
 ======================= */
 onMounted(async () => {
   loading.value = true
-  await getStatus().finally(() => {
+
+  await Promise.all([getStatus(), getInvoiceLink()]).finally(() => {
     loading.value = false
   })
 
@@ -137,22 +166,16 @@ onMounted(async () => {
     const coinText = k.add([k.text('Coins: 0'), k.pos(20, 52)])
 
     /* ---- MOVERS ---- */
-    // k.onUpdate(() => {
-    //   if (gameOver) return
-
-    //   k.get("mover").forEach((m) => {
-    //     m.pos.x -= currentSpeed() * k.dt()
-
-    //     if (m.pos.x < -200) {
-    //       k.destroy(m)
-    //     }
-    //   })
-    // })
-
-    k.onUpdate('mover', (m) => {
+    k.onUpdate(() => {
       if (gameOver) return
 
-      m.pos.x -= currentSpeed() * k.dt()
+      k.get('mover').forEach((m) => {
+        m.pos.x -= currentSpeed() * k.dt()
+
+        if (m.pos.x < -200) {
+          k.destroy(m)
+        }
+      })
     })
 
     /* ---- SPEED ---- */
@@ -335,7 +358,10 @@ onMounted(async () => {
       k.shake(16)
       k.play('crash')
       k.tween(music.volume, 0, 0.8, (v) => (music.volume = v))
-      k.wait(1, () => k.go('lose', { score: Math.floor(score), coins }))
+      k.wait(1, async () => {
+        k.go('lose', { score: Math.floor(score), coins })
+        await carGameService.reward({ coins: coins })
+      })
     })
 
     player.onCollide('coin', (c) => {
@@ -403,9 +429,11 @@ onMounted(async () => {
 
     // 5. Button Logic
     btn.onClick(() => {
-      // if (canPlay.value === true) {
-      k.go('game')
-      // }
+      if (canPlay.value === true) {
+        k.go('game')
+      } else {
+        openInvoice()
+      }
     })
   })
 

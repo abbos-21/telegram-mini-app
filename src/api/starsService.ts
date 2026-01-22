@@ -6,4 +6,11 @@ export const starsService = {
     const response = await apiClient.post<ApiResponse<InvoiceLinkResponse>>('/stars/create-invoice')
     return response.data
   },
+
+  getCarGameInvoiceLink: async (): Promise<ApiResponse<InvoiceLinkResponse>> => {
+    const response = await apiClient.post<ApiResponse<InvoiceLinkResponse>>(
+      '/stars/create-car-game-invoice',
+    )
+    return response.data
+  },
 }
