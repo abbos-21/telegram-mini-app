@@ -269,9 +269,15 @@ const backgroundImage = computed(() => {
 
     <!-- ACTIONS -->
     <div class="flex justify-between items-start">
-      <button @click="openBottlePopup">
-        <img :src="IceImage" class="w-9" />
-      </button>
+      <div class="flex flex-col items-center gap-4">
+        <button @click="openBottlePopup">
+          <img :src="IceImage" class="w-9" />
+        </button>
+
+        <RouterLink to="/game" class="car">
+          <img src="/car128.png" class="w-9" alt="" />
+        </RouterLink>
+      </div>
 
       <div class="flex flex-col items-center gap-2 -me-3">
         <button @click="openSpinPopup">
@@ -338,5 +344,39 @@ const backgroundImage = computed(() => {
   .progress-bar-wrapper-sm {
     display: block;
   }
+}
+
+@keyframes shake {
+  0% {
+    transform: rotate(0deg);
+  }
+  10% {
+    transform: rotate(-2deg);
+  }
+  25% {
+    transform: rotate(-5deg);
+  }
+  40% {
+    transform: rotate(-2deg);
+  }
+  50% {
+    transform: rotate(0deg);
+  }
+  60% {
+    transform: rotate(2deg);
+  }
+  75% {
+    transform: rotate(5deg);
+  }
+  90% {
+    transform: rotate(2deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+.car {
+  animation: shake 0.5s ease-in-out infinite;
 }
 </style>

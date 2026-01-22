@@ -23,11 +23,11 @@ onMounted(() => {
         <RouterLink to="/tasks/main" class="tab" active-class="active"> Main </RouterLink>
         <RouterLink to="/tasks/partner" class="tab relative" active-class="active">
           Partner
-          <span
+          <!-- <span
             class="hey-badge absolute w-10 h-5 rounded-full font-bold bg-red-500 text-white -top-2 -right-2 flex justify-center items-center text-xs"
           >
             New!
-          </span>
+          </span> -->
         </RouterLink>
       </div>
     </div>
