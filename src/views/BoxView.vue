@@ -26,13 +26,13 @@ const {
   <LoaderComponent v-if="loading" />
 
   <div
-    class="w-full h-full bg-cover bg-center bg-no-repeat p-2 py-8 relative flex flex-col gap-8 overflow-y-scroll scrollbar-hide"
+    class="w-full h-full bg-cover bg-center p-2 py-8 flex flex-col gap-8"
     :style="{ backgroundImage: `url(${PopupBackgroundImage})` }"
   >
     <h1 class="text-center text-white font-bold text-xl">Choose and get your reward</h1>
 
     <!-- Cards -->
-    <div v-if="cards.length > 0" class="grid grid-cols-3 gap-x-4 gap-y-6 px-4">
+    <div v-if="cards.length" class="grid grid-cols-3 gap-4 px-4">
       <div
         v-for="card in cards"
         :key="card.id"
@@ -42,41 +42,38 @@ const {
       >
         <div class="flip-card-inner" :class="{ flipped: card.flipped }">
           <div class="flip-card-front">
-            <img :src="MenuItemBackground" alt="Gift box" class="w-full h-full object-cover" />
+            <img :src="MenuItemBackground" class="w-full h-full" />
           </div>
-
           <div class="flip-card-back">
-            <div class="h-full text-center flex flex-col">
-              <h2 class="text-white font-bold my-auto">
-                {{ card.reward.name }}
-              </h2>
-            </div>
+            <h2 class="text-white font-bold">
+              {{ card.reward.name }}
+            </h2>
           </div>
         </div>
       </div>
     </div>
 
-    <div v-if="!canPlay" class="grid grid-cols-3 gap-x-4 gap-y-6 px-4 opacity-50">
-      <div v-for="n in 12" :key="n" class="pointer-events-none aspect-4/3">
-        <img :src="MenuItemBackground" alt="Gift box" class="w-full h-full object-cover" />
+    <!-- Locked -->
+    <div v-if="!canPlay" class="grid grid-cols-3 gap-4 px-4 opacity-50">
+      <div v-for="n in 12" :key="n">
+        <img :src="MenuItemBackground" />
       </div>
     </div>
 
-    <!-- Claim button -->
-    <div v-if="canClaim" class="flex justify-center w-full">
-      <button type="button" @click="claimRewards" style="width: calc(50% - 8px)">
-        <img :src="BoxClaimButtonImage" alt="claim-rewards" class="w-full" />
+    <!-- Claim -->
+    <div v-if="canClaim" class="flex justify-center">
+      <button @click="claimRewards">
+        <img :src="BoxClaimButtonImage" />
       </button>
     </div>
 
-    <!-- Buy buttons -->
-    <div class="grid grid-cols-2 gap-4" v-if="!canPlay">
-      <button type="button" @click="payWithCoins">
-        <img :src="BoxCoinButtonImage" alt="buy-with-coins" />
+    <!-- Buy -->
+    <div v-if="!canPlay" class="grid grid-cols-2 gap-4">
+      <button @click="payWithCoins">
+        <img :src="BoxCoinButtonImage" />
       </button>
-
-      <button type="button" @click="openInvoice">
-        <img :src="BoxStarButtonImage" alt="buy-with-stars" />
+      <button @click="openInvoice">
+        <img :src="BoxStarButtonImage" />
       </button>
     </div>
   </div>
@@ -84,44 +81,23 @@ const {
 
 <style scoped>
 .flip-card {
-  background-color: transparent;
   perspective: 1000px;
   cursor: pointer;
-  width: 100%;
   aspect-ratio: 4 / 3;
 }
-
 .flip-card-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  text-align: center;
-  transition: transform 0.8s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transition: transform 0.8s;
   transform-style: preserve-3d;
-  border-radius: 12px;
 }
-
 .flip-card-inner.flipped {
   transform: rotateY(180deg);
 }
-
 .flip-card-front,
 .flip-card-back {
   position: absolute;
-  width: 100%;
-  height: 100%;
   backface-visibility: hidden;
-  border-radius: 12px;
-  overflow: hidden;
 }
-
 .flip-card-back {
-  background-color: rgba(0, 146, 184, 0.5);
-  color: white;
-  border: 1px solid white;
   transform: rotateY(180deg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 </style>
