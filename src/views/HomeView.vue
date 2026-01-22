@@ -1,342 +1,127 @@
 <script setup lang="ts">
-import { onMounted, ref, computed, inject } from 'vue'
-import WebApp from '@twa-dev/sdk'
-import { toast } from 'vue3-toastify'
-import { useAdsgram } from '@adsgram/vue'
-
-import { useGame } from '@/composables/useGame'
-import { useNavigate } from '@/composables/useNavigate'
-import { useOrchestrator, type OrchestratorTask } from '@/composables/useOrchestrator'
-import { runChainUntilSuccess } from '@/utils/chainFunction'
-
-import { isMusicEnabled, isMusicAvailable, toggleMusic } from '@/stores/music'
-
-import EnergyLevel from '@/components/EnergyLevel.vue'
-import HealthLevel from '@/components/HealthLevel.vue'
-import BottlePopup from '@/components/BottlePopup.vue'
-import SpinPopup from '@/components/SpinPopup.vue'
-import ProgressBar from '@/components/ProgressBar.vue'
-
+import { PopupBackgroundImage } from '@/assets/backgrounds/winter'
 import {
-  Level1BackgroundImage,
-  Level2BackgroundImage,
-  Level3BackgroundImage,
-  Level4BackgroundImage,
-  Level5BackgroundImage,
-  Level6BackgroundImage,
-  Level7BackgroundImage,
-  Level8BackgroundImage,
-  Level9BackgroundImage,
-  Level10BackgroundImage,
-  Level11BackgroundImage,
-  Level12BackgroundImage,
-  Level13BackgroundImage,
-} from '@/assets/backgrounds/winter'
-import {
-  CoinImage,
-  CollectButtonImage,
-  PodiumImage,
-  UnitedKingdomFlagImage,
-  WithdrawImage,
-  MusicImage,
-  IceImage,
-  SpinImage,
-  MysteryBoxImage,
+  BoxClaimButtonImage,
+  BoxCoinButtonImage,
+  BoxStarButtonImage,
+  MenuItemBackground,
 } from '@/assets/images/winter'
-import { useRouter } from 'vue-router'
-const router = useRouter()
+import LoaderComponent from '@/components/LoaderComponent.vue'
+import { useBoxGame } from '@/composables/useBoxGame'
 
-import { useSeasonTimer } from '@/composables/useSeasonTimer'
-
-const { timeLeftLabel } = useSeasonTimer()
-
-/* -------------------- USER / BIGGIE -------------------- */
-const BIGGIES = new Set<number>([5035538171, 1031081189, 352641904, 1701438929])
-
-const telegramUserId = WebApp.initDataUnsafe?.user?.id ?? null
-const isBiggie = telegramUserId !== null && BIGGIES.has(telegramUserId)
-
-const runIfUserIsNotBiggie = (fn: () => void) => {
-  if (!isBiggie) fn()
-}
-
-/* -------------------- ADS -------------------- */
-const interstitialAds = useAdsgram({ blockId: import.meta.env.VITE_BLOCK_ID })
-const spinAds = useAdsgram({ blockId: import.meta.env.VITE_SPIN_BLOCK_ID })
-const collectAds = useAdsgram({ blockId: import.meta.env.VITE_COLLECT_BLOCK_ID })
-const withdrawalAds = useAdsgram({
-  blockId: import.meta.env.VITE_WITHDRAWAL_BLOCK_ID,
-})
-const bottleAds = useAdsgram({ blockId: import.meta.env.VITE_BOTTLE_BLOCK_ID })
-const boxAds = useAdsgram({ blockId: import.meta.env.VITE_BOX_BLOCK_ID })
-
-const tasks: OrchestratorTask[] = [
-  { name: 'Interstitial', probability: 25, fn: () => interstitialAds.show() },
-  { name: 'Spin', probability: 75, fn: () => spinAds.show() },
-]
-
-const { run: runSpinAds } = useOrchestrator(tasks)
-
-/* -------------------- GAME -------------------- */
-const { user, mine, collect, sync, getUserData } = useGame()
-const { goTo } = useNavigate()
-
-/* -------------------- POPUPS -------------------- */
-const isBottlePopupOpen = ref(false)
-const isSpinPopupOpen = ref(false)
-
-const openBoxRoute = () => {
-  runIfUserIsNotBiggie(() => boxAds.show())
-  router.push('/box')
-}
-
-const openBottlePopup = () => {
-  isBottlePopupOpen.value = true
-  runIfUserIsNotBiggie(() => bottleAds.show())
-}
-const closeBottlePopup = () => (isBottlePopupOpen.value = false)
-
-const openSpinPopup = () => {
-  isSpinPopupOpen.value = true
-  runSpinAds()
-}
-const closeSpinPopup = async () => {
-  isSpinPopupOpen.value = false
-  await getUserData()
-}
-
-/* -------------------- COMPUTED -------------------- */
-const canCollect = computed(() => {
-  if (!user.value) return false
-  return user.value.tempCoins >= user.value.vaultCapacity * 0.1
-})
-
-/* -------------------- ACTIONS -------------------- */
-const handleWithdraw = () => {
-  runIfUserIsNotBiggie(() => withdrawalAds.show())
-  goTo('/withdraw')
-}
-
-const handleCollect = () => {
-  collect()
-  runIfUserIsNotBiggie(() => collectAds.show())
-}
-
-const navHeight = inject('navHeight')
-const withdrawRate: number | undefined = inject('withdrawRate')
-
-/* -------------------- LIFECYCLE -------------------- */
-onMounted(async () => {
-  if (telegramUserId === 1031081189) {
-    alert('Hey, you must be the admin!')
-  }
-
-  await runChainUntilSuccess([sync, mine, getUserData])
-
-  if (user.value?.healthLevel === 0) {
-    toast.info('Health 0, coins burned')
-  }
-})
-
-const levelBackgrounds = [
-  Level1BackgroundImage,
-  Level2BackgroundImage,
-  Level3BackgroundImage,
-  Level4BackgroundImage,
-  Level5BackgroundImage,
-  Level6BackgroundImage,
-  Level7BackgroundImage,
-  Level8BackgroundImage,
-  Level9BackgroundImage,
-  Level10BackgroundImage,
-  Level11BackgroundImage,
-  Level12BackgroundImage,
-  Level13BackgroundImage,
-]
-
-const backgroundImage = computed(() => {
-  const level = user.value?.level ?? 1
-
-  // Clamp level to available backgrounds
-  const index = Math.min(Math.max(level - 1, 0), levelBackgrounds.length - 1)
-
-  return `url(${levelBackgrounds[index]})`
-})
+const {
+  loading,
+  canPlay,
+  cards,
+  openedCount,
+  openCard,
+  canClaim,
+  claimRewards,
+  payWithCoins,
+  openInvoice,
+} = useBoxGame()
 </script>
 
 <template>
+  <LoaderComponent v-if="loading" />
+
   <div
-    class="h-full w-full flex flex-col relative bg-cover bg-center bg-no-repeat p-2 gap-4 justify-between"
-    :style="{
-      backgroundImage,
-      paddingBottom: `${navHeight}px`,
-    }"
+    class="w-full h-full bg-cover bg-center bg-no-repeat p-2 py-8 relative flex flex-col gap-8 overflow-y-scroll scrollbar-hide"
+    :style="{ backgroundImage: `url(${PopupBackgroundImage})` }"
   >
-    <!-- TOP BAR -->
-    <div class="flex justify-between items-start">
-      <div class="flex flex-col gap-2 items-start">
-        <button
-          @click="handleWithdraw"
-          class="flex gap-2 items-center rounded-full bg-sky-400 px-2 py-1 border-4 border-sky-200"
-        >
-          <img :src="CoinImage" class="w-5 h-5" />
-          <div class="text-center">
-            <p class="font-bold text-sm">{{ user?.coins.toFixed(2) ?? 0 }}</p>
-            <p class="text-[10px] font-bold text-gray-500">
-              {{ ((user?.coins ?? 0) / (withdrawRate ?? Infinity)).toFixed(2) }} TON
-            </p>
+    <h1 class="text-center text-white font-bold text-xl">Choose and get your reward</h1>
+
+    <!-- Cards -->
+    <div v-if="cards.length > 0" class="grid grid-cols-3 gap-x-4 gap-y-6 px-4">
+      <div
+        v-for="card in cards"
+        :key="card.id"
+        class="flip-card"
+        :class="{ 'pointer-events-none': openedCount >= 3 && !card.flipped }"
+        @click="openCard(card)"
+      >
+        <div class="flip-card-inner" :class="{ flipped: card.flipped }">
+          <div class="flip-card-front">
+            <img :src="MenuItemBackground" alt="Gift box" class="w-full h-full object-cover" />
           </div>
-          <img :src="WithdrawImage" class="w-5 h-5" />
-        </button>
 
-        <RouterLink to="/leaderboard" class="flex flex-col items-center gap-1">
-          <img :src="PodiumImage" class="w-8" />
-          <span
-            class="bg-[#00C5A6] text-white text-[10px] font-bold px-1 py-px rounded-md w-25 text-center"
-          >
-            {{ timeLeftLabel }}
-          </span>
-        </RouterLink>
-      </div>
-
-      <div class="flex flex-col gap-2 items-end">
-        <RouterLink to="/game" class="rounded-full bg-sky-400 px-2 py-1 border-4 border-sky-200">
-          <p class="text-sm font-bold">Your level: {{ user?.level ?? 0 }}</p>
-        </RouterLink>
-
-        <div
-          class="w-10 h-10 flex justify-center items-center rounded-full bg-sky-400 border-4 border-sky-200"
-        >
-          <img :src="UnitedKingdomFlagImage" class="w-5 h-5" />
+          <div class="flip-card-back">
+            <div class="h-full text-center flex flex-col">
+              <h2 class="text-white font-bold my-auto">
+                {{ card.reward.name }}
+              </h2>
+            </div>
+          </div>
         </div>
-
-        <button
-          class="w-8 h-8 relative music-button mx-1"
-          :class="{ 'music-disabled': !isMusicEnabled || !isMusicAvailable }"
-          @click="toggleMusic"
-        >
-          <img :src="MusicImage" class="w-full h-full" />
-          <div
-            v-if="!isMusicEnabled || !isMusicAvailable"
-            class="absolute inset-0 flex items-center justify-center"
-          >
-            <div class="diagonal-line"></div>
-          </div>
-        </button>
       </div>
     </div>
 
-    <!-- STATS -->
-    <div>
-      <div class="flex justify-center progress-bar-wrapper">
-        <div class="w-40">
-          <ProgressBar
-            :current-value="user?.tempCoins ?? 0"
-            :max-value="user?.vaultCapacity ?? Infinity"
-            :min-value="0"
-          />
-        </div>
-      </div>
-
-      <div class="flex justify-between mt-2">
-        <HealthLevel
-          :current-value="user?.currentHealth ?? 0"
-          :max-value="user?.maxHealth ?? 0"
-          color="green"
-          size="medium"
-          :show-glow="true"
-          :animated="true"
-        />
-
-        <div class="w-40 progress-bar-wrapper-sm">
-          <ProgressBar
-            :current-value="user?.tempCoins ?? 0"
-            :max-value="user?.vaultCapacity ?? Infinity"
-            :min-value="0"
-          />
-        </div>
-
-        <EnergyLevel
-          :current-value="user?.currentEnergy ?? 0"
-          :max-value="user?.maxEnergy ?? 0"
-          color="blue"
-          size="medium"
-          :show-glow="true"
-          :animated="true"
-        />
+    <div v-if="!canPlay" class="grid grid-cols-3 gap-x-4 gap-y-6 px-4 opacity-50">
+      <div v-for="n in 12" :key="n" class="pointer-events-none aspect-4/3">
+        <img :src="MenuItemBackground" alt="Gift box" class="w-full h-full object-cover" />
       </div>
     </div>
 
-    <!-- ACTIONS -->
-    <div class="flex justify-between items-start">
-      <button @click="openBottlePopup">
-        <img :src="IceImage" class="w-9" />
+    <!-- Claim button -->
+    <div v-if="canClaim" class="flex justify-center w-full">
+      <button type="button" @click="claimRewards" style="width: calc(50% - 8px)">
+        <img :src="BoxClaimButtonImage" alt="claim-rewards" class="w-full" />
+      </button>
+    </div>
+
+    <!-- Buy buttons -->
+    <div class="grid grid-cols-2 gap-4" v-if="!canPlay">
+      <button type="button" @click="payWithCoins">
+        <img :src="BoxCoinButtonImage" alt="buy-with-coins" />
       </button>
 
-      <div class="flex flex-col items-center gap-2 -me-3">
-        <button @click="openSpinPopup">
-          <img :src="SpinImage" class="w-9" />
-        </button>
-
-        <button @click="openBoxRoute">
-          <img :src="MysteryBoxImage" class="w-15" />
-        </button>
-      </div>
+      <button type="button" @click="openInvoice">
+        <img :src="BoxStarButtonImage" alt="buy-with-stars" />
+      </button>
     </div>
-
-    <button
-      class="collect-button absolute left-1/2 -translate-x-1/2 mb-2"
-      :style="{ bottom: `${navHeight}px` }"
-      :disabled="!canCollect"
-      :class="{ 'cursor-not-allowed opacity-50': !canCollect }"
-      @click="handleCollect"
-    >
-      <img :src="CollectButtonImage" class="w-full" />
-    </button>
   </div>
-
-  <BottlePopup :is-open="isBottlePopupOpen" @close="closeBottlePopup" />
-  <SpinPopup :is-open="isSpinPopupOpen" @close="closeSpinPopup" />
 </template>
 
 <style scoped>
-.music-button {
-  transition: opacity 0.2s ease;
-}
-.music-disabled {
-  opacity: 0.7;
-}
-.diagonal-line {
-  width: 45px;
-  height: 1.5px;
-  background-color: red;
-  transform: rotate(45deg);
-}
-.collect-button {
-  width: 160px;
-}
-@media (max-width: 375px) {
-  .collect-button {
-    width: 144px;
-  }
-}
-@media (max-width: 320px) {
-  .collect-button {
-    width: 128px;
-  }
+.flip-card {
+  background-color: transparent;
+  perspective: 1000px;
+  cursor: pointer;
+  width: 100%;
+  aspect-ratio: 4 / 3;
 }
 
-.progress-bar-wrapper-sm {
-  display: none;
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.8s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transform-style: preserve-3d;
+  border-radius: 12px;
 }
 
-@media (max-height: 590px) {
-  .progress-bar-wrapper {
-    display: none;
-  }
+.flip-card-inner.flipped {
+  transform: rotateY(180deg);
+}
 
-  .progress-bar-wrapper-sm {
-    display: block;
-  }
+.flip-card-front,
+.flip-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.flip-card-back {
+  background-color: rgba(0, 146, 184, 0.5);
+  color: white;
+  border: 1px solid white;
+  transform: rotateY(180deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>

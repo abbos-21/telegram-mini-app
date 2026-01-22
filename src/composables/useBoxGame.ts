@@ -69,12 +69,8 @@ export function useBoxGame() {
     openedCount.value++
     selectedRewardIds.value.push(card.reward.id)
 
-    // if (openedCount.value === MAX_OPENS) {
-    //   canClaim.value = true
-    // }
-
     if (openedCount.value === MAX_OPENS) {
-      claimRewards()
+      canClaim.value = true
     }
   }
 
@@ -94,10 +90,7 @@ export function useBoxGame() {
 
       gameFinished.value = true
       canClaim.value = false
-
-      setTimeout(() => {
-        cards.value = []
-      }, 1000)
+      cards.value = [] // hide cards after claim
 
       const response = await boxService.getStatus()
       canPlay.value = response.data.user.canPlayBox
