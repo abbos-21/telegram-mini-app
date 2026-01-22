@@ -137,16 +137,26 @@ onMounted(async () => {
     const coinText = k.add([k.text('Coins: 0'), k.pos(20, 52)])
 
     /* ---- MOVERS ---- */
-    k.onUpdate(() => {
+    // k.onUpdate(() => {
+    //   if (gameOver) return
+
+    //   k.get("mover").forEach((m) => {
+    //     m.pos.x -= currentSpeed() * k.dt()
+
+    //     if (m.pos.x < -200) {
+    //       k.destroy(m)
+    //     }
+    //   })
+    // })
+
+    k.onUpdate('mover', (m) => {
       if (gameOver) return
 
-      k.get("mover").forEach((m) => {
-        m.pos.x -= currentSpeed() * k.dt()
+      m.pos.x -= currentSpeed() * k.dt()
 
-        if (m.pos.x < -200) {
-          k.destroy(m)
-        }
-      })
+      if (m.pos.x < -200) {
+        k.destroy(m)
+      }
     })
 
     /* ---- SPEED ---- */
@@ -398,7 +408,7 @@ onMounted(async () => {
     // 5. Button Logic
     btn.onClick(() => {
       // if (canPlay.value === true) {
-        k.go('game')
+      k.go('game')
       // }
     })
   })
