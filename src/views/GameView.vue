@@ -59,7 +59,6 @@ onMounted(async () => {
   ======================= */
   try {
     await Promise.all([
-      k.loadSprite('play', '/play.webp'),
       k.loadSprite('player', '/car128.webp'),
       k.loadSprite('background', '/background.webp'),
       k.loadSprite('ice', '/ice-cream.webp'),
