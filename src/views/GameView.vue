@@ -133,8 +133,16 @@ onMounted(async () => {
     const coinText = k.add([k.text('Coins: 0'), k.pos(20, 52)])
 
     /* ---- MOVERS ---- */
-    k.onUpdate('mover', (m) => {
-      if (!gameOver) m.pos.x -= currentSpeed() * k.dt()
+    k.onUpdate(() => {
+      if (gameOver) return
+
+      k.get("mover").forEach((m) => {
+        m.pos.x -= currentSpeed() * k.dt()
+
+        if (m.pos.x < -200) {
+          k.destroy(m)
+        }
+      })
     })
 
     /* ---- SPEED ---- */

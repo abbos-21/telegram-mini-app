@@ -23,6 +23,7 @@
     "axios": "^1.12.2",
     "kaboom": "^3000.1.17",
     "monetag-tg-sdk": "^1.0.1",
+    "phaser": "^3.90.0",
     "pinia": "^3.0.3",
     "tailwindcss": "^4.1.14",
     "vite-svg-loader": "^5.1.0",
