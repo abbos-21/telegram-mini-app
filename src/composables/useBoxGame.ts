@@ -1,6 +1,7 @@
+// src/composables/useBoxGame.ts
 import { starsService } from '@/api/starsService'
 import { boxService } from '@/api/boxService'
-import { onMounted, ref } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import WebApp from '@twa-dev/sdk'
 import type { ApiError, BoxReward } from '@/api/types'
 import { toast } from 'vue3-toastify'
@@ -8,15 +9,13 @@ import { toast } from 'vue3-toastify'
 export function useBoxGame() {
   const loading = ref(false)
   const canPlay = ref(false)
-  const rewardList = ref<BoxReward[]>([])
+  const rewardList = ref<BoxReward[] | null>(null)
   const invoiceLink = ref<string | null>(null)
-
   const MAX_OPENS = 3
   const openedCount = ref(0)
   const selectedRewardIds = ref<number[]>([])
   const canClaim = ref(false)
   const gameFinished = ref(false)
-
   const cards = ref<
     Array<{
       id: number
@@ -24,28 +23,7 @@ export function useBoxGame() {
       flipped: boolean
     }>
   >([])
-
-  /* -------------------- Helpers -------------------- */
-
-  function resetGameState() {
-    openedCount.value = 0
-    selectedRewardIds.value = []
-    canClaim.value = false
-    gameFinished.value = false
-    cards.value = []
-  }
-
-  function buildCards(rewards: BoxReward[]) {
-    resetGameState()
-
-    const shuffled = [...rewards].sort(() => Math.random() - 0.5)
-
-    cards.value = shuffled.map((reward, index) => ({
-      id: index + 1,
-      reward,
-      flipped: false,
-    }))
-  }
+  const error = ref<ApiError | null>(null)
 
   /* -------------------- Payments -------------------- */
 
@@ -53,8 +31,8 @@ export function useBoxGame() {
     try {
       const response = await starsService.getInvoiceLink()
       invoiceLink.value = response.data.invoiceLink
-    } catch {
-      toast.error('Failed to get invoice link')
+    } catch (error) {
+      console.error('Failed to get invoice link:', error)
     }
   }
 
@@ -63,14 +41,24 @@ export function useBoxGame() {
 
     WebApp.openInvoice(invoiceLink.value, (status) => {
       if (status === 'paid') {
+        loading.value = true
         window.location.reload()
-      } else {
-        toast.error('Payment failed')
+      } else if (status === 'failed') {
+        toast.error('Payment failed, please try again later')
+        loading.value = true
+        window.location.reload()
       }
     })
   }
 
   /* -------------------- Game logic -------------------- */
+
+  function resetGameState() {
+    openedCount.value = 0
+    selectedRewardIds.value = []
+    canClaim.value = false
+    gameFinished.value = false
+  }
 
   function openCard(card: { flipped: boolean; reward: BoxReward }) {
     if (gameFinished.value) return
@@ -79,10 +67,7 @@ export function useBoxGame() {
 
     card.flipped = true
     openedCount.value++
-
-    if (!selectedRewardIds.value.includes(card.reward.id)) {
-      selectedRewardIds.value.push(card.reward.id)
-    }
+    selectedRewardIds.value.push(card.reward.id)
 
     if (openedCount.value === MAX_OPENS) {
       canClaim.value = true
@@ -94,23 +79,23 @@ export function useBoxGame() {
 
     try {
       loading.value = true
-
-      const res = await boxService.rewardUser({
+      const claimResponse = await boxService.rewardUser({
         rewardIds: selectedRewardIds.value,
       })
 
-      if (res.success) {
-        toast.success('Rewards claimed successfully')
+      if (claimResponse.success) {
+        // WebApp.HapticFeedback.notificationOccurred('success')
+        toast.success('Successfully claimed all the rewards')
       }
 
       gameFinished.value = true
       canClaim.value = false
-      cards.value = []
+      cards.value = [] // hide cards after claim
 
-      const status = await boxService.getStatus()
-      canPlay.value = status.data.user.canPlayBox
-    } catch {
-      toast.error('Failed to claim rewards')
+      const response = await boxService.getStatus()
+      canPlay.value = response.data.user.canPlayBox
+    } catch (error) {
+      console.error('Failed to claim rewards:', error)
     } finally {
       loading.value = false
     }
@@ -122,15 +107,18 @@ export function useBoxGame() {
     try {
       loading.value = true
       await boxService.payWithCoins()
-      await loadRewards()
     } catch (err) {
-      const e = err as ApiError
-      toast.error(e.response?.data?.message || 'Payment failed')
+      error.value = err as ApiError
+      toast.error(error.value.response?.data?.message || 'Payment failed')
     } finally {
-      const status = await boxService.getStatus()
-      canPlay.value = status.data.user.canPlayBox
+      const response = await boxService.getStatus()
+      canPlay.value = response.data.user.canPlayBox
       loading.value = false
     }
+
+    if (!canPlay.value) return
+
+    await loadRewards()
   }
 
   async function loadRewards() {
@@ -138,29 +126,47 @@ export function useBoxGame() {
       loading.value = true
       const response = await boxService.getRewards()
       rewardList.value = response.data.rewardList
-      buildCards(rewardList.value)
-    } catch (err: unknown) {
-      const e = err as ApiError
-      toast.error(e.response?.data?.message || 'Failed to load rewards')
+    } catch (error) {
+      console.log(error)
     } finally {
       loading.value = false
+    }
+
+    if (rewardList.value) {
+      resetGameState()
+
+      // Create a shuffled copy of the rewards
+      const shuffledRewards = [...rewardList.value].sort(() => Math.random() - 0.5)
+
+      cards.value = shuffledRewards.map((reward, index) => ({
+        id: index + 1, // still sequential IDs for v-for keys (safe and stable)
+        reward,
+        flipped: false,
+      }))
     }
   }
 
   /* -------------------- Init -------------------- */
 
   onMounted(async () => {
-    loading.value = true
-    await getInvoiceLink()
-
-    const status = await boxService.getStatus()
-    canPlay.value = status.data.user.canPlayBox
+    try {
+      loading.value = true
+      await getInvoiceLink()
+      const response = await boxService.getStatus()
+      canPlay.value = response.data.user.canPlayBox
+    } catch (error) {
+      console.log(error)
+    } finally {
+      loading.value = false
+    }
 
     if (canPlay.value) {
       await loadRewards()
     }
+  })
 
-    loading.value = false
+  onBeforeUnmount(() => {
+    claimRewards()
   })
 
   return {
