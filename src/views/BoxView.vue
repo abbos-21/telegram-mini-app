@@ -1,10 +1,25 @@
 <script setup lang="ts">
 import { PopupBackgroundImage } from '@/assets/backgrounds/winter'
-import { BoxCoinButtonImage, BoxStarButtonImage, MenuItemBackground } from '@/assets/images/winter'
+import {
+  BoxClaimButtonImage,
+  BoxCoinButtonImage,
+  BoxStarButtonImage,
+  MenuItemBackground,
+} from '@/assets/images/winter'
 import LoaderComponent from '@/components/LoaderComponent.vue'
 import { useBoxGame } from '@/composables/useBoxGame'
 
-const { loading, canPlay, cards, openedCount, openCard, payWithCoins, openInvoice } = useBoxGame()
+const {
+  loading,
+  canPlay,
+  cards,
+  openedCount,
+  openCard,
+  canClaim,
+  claimRewards,
+  payWithCoins,
+  openInvoice,
+} = useBoxGame()
 </script>
 
 <template>
@@ -48,11 +63,11 @@ const { loading, canPlay, cards, openedCount, openCard, payWithCoins, openInvoic
     </div>
 
     <!-- Claim button -->
-    <!-- <div v-if="canClaim" class="flex justify-center w-full">
+    <div v-if="canClaim" class="flex justify-center w-full">
       <button type="button" @click="claimRewards" style="width: calc(50% - 8px)">
         <img :src="BoxClaimButtonImage" alt="claim-rewards" class="w-full" />
       </button>
-    </div> -->
+    </div>
 
     <!-- Buy buttons -->
     <div class="grid grid-cols-2 gap-4" v-if="!canPlay">
