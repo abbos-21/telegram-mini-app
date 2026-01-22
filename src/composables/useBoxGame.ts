@@ -74,7 +74,6 @@ export function useBoxGame() {
     // }
 
     if (openedCount.value === MAX_OPENS) {
-      gameFinished.value = true
       claimRewards()
     }
   }
