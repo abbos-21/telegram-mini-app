@@ -1,19 +1,19 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import kaboom from 'kaboom'
-// import { carGameService } from '@/api/carGameService'
+import { carGameService } from '@/api/carGameService'
 
-// const loading = ref<boolean>(false)
-// const canPlay = ref<boolean>(false)
+const loading = ref<boolean>(false)
+const canPlay = ref<boolean>(false)
 
-// const getStatus = async () => {
-//   try {
-//     const response = await carGameService.getStatus()
-//     canPlay.value = response.data.user.canPlayCar
-//   } catch (err) {
-//     console.log('Error while getting status: ', err)
-//   }
-// }
+const getStatus = async () => {
+  try {
+    const response = await carGameService.getStatus()
+    canPlay.value = response.data.user.canPlayCar
+  } catch (err) {
+    console.log('Error while getting status: ', err)
+  }
+}
 
 const canvas = ref<HTMLCanvasElement | null>(null)
 
@@ -44,6 +44,11 @@ const CONFIG = {
    MOUNT
 ======================= */
 onMounted(async () => {
+  loading.value = true
+  await getStatus().finally(() => {
+    loading.value = false
+  })
+
   if (!canvas.value) return
 
   const k = kaboom({
@@ -59,10 +64,10 @@ onMounted(async () => {
   ======================= */
   try {
     await Promise.all([
-      k.loadSprite('player', '/car128.webp'),
-      k.loadSprite('background', '/background.webp'),
-      k.loadSprite('ice', '/ice-cream.webp'),
-      k.loadSprite('coin', '/coin.webp'),
+      k.loadSprite('player', '/car128.png'),
+      k.loadSprite('background', '/background.png'),
+      k.loadSprite('ice', '/ice-cream.png'),
+      k.loadSprite('coin', '/coin.png'),
       k.loadSound('crash', '/crash.mp3'),
       k.loadSound('bg', '/noise.mp3'),
       k.loadSound('collect', '/collect.mp3'),
@@ -392,7 +397,9 @@ onMounted(async () => {
 
     // 5. Button Logic
     btn.onClick(() => {
-      k.go('game') // Only go to game if button is clicked
+      // if (canPlay.value === true) {
+        k.go('game')
+      // }
     })
   })
 
