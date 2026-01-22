@@ -69,8 +69,13 @@ export function useBoxGame() {
     openedCount.value++
     selectedRewardIds.value.push(card.reward.id)
 
+    // if (openedCount.value === MAX_OPENS) {
+    //   canClaim.value = true
+    // }
+
     if (openedCount.value === MAX_OPENS) {
       canClaim.value = true
+      claimRewards() // auto-claim immediately
     }
   }
 

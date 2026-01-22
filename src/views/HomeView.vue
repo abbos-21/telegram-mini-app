@@ -154,13 +154,18 @@ const levelBackgrounds = [
   Level13BackgroundImage,
 ]
 
+// const backgroundImage = computed(() => {
+//   const level = user.value?.level ?? 1
+
+//   // Clamp level to available backgrounds
+//   const index = Math.min(Math.max(level - 1, 0), levelBackgrounds.length - 1)
+
+//   return `url(${levelBackgrounds[index]})`
+// })
+
 const backgroundImage = computed(() => {
-  const level = user.value?.level ?? 1
-
-  // Clamp level to available backgrounds
-  const index = Math.min(Math.max(level - 1, 0), levelBackgrounds.length - 1)
-
-  return `url(${levelBackgrounds[index]})`
+  const image = levelBackgrounds[(user.value?.level ?? 0) - 1]
+  return image ? `url(${image})` : 'none'
 })
 </script>
 

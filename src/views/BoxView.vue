@@ -63,11 +63,11 @@ const {
     </div>
 
     <!-- Claim button -->
-    <div v-if="canClaim" class="flex justify-center w-full">
+    <!-- <div v-if="canClaim" class="flex justify-center w-full">
       <button type="button" @click="claimRewards" style="width: calc(50% - 8px)">
         <img :src="BoxClaimButtonImage" alt="claim-rewards" class="w-full" />
       </button>
-    </div>
+    </div> -->
 
     <!-- Buy buttons -->
     <div class="grid grid-cols-2 gap-4" v-if="!canPlay">
