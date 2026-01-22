@@ -414,7 +414,7 @@ onMounted(async () => {
 
     // 3. Create the Button
     const btn = k.add([
-      k.rect(240, 80, { radius: 8 }), // Shape and size
+      k.rect(240, 60, { radius: 8 }), // Shape and size
       k.pos(k.center()), // Positioned in the middle
       k.color(255, 255, 255), // Button color
       k.outline(4), // Border
@@ -424,7 +424,7 @@ onMounted(async () => {
 
     // 4. Add Text inside the Button
     btn.add([
-      k.text('START', { size: 32 }),
+      k.text(`${canPlay.value ? 'START' : 'PLAY FOR 1 STAR'}`, { size: 24 }),
       k.color(0, 0, 0), // Text color (black)
       k.anchor('center'),
     ])
