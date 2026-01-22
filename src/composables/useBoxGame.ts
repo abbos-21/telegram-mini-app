@@ -7,6 +7,7 @@ import type { ApiError, BoxReward } from '@/api/types'
 import { toast } from 'vue3-toastify'
 
 export function useBoxGame() {
+  const isDisabledBoxesVisible = ref<boolean>(true)
   const loading = ref(false)
   const canPlay = ref(false)
   const rewardList = ref<BoxReward[] | null>(null)
@@ -94,9 +95,11 @@ export function useBoxGame() {
 
       gameFinished.value = true
       canClaim.value = false
+      isDisabledBoxesVisible.value = false
 
       setTimeout(() => {
         cards.value = []
+        isDisabledBoxesVisible.value = true
       }, 1500)
 
       const response = await boxService.getStatus()
@@ -185,5 +188,6 @@ export function useBoxGame() {
     claimRewards,
     payWithCoins,
     openInvoice,
+    isDisabledBoxesVisible,
   }
 }

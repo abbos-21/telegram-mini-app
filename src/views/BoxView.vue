@@ -1,11 +1,6 @@
 <script setup lang="ts">
 import { PopupBackgroundImage } from '@/assets/backgrounds/winter'
-import {
-  BoxClaimButtonImage,
-  BoxCoinButtonImage,
-  BoxStarButtonImage,
-  MenuItemBackground,
-} from '@/assets/images/winter'
+import { BoxCoinButtonImage, BoxStarButtonImage, MenuItemBackground } from '@/assets/images/winter'
 import LoaderComponent from '@/components/LoaderComponent.vue'
 import { useBoxGame } from '@/composables/useBoxGame'
 
@@ -15,10 +10,9 @@ const {
   cards,
   openedCount,
   openCard,
-  canClaim,
-  claimRewards,
   payWithCoins,
   openInvoice,
+  isDisabledBoxesVisible,
 } = useBoxGame()
 </script>
 
@@ -56,7 +50,10 @@ const {
       </div>
     </div>
 
-    <div v-if="!canPlay" class="grid grid-cols-3 gap-x-4 gap-y-6 px-4 opacity-50">
+    <div
+      v-if="!canPlay && isDisabledBoxesVisible"
+      class="grid grid-cols-3 gap-x-4 gap-y-6 px-4 opacity-50"
+    >
       <div v-for="n in 12" :key="n" class="pointer-events-none aspect-4/3">
         <img :src="MenuItemBackground" alt="Gift box" class="w-full h-full object-cover" />
       </div>
