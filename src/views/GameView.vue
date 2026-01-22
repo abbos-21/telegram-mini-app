@@ -153,10 +153,6 @@ onMounted(async () => {
       if (gameOver) return
 
       m.pos.x -= currentSpeed() * k.dt()
-
-      if (m.pos.x < -200) {
-        k.destroy(m)
-      }
     })
 
     /* ---- SPEED ---- */
