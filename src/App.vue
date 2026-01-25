@@ -131,7 +131,8 @@ const handleRetry = () => {
 
 const isTelegramMobile = (): boolean => {
   const platform = WebApp.platform
-  return platform === 'android' || platform === 'ios' || platform === 'android_x'
+  // return platform === 'android' || platform === 'ios' || platform === 'android_x'
+  return true
 }
 
 const withdrawRate = ref<number | null>(null)
