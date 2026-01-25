@@ -116,7 +116,6 @@ const watchAd = async () => {
 
     const { show, addEventListener } = useAdsgram({
       blockId: healthRewardBlockId,
-      debug: true,
     })
 
     addEventListener('onBannerNotFound', () => {
@@ -157,7 +156,6 @@ const watchAd = async () => {
     }
     const { show, addEventListener } = useAdsgram({
       blockId: energyRewardBlockId,
-      debug: true,
     })
 
     addEventListener('onBannerNotFound', () => {
