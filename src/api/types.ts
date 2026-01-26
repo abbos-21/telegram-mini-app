@@ -231,18 +231,13 @@ export interface InvoiceLinkResponse {
   invoiceLink: string
 }
 
-export interface BoxResponse {
-  user: User
-}
+// export interface BoxResponse {
+//   user: User
+// }
 
-export interface BoxReward {
-  id: number
-  name: string
-}
-
-export interface BoxRewardResponse {
-  rewardList: BoxReward[]
-}
+// export interface BoxRewardResponse {
+//   rewardList: BoxReward[]
+// }
 
 export interface InfoNextRefillResponse {
   secondsLeft: number
@@ -251,6 +246,36 @@ export interface InfoNextRefillResponse {
 
 export interface CarGameResponse {
   user: User
+}
+
+export interface BoxReward {
+  id: string
+  name: string
+  isOpened?: boolean
+}
+
+export interface BoxSession {
+  id: string
+  userId: number
+  rewards: BoxReward[]
+  opened: number
+  claimed: boolean
+  createdAt: string
+}
+
+export interface UserStatus {
+  canPlayBox: boolean
+  boxSession: BoxSession[]
+}
+
+export interface StartGameResponse {
+  sessionId: string
+  boxes: number
+  maxOpens: number
+}
+
+export interface OpenCardResponse {
+  reward: BoxReward
 }
 
 export interface ApiError {
