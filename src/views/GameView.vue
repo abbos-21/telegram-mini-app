@@ -9,6 +9,7 @@ import { toast } from 'vue3-toastify'
 const loading = ref<boolean>(false)
 const canPlay = ref<boolean>(false)
 const invoiceLink = ref<string | null>(null)
+const currentSessionId = ref<string | null>(null)
 
 const getStatus = async () => {
   try {
@@ -114,7 +115,17 @@ onMounted(async () => {
   /* =======================
      GAME SCENE
   ======================= */
-  k.scene('game', () => {
+  k.scene('game', async () => {
+    try {
+      currentSessionId.value = await carGameService.startGame()
+      // If successful, update local state so UI knows we consumed the ticket
+      canPlay.value = false
+    } catch {
+      toast.error('Could not start game session')
+      k.go('lose') // Go back to menu if server start fails
+      return
+    }
+
     k.setGravity(CONFIG.GRAVITY)
 
     let score = 0
@@ -358,9 +369,29 @@ onMounted(async () => {
       k.shake(16)
       k.play('crash')
       k.tween(music.volume, 0, 0.8, (v) => (music.volume = v))
-      await carGameService.reward({ coins: coins })
+
+      // 2. CLAIM REWARD USING SESSION ID
+      if (currentSessionId.value) {
+        try {
+          await carGameService.claimReward({
+            sessionId: currentSessionId.value,
+            coins: coins,
+            score: Math.floor(score),
+          })
+          toast.success(`Collected ${coins} coins!`)
+        } catch (err) {
+          console.error(err)
+          toast.error('Failed to save score')
+        }
+      }
+
+      // Reset session
+      currentSessionId.value = null
+
+      // Refresh invoice link for next round
       await getStatus()
       await getInvoiceLink()
+
       k.wait(1, async () => {
         k.go('lose', { score: Math.floor(score), coins })
       })

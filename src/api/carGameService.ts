@@ -7,8 +7,19 @@ export const carGameService = {
     return response.data
   },
 
-  reward: async (payload: { coins: number }): Promise<ApiResponse<null>> => {
-    const response = await apiClient.post<ApiResponse<null>>('/car-game/reward', payload)
+  // New Start Method
+  startGame: async (): Promise<string> => {
+    const response = await apiClient.post<ApiResponse<{ sessionId: string }>>('/car-game/start')
+    return response.data.data.sessionId
+  },
+
+  // Updated Reward Method
+  claimReward: async (payload: {
+    sessionId: string
+    coins: number
+    score: number
+  }): Promise<ApiResponse<null>> => {
+    const response = await apiClient.post<ApiResponse<null>>('/car-game/claim', payload)
     return response.data
   },
 }

@@ -127,9 +127,9 @@ const withdrawRate: number | undefined = inject('withdrawRate')
 
 /* -------------------- LIFECYCLE -------------------- */
 onMounted(async () => {
-  if (telegramUserId === 1031081189) {
-    alert('Hey, you must be the admin!')
-  }
+  // if (telegramUserId === 1031081189) {
+  //   alert('Hey, you must be the admin!')
+  // }
 
   await runChainUntilSuccess([sync, mine, getUserData])
 
