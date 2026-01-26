@@ -392,9 +392,7 @@ onMounted(async () => {
       await getStatus()
       await getInvoiceLink()
 
-      k.wait(1, async () => {
-        k.go('lose', { score: Math.floor(score), coins })
-      })
+      k.go('lose', { score: Math.floor(score), coins })
     })
 
     player.onCollide('coin', (c) => {

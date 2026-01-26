@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@adsgram/vue": "^1.0.2",
+    "@fingerprintjs/fingerprintjs-pro-vue-v3": "^1.5.0",
     "@tailwindcss/vite": "^4.1.14",
     "@twa-dev/sdk": "^8.0.2",
     "animate.css": "^4.1.1",
